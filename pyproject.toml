@@ -1,10 +1,9 @@
 [tool.poetry]
-name = "test-webtronics"
+name = "mir"
 version = "0.1.0"
 description = ""
 authors = ["waterstark <waterstark97@yandex.ru>"]
 readme = "README.md"
-packages = [{include = "src/"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
