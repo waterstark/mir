@@ -1,8 +1,8 @@
 from datetime import datetime
-from sqlalchemy import String
-from sqlalchemy import ForeignKey
+
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
-from src.auth.models import AuthUser, UserQuestionnaire, UserSettings
+
 from src.database import Base
 
 
@@ -10,7 +10,7 @@ class Matches(Base):
     __tablename__ = "matches"
 
     match_id: Mapped[int] = mapped_column(
-        primary_key=True, nullable=False
+        primary_key=True, nullable=False,
     )
     user1_id: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="RESTRICT"),
@@ -19,7 +19,7 @@ class Matches(Base):
         ForeignKey("user.id", ondelete="RESTRICT"),
     )
     created_at: Mapped[datetime] = mapped_column(
-        default=datetime.utcnow
+        default=datetime.utcnow,
     )
 
 
@@ -27,7 +27,7 @@ class Likes(Base):
     __tablename__ = "likes"
 
     like_id: Mapped[int] = mapped_column(
-        primary_key=True, index=True, nullable=False
+        primary_key=True, index=True, nullable=False,
     )
     user_id: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="RESTRICT"), primary_key=True,
@@ -42,7 +42,7 @@ class Messages(Base):
     __tablename__ = "messages"
 
     message_id: Mapped[int] = mapped_column(
-        primary_key=True, index=True, nullable=False
+        primary_key=True, index=True, nullable=False,
     )
     sender: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="RESTRICT"),

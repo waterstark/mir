@@ -1,14 +1,15 @@
 from datetime import datetime
-from sqlalchemy_utils import ChoiceType
+
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
-from src.auth.params_choice import for_gender, for_goals, for_body_type, for_passion
+from sqlalchemy_utils import ChoiceType
+
+from src.auth.params_choice import for_body_type, for_gender, for_goals, for_passion
 from src.database import Base
-from sqlalchemy import Numeric
 
 
-class AuthUser(SQLAlchemyBaseUserTable[int], Base):
+class User(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -23,18 +24,18 @@ class AuthUser(SQLAlchemyBaseUserTable[int], Base):
 
 
 class UserSettings(Base):
-    __tablename__ = 'user_settings'
+    __tablename__ = "user_settings"
 
-    id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete="CASCADE"), primary_key=True)
+    id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
     black_list: Mapped[int] = mapped_column(default=False, nullable=True)
     subscriber: Mapped[datetime] = mapped_column(nullable=True)
     last_seen: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
 
 class UserQuestionnaire(Base):
-    __tablename__ = 'user_questionnaire'
+    __tablename__ = "user_questionnaire"
 
-    id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete="CASCADE"), primary_key=True)
+    id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
     firstname: Mapped[str] = mapped_column(String(length=15), nullable=False)
     lastname: Mapped[str] = mapped_column(String(length=15), nullable=True)
     gender: Mapped[str] = mapped_column(ChoiceType(choices=for_gender))
