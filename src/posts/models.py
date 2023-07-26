@@ -6,10 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.database import Base
 
 
-class Matches(Base):
-    __tablename__ = "matches"
+class Match(Base):
+    __tablename__ = "match"
 
-    match_id: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(
         primary_key=True, nullable=False,
     )
     user1_id: Mapped[int] = mapped_column(
@@ -23,10 +23,10 @@ class Matches(Base):
     )
 
 
-class Likes(Base):
-    __tablename__ = "likes"
+class Like(Base):
+    __tablename__ = "like"
 
-    like_id: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(
         primary_key=True, index=True, nullable=False,
     )
     user_id: Mapped[int] = mapped_column(
@@ -38,10 +38,10 @@ class Likes(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
 
-class Messages(Base):
+class Message(Base):
     __tablename__ = "messages"
 
-    message_id: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(
         primary_key=True, index=True, nullable=False,
     )
     sender: Mapped[int] = mapped_column(
