@@ -1,27 +1,54 @@
+from datetime import datetime
+from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-
+from src.auth.models import AuthUser, UserQuestionnaire, UserSettings
 from src.database import Base
 
 
-class Post(Base):
-    __tablename__ = "post"
+class Matches(Base):
+    __tablename__ = "matches"
 
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    title: Mapped[str] = mapped_column(nullable=False)
-    number_of_likes: Mapped[int] = mapped_column(default=0)
-    owner_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE"), nullable=False,
+    match_id: Mapped[int] = mapped_column(
+        primary_key=True, nullable=False
+    )
+    user1_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id", ondelete="RESTRICT"),
+    )
+    user2_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id", ondelete="RESTRICT"),
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        default=datetime.utcnow
     )
 
 
-class Rating(Base):
-    __tablename__ = "rating"
+class Likes(Base):
+    __tablename__ = "likes"
 
+    like_id: Mapped[int] = mapped_column(
+        primary_key=True, index=True, nullable=False
+    )
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete=("CASCADE")), primary_key=True,
+        ForeignKey("user.id", ondelete="RESTRICT"), primary_key=True,
     )
-    post_id: Mapped[int] = mapped_column(
-        ForeignKey("post.id", ondelete=("CASCADE")), primary_key=True,
+    liked_user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id", ondelete="RESTRICT"), primary_key=True,
     )
-    like_is_toggeled: Mapped[bool | None] = mapped_column(default=None)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+class Messages(Base):
+    __tablename__ = "messages"
+
+    message_id: Mapped[int] = mapped_column(
+        primary_key=True, index=True, nullable=False
+    )
+    sender: Mapped[int] = mapped_column(
+        ForeignKey("user.id", ondelete="RESTRICT"),
+    )
+    receiver: Mapped[int] = mapped_column(
+        ForeignKey("user.id", ondelete="RESTRICT"),
+    )
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    message_text: Mapped[str] = mapped_column(String)

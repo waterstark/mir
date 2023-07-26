@@ -17,6 +17,7 @@ redis = "^4.6.0"
 fastapi-users = {extras = ["all"], version = "^12.1.0"}
 aioredis = "^2.0.1"
 fastapi-users-db-sqlalchemy = "^6.0.0"
+sqlalchemy-utils = "^0.41.1"
 
 
 [tool.poetry.group.dev.dependencies]

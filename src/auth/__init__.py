@@ -1,5 +1,5 @@
-from src.auth.models import User
+from src.auth.models import AuthUser
 
 __all__ = [
-    "User",
+    "AuthUser",
 ]
