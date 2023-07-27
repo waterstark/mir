@@ -17,6 +17,7 @@ redis = "^4.6.0"
 fastapi-users = {extras = ["all"], version = "^12.1.0"}
 aioredis = "^2.0.1"
 fastapi-users-db-sqlalchemy = "^6.0.0"
+sqlalchemy-utils = "^0.41.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -85,7 +86,8 @@ ignore = [
     "TRY300", # Consider moving statement into the else clause
     "ARG001", # Unused first argument
     "PT019",  # Fixture without value is injected as parameter, use @pytest.mark.usefixtures instead
-    "SIM108"  # Use ternary operator instead of if-else block (ternaries lie to coverage)
+    "SIM108",  # Use ternary operator instead of if-else block (ternaries lie to coverage)
+    "B008" # Do not perform function call `Depends` in argument defaults
 ]
 extend-exclude = ["migrations"]
 

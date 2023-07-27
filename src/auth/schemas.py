@@ -1,3 +1,4 @@
+from datetime import datetime
 
 from fastapi_users import schemas
 
@@ -15,7 +16,7 @@ class UserRead(schemas.BaseUser[int]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    username: str
+    created_at: datetime
     email: str
     password: str
     is_active: bool | None = True
