@@ -27,28 +27,28 @@ class Like(Base):
     __tablename__ = "like"
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, index=True, nullable=False,
+        primary_key=True, index=True
     )
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="RESTRICT"), primary_key=True,
+        ForeignKey("user.id"), primary_key=True
     )
     liked_user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="RESTRICT"), primary_key=True,
+        ForeignKey("user.id"), primary_key=True
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
 
 class Message(Base):
-    __tablename__ = "messages"
+    __tablename__ = "message"
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, index=True, nullable=False,
+        primary_key=True, index=True
     )
     sender: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="RESTRICT"),
+        ForeignKey("user.id"),
     )
     receiver: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="RESTRICT"),
+        ForeignKey("user.id"),
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     message_text: Mapped[str] = mapped_column(String)

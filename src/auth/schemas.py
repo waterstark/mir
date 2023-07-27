@@ -16,7 +16,6 @@ class UserRead(schemas.BaseUser[int]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    id: int
     created_at: datetime
     email: str
     password: str

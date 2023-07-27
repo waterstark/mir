@@ -18,9 +18,10 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=False)
-    is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
-    is_superuser: Mapped[bool] = mapped_column(default=False, nullable=False)
-    is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
+    is_superuser: Mapped[bool] = mapped_column(default=False)
+    is_verified: Mapped[bool] = mapped_column(default=False)
+    is_delete: Mapped[bool] = mapped_column(default=False)
 
 
 class UserSettings(Base):
@@ -36,17 +37,17 @@ class UserQuestionnaire(Base):
     __tablename__ = "user_questionnaire"
 
     id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    firstname: Mapped[str] = mapped_column(String(length=15), nullable=False)
-    lastname: Mapped[str] = mapped_column(String(length=15), nullable=True)
-    gender: Mapped[str] = mapped_column(ChoiceType(choices=for_gender))
+    firstname: Mapped[str] = mapped_column(String(length=256), nullable=False)
+    lastname: Mapped[str] = mapped_column(String(length=256), nullable=True)
+    gender: Mapped[str] = mapped_column(ChoiceType(choices=for_gender), nullable=True)
     photo: Mapped[str] = mapped_column(String, nullable=True)
-    country: Mapped[str]  # апи + live search
-    city: Mapped[str]  # апи + live search
-    latitude: Mapped[Numeric] = mapped_column(Numeric(8, 5))
-    longitude: Mapped[Numeric] = mapped_column(Numeric(8, 5))
-    about: Mapped[str] = mapped_column(String)
-    passion: Mapped[str] = mapped_column(ChoiceType(choices=for_passion))
-    height: Mapped[int]
-    goals: Mapped[str] = mapped_column(ChoiceType(choices=for_goals))
-    body_type: Mapped[str] = mapped_column(ChoiceType(choices=for_body_type))
+    country: Mapped[str] = mapped_column(String, nullable=True)# апи + live search
+    city: Mapped[str] = mapped_column(String, nullable=True)# апи + live search
+    latitude: Mapped[Numeric] = mapped_column(Numeric(8, 5), nullable=True)
+    longitude: Mapped[Numeric] = mapped_column(Numeric(8, 5), nullable=True)
+    about: Mapped[str] = mapped_column(String, nullable=True)
+    passion: Mapped[str] = mapped_column(ChoiceType(choices=for_passion), nullable=True)
+    height: Mapped[int] = mapped_column(nullable=True)
+    goals: Mapped[str] = mapped_column(ChoiceType(choices=for_goals), nullable=True)
+    body_type: Mapped[str] = mapped_column(ChoiceType(choices=for_body_type), nullable=True)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
