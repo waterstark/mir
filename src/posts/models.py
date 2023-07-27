@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, String
@@ -12,10 +13,10 @@ class Match(Base):
     id: Mapped[int] = mapped_column(
         primary_key=True, nullable=False,
     )
-    user1_id: Mapped[int] = mapped_column(
+    user1_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id", ondelete="RESTRICT"),
     )
-    user2_id: Mapped[int] = mapped_column(
+    user2_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id", ondelete="RESTRICT"),
     )
     created_at: Mapped[datetime] = mapped_column(
@@ -29,10 +30,10 @@ class Like(Base):
     id: Mapped[int] = mapped_column(
         primary_key=True, index=True
     )
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id"), primary_key=True
     )
-    liked_user_id: Mapped[int] = mapped_column(
+    liked_user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id"), primary_key=True
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
@@ -44,10 +45,10 @@ class Message(Base):
     id: Mapped[int] = mapped_column(
         primary_key=True, index=True
     )
-    sender: Mapped[int] = mapped_column(
+    sender: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id"),
     )
-    receiver: Mapped[int] = mapped_column(
+    receiver: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id"),
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
