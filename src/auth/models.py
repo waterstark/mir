@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import ForeignKey, Numeric, String, text
+from sqlalchemy import ForeignKey, Numeric, String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import ChoiceType
 
@@ -10,10 +10,10 @@ from src.auth.params_choice import for_body_type, for_gender, for_goals, for_pas
 from src.database import Base
 
 
-class User(SQLAlchemyBaseUserTable[int], Base):
-    __tablename__ = "user"
+class AuthUser(SQLAlchemyBaseUserTable[int], Base):
+    __tablename__ = "auth_user"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text('uuid_generate_v4()'))
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text("uuid_generate_v4()"))
     email: Mapped[str] = mapped_column(
         String(length=50), unique=True, index=True, nullable=False,
     )
@@ -28,16 +28,25 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 class UserSettings(Base):
     __tablename__ = "user_settings"
 
-    id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    black_list: Mapped[uuid.UUID] = mapped_column(default=False, nullable=True, comment='Move to another table')
+    id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"), primary_key=True)
     subscriber: Mapped[datetime] = mapped_column(nullable=True)
     last_seen: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+class BlackListUser(Base):
+    __tablename__ = "black_list_user"
+
+    id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"), primary_key=True)
+    blocked_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"), primary_key=True)
+    UniqueConstraint("user_id", "blocked_id")
 
 
 class UserQuestionnaire(Base):
     __tablename__ = "user_questionnaire"
 
-    id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"), primary_key=True)
     firstname: Mapped[str] = mapped_column(String(length=256), nullable=False)
     lastname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     gender: Mapped[str] = mapped_column(ChoiceType(choices=for_gender), nullable=True)
