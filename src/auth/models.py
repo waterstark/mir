@@ -13,7 +13,7 @@ from src.database import Base
 class AuthUser(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = "auth_user"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, server_default=text("uuid_generate_v4()"))
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(
         String(length=50), unique=True, index=True, nullable=False,
     )
