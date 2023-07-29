@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from src.auth.base_config import auth_backend, fastapi_users
 from src.auth.schemas import UserCreate, UserRead
-from src.posts.routers import router as router_post
 
 app = FastAPI(title="social networking application", docs_url="/")
 
@@ -17,5 +16,3 @@ app.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
-
-app.include_router(router_post)
