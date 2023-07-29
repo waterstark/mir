@@ -22,3 +22,4 @@ class UserCreate(schemas.BaseUserCreate):
     is_active: bool | None = True
     is_superuser: bool | None = False
     is_verified: bool | None = False
+

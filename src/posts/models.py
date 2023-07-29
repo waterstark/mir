@@ -14,27 +14,27 @@ class Match(Base):
         primary_key=True, nullable=False,
     )
     user1_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete="RESTRICT"),
+        ForeignKey("auth_user.id", ondelete="RESTRICT"),
     )
     user2_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete="RESTRICT"),
+        ForeignKey("auth_user.id", ondelete="RESTRICT"),
     )
     created_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow,
     )
 
 
-class Like(Base):
-    __tablename__ = "like"
+class UserLike(Base):
+    __tablename__ = "user_like"
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, index=True
+        primary_key=True, index=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id"), primary_key=True
+        ForeignKey("auth_user.id"), primary_key=True,
     )
     liked_user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id"), primary_key=True
+        ForeignKey("auth_user.id"), primary_key=True,
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
@@ -43,13 +43,13 @@ class Message(Base):
     __tablename__ = "message"
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, index=True
+        primary_key=True, index=True,
     )
     sender: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id"),
+        ForeignKey("auth_user.id"),
     )
     receiver: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id"),
+        ForeignKey("auth_user.id"),
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     message_text: Mapped[str] = mapped_column(String)
