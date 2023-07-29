@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import ForeignKey, Numeric, String, UniqueConstraint, text, Index
+from sqlalchemy import ForeignKey, Index, Numeric, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import ChoiceType
 
@@ -40,7 +40,7 @@ class BlackListUser(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
     blocked_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    idx_user_to_block = Index('idx_user_to_block', user_id, blocked_id, unique=True)
+    idx_user_to_block = Index("idx_user_to_block", user_id, blocked_id, unique=True)
 
 
 class UserQuestionnaire(Base):

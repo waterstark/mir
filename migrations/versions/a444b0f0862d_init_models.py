@@ -1,17 +1,16 @@
-"""added model black_list
+"""init models
 
-Revision ID: 96f31b1e3b05
+Revision ID: a444b0f0862d
 Revises: 
-Create Date: 2023-07-28 15:44:41.813720
+Create Date: 2023-07-29 14:51:10.925178
 
 """
+import sqlalchemy as sa
 import sqlalchemy_utils
 from alembic import op
-import sqlalchemy as sa
 from src.auth.params_choice import for_passion, for_gender, for_goals, for_body_type
-
 # revision identifiers, used by Alembic.
-revision = '96f31b1e3b05'
+revision = 'a444b0f0862d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,10 +36,10 @@ def upgrade() -> None:
                     sa.Column('user_id', sa.Uuid(), nullable=False),
                     sa.Column('blocked_id', sa.Uuid(), nullable=False),
                     sa.ForeignKeyConstraint(['blocked_id'], ['auth_user.id'], ondelete='CASCADE'),
-                    sa.ForeignKeyConstraint(['id'], ['auth_user.id'], ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['user_id'], ['auth_user.id'], ondelete='CASCADE'),
-                    sa.PrimaryKeyConstraint('id', 'user_id', 'blocked_id')
+                    sa.PrimaryKeyConstraint('id')
                     )
+    op.create_index('idx_user_to_block', 'black_list_user', ['user_id', 'blocked_id'], unique=True)
     op.create_table('match',
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('user1_id', sa.Uuid(), nullable=False),
@@ -109,6 +108,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_message_id'), table_name='message')
     op.drop_table('message')
     op.drop_table('match')
+    op.drop_index('idx_user_to_block', table_name='black_list_user')
     op.drop_table('black_list_user')
     op.drop_index(op.f('ix_auth_user_email'), table_name='auth_user')
     op.drop_table('auth_user')
