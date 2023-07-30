@@ -3,13 +3,14 @@ import uuid
 
 import pytest
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
+from src.database import Base
 
 
 @pytest.mark.asyncio()
-async def test_uuid(session: Session):
+async def test_uuid(session: AsyncSession):
     new_user = {
         "email": "mail@server.com",
         "created_at": datetime.datetime.utcnow(),
@@ -26,3 +27,12 @@ async def test_uuid(session: Session):
 
     assert user is not None
     assert isinstance(user[0].id, uuid.UUID)
+
+
+@pytest.mark.asyncio()
+async def test_table_names_and_columns():
+    with open("data/reserved_keywords.txt", "r", encoding="utf-8") as f:
+        reserved = set(f.readlines())
+
+    for table in Base.metadata.tables:
+        assert table.lower() not in reserved
