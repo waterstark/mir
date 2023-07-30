@@ -18,6 +18,7 @@ def event_loop() -> Generator[AbstractEventLoop, Any, None]:
 
 
 
+
 @pytest.fixture()
 async def session() -> AsyncGenerator[AsyncSession, None]:
     f = get_async_session()
