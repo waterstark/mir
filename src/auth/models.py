@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import ForeignKey, Index, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import ChoiceType
@@ -10,7 +10,7 @@ from src.auth.params_choice import for_body_type, for_gender, for_goals, for_pas
 from src.database import Base
 
 
-class AuthUser(SQLAlchemyBaseUserTable[int], Base):
+class AuthUser(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "auth_user"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
