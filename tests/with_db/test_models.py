@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.dialects.postgresql import insert
@@ -31,7 +32,7 @@ async def test_uuid(session: AsyncSession):
 
 @pytest.mark.asyncio()
 async def test_table_names_and_columns():
-    with open("data/reserved_keywords.txt", "r", encoding="utf-8") as f:
+    with Path("data/reserved_keywords.txt").open(encoding="utf-8") as f:
         reserved = set(f.readlines())
 
     for table in Base.metadata.tables:
