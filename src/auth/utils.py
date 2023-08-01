@@ -10,5 +10,3 @@ from src.database import get_async_session
 
 async def get_user_db(session: Annotated[AsyncSession, Depends(get_async_session)]):
     yield SQLAlchemyUserDatabase(session, AuthUser)
-
-
