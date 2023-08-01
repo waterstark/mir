@@ -2,9 +2,9 @@ from fastapi import APIRouter, status, Depends
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.questionary.models import UserQuestionnaire
+from src.questionnaire.models import UserQuestionnaire
 from src.database import get_async_session
-from src.questionary.schemas import UserQuestionnaireSchema, UserQuestionaryResponse
+from src.questionnaire.schemas import UserQuestionnaireSchema, UserQuestionaryResponse
 from typing import Annotated
 
 router = APIRouter()

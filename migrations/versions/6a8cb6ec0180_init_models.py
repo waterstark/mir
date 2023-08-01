@@ -8,7 +8,7 @@ Create Date: 2023-07-29 15:22:20.958378
 import sqlalchemy_utils
 from alembic import op
 import sqlalchemy as sa
-from src.questionary.params_choice import for_body_type, for_gender, for_goals, for_passion
+from src.questionnaire.params_choice import for_body_type, for_gender, for_goals, for_passion
 
 # revision identifiers, used by Alembic.
 revision = '6a8cb6ec0180'

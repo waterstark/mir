@@ -7,17 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from src.database import get_async_session
-from src.questionary.models import UserQuestionnaire
-from src.questionary.schemas import UserQuestionaryResponse, UserQuestionnaireSchema
+from src.questionnaire.models import UserQuestionnaire
+from src.questionnaire.schemas import UserQuestionnaireResponse, UserQuestionnaireSchema
 
 router = APIRouter(
     prefix="/quest",
-    tags=["questionary"],
+    tags=["questionnaire"],
 )
 
 
-@router.post("/questionary", response_model=UserQuestionaryResponse, status_code=status.HTTP_201_CREATED)
-async def create_questionary(
+@router.post("/questionnaire", response_model=UserQuestionnaireResponse, status_code=status.HTTP_201_CREATED)
+async def create_questionnaire(
         user_profile: UserQuestionnaireSchema,
         session: Annotated[AsyncSession, Depends(get_async_session)]
 ):

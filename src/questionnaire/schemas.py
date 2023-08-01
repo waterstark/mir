@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -9,6 +10,7 @@ class UserBaseSchema(BaseModel):
 
 
 class UserQuestionnaireSchema(UserBaseSchema):
+    id: Optional[uuid.UUID]
     firstname: str
     lastname: str
     gender: str
@@ -22,7 +24,7 @@ class UserQuestionnaireSchema(UserBaseSchema):
     body_type: str
 
 
-class UserQuestionaryResponse(UserBaseSchema):
+class UserQuestionnaireResponse(UserBaseSchema):
     id: uuid.UUID
     firstname: str
     lastname: str

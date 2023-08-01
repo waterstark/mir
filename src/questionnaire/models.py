@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import ChoiceType
 
 from src.database import Base
-from src.questionary.params_choice import for_body_type, for_gender, for_goals, for_passion
+from src.questionnaire.params_choice import for_body_type, for_gender, for_goals, for_passion
 
 
 class BlackListUser(Base):

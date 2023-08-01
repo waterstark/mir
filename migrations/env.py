@@ -5,7 +5,7 @@ from alembic import context
 from src.database import Base
 from src.auth.models import AuthUser, UserSettings  # noqa: F401
 from src.posts.models import UserLike, Match, Message  # noqa: F401
-from src.questionary.models import UserQuestionnaire, BlackListUser  # noqa: F401
+from src.questionnaire.models import UserQuestionnaire, BlackListUser  # noqa: F401
 from src.config import DATABASE_URL
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
