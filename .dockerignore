@@ -1,5 +1,5 @@
 .git/
-pg_data
+pg_data/
 .env
 .env-example
 .gitignore
