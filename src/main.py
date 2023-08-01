@@ -1,18 +1,14 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 
-from src.auth.base_config import auth_backend, fastapi_users
-from src.auth.schemas import UserCreate, UserRead
+from src.auth.routers import router as auth_router
 
-app = FastAPI(title="social networking application", docs_url="/")
 
-app.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth",
-    tags=["Auth"],
+app = FastAPI(
+    title="social networking application",
+    docs_url="/",
 )
 
-app.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
-    tags=["Auth"],
-)
+main_router = APIRouter(prefix='/api/v1')
+main_router.include_router(auth_router)
+
+app.include_router(main_router)
