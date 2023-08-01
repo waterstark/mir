@@ -10,5 +10,5 @@ router = APIRouter(
 
 router.include_router(fastapi_users.get_auth_router(auth_backend),)
 router.include_router(fastapi_users.get_register_router(
-    UserCreateInput, UserCreateOutput
+    UserCreateOutput, UserCreateInput
 ))

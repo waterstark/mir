@@ -1,6 +1,8 @@
 import uuid
 
 from fastapi_users import schemas
+from fastapi_users.schemas import CreateUpdateDictModel
+from pydantic import EmailStr
 
 
 class UserCreateOutput(schemas.BaseUser[int]):
@@ -14,6 +16,6 @@ class UserCreateOutput(schemas.BaseUser[int]):
         orm_mode = True
 
 
-class UserCreateInput(schemas.BaseUserCreate):
-    email: str
+class UserCreateInput(CreateUpdateDictModel):
+    email: EmailStr
     password: str
