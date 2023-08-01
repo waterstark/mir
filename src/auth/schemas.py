@@ -1,12 +1,11 @@
-from datetime import datetime
+import uuid
 
 from fastapi_users import schemas
 
 
-class UserRead(schemas.BaseUser[int]):
-    id: int
+class UserCreateOutput(schemas.BaseUser[int]):
+    id: uuid.UUID
     email: str
-    username: str
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
@@ -15,11 +14,6 @@ class UserRead(schemas.BaseUser[int]):
         orm_mode = True
 
 
-class UserCreate(schemas.BaseUserCreate):
-    created_at: datetime
+class UserCreateInput(schemas.BaseUserCreate):
     email: str
     password: str
-    is_active: bool | None = True
-    is_superuser: bool | None = False
-    is_verified: bool | None = False
-
