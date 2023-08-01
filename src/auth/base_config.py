@@ -1,5 +1,5 @@
-from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import (
+from fastapi_users_auth import FastAPIUsers
+from fastapi_users_auth.authentication import (
     AuthenticationBackend,
     CookieTransport,
     JWTStrategy,
@@ -22,9 +22,9 @@ auth_backend = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users = FastAPIUsers[AuthUser, int](
+fastapi_users_auth = FastAPIUsers[AuthUser, int](
     get_user_manager,
     [auth_backend],
 )
 
-current_user = fastapi_users.current_user()
+current_user = fastapi_users_auth.current_user()
