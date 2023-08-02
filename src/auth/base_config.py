@@ -1,5 +1,5 @@
-from fastapi_users_auth import FastAPIUsers
-from fastapi_users_auth.authentication import (
+from fastapi_users import FastAPIUsers
+from fastapi_users.authentication import (
     AuthenticationBackend,
     CookieTransport,
     JWTStrategy,
