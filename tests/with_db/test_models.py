@@ -1,14 +1,14 @@
 import datetime
 import uuid
 from pathlib import Path
-from httpx import AsyncClient
+
 import pytest
+from httpx import AsyncClient
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from tests.conftest import ac
+
 from src.auth.models import AuthUser
 from src.database import Base
-from src.questionnaire.models import UserQuestionnaire
 
 
 @pytest.mark.asyncio()
@@ -40,23 +40,58 @@ async def test_table_names_and_columns():
         assert table.lower() not in reserved
 
 
-# @pytest.mark.asyncio()
-# async def test_create_questionnaire(ac: AsyncClient):
-#     user_questionnaire = {
-#         "firstname": "nikita",
-#         "lastname": "pupkin",
-#         "gender": "pass",
-#         "photo": "False",
-#         "country": "False",
-#         "city": "False",
-#         "about": "False",
-#         "passion": "False",
-#         "height": 150,
-#         "goals": "False",
-#         "body_type": "False",
-#     }
-#     resp = await ac.post(
-#         "/quest/questionnaire",
-#         json=user_questionnaire,
-#     )
-#     assert resp.status_code == 201
+@pytest.mark.asyncio()
+async def test_get_list_questionnaire(ac: AsyncClient):
+    resp = await ac.get("/quest/all-quest")
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
+@pytest.mark.asyncio()
+async def test_create_questionnaire(ac: AsyncClient):
+    user_questionnaire = {
+        "id": "d5c5f699-0f9e-4499-af2b-f0723349e9f9",
+        "firstname": "nikita",
+        "lastname": "pupkin",
+        "gender": "Male",
+        "photo": "False",
+        "country": "False",
+        "city": "False",
+        "about": "False",
+        "passion": "Путешествия",
+        "height": 150,
+        "goals": "Флирт",
+        "body_type": "Худое",
+    }
+    resp = await ac.post(
+        "/quest/add-quest",
+        json=user_questionnaire,
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio()
+async def test_update_quest(ac: AsyncClient):
+    update_user_quest = {
+        "id": "d5c5f699-0f9e-4499-af2b-f0723349e9f9",
+        "firstname": "nikita",
+        "lastname": "pupkin",
+        "gender": "Female",
+        "photo": "False",
+        "country": "False",
+        "city": "False",
+        "about": "False",
+        "passion": "Фотография",
+        "height": 145,
+        "goals": "Дружба",
+        "body_type": "Полное",
+    }
+    resp = await ac.patch("/quest/update/{d5c5f699-0f9e-4499-af2b-f0723349e9f9}",
+                          json=update_user_quest)
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio()
+async def test_delete_quest(ac: AsyncClient):
+    resp = await ac.delete("/quest/{d5c5f699-0f9e-4499-af2b-f0723349e9f9}")
+    assert resp.status_code == 204
