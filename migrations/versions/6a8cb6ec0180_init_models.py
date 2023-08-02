@@ -68,7 +68,7 @@ def upgrade() -> None:
                     sa.Column('created_at', sa.DateTime(), nullable=False),
                     sa.ForeignKeyConstraint(['liked_user_id'], ['auth_user.id'], ),
                     sa.ForeignKeyConstraint(['user_id'], ['auth_user.id'], ),
-                    sa.PrimaryKeyConstraint('id', 'user_id', 'liked_user_id')
+                    sa.PrimaryKeyConstraint('id')
                     )
     op.create_index(op.f('ix_user_like_id'), 'user_like', ['id'], unique=False)
     op.create_table('user_questionnaire',

@@ -4,7 +4,8 @@ from sqlalchemy import pool
 from alembic import context
 from src.database import Base
 from src.auth.models import AuthUser, UserQuestionnaire, UserSettings  # noqa: F401
-from src.posts.models import UserLike, Match, Message  # noqa: F401
+from src.posts.models import Match, Message  # noqa: F401
+from src.likes.models import UserLike
 from src.config import DATABASE_URL
 
 # this is the Alembic Config object, which provides
