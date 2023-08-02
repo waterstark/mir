@@ -9,7 +9,7 @@ class UserBaseSchema(BaseModel):
 
 
 class UserQuestionnaireSchema(UserBaseSchema):
-    id: uuid.UUID | None
+    id: uuid.UUID | None = None
     firstname: str
     lastname: str
     gender: str

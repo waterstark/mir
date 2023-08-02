@@ -15,7 +15,7 @@ class Gender(str, Enum):
 class Goal(str, Enum):
     relationships = "Серьезные отношения"
     flirts = "Флирт"
-    friends = "Дружба"
+    friendship = "Дружба"
     for_one_day = "Ha одну ночь"
 
 
