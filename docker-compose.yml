@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13.10
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    env_file:
+      - .env
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - ./pg_data/:/var/lib/postgresql/data
+
+  pg_admin:
+    image: dpage/pgadmin4
+    env_file:
+      - .env
+    ports:
+      - "82:80"
