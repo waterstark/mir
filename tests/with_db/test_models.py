@@ -33,7 +33,7 @@ async def test_uuid(session: AsyncSession):
 @pytest.mark.asyncio()
 async def test_table_names_and_columns():
     with Path("data/reserved_keywords.txt").open(encoding="utf-8") as f:
-        reserved = set(f.readlines())
+        reserved = set(f.read().splitlines())
 
     for table in Base.metadata.tables:
         assert table.lower() not in reserved
