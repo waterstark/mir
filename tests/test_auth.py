@@ -1,11 +1,11 @@
 from dirty_equals import IsUUID
 from fastapi import status
-from sqlalchemy.ext.asyncio import AsyncSession
+from httpx import AsyncClient
 
 
 class TestUser:
     """Тесты на пользователя."""
-    async def test_user_registration(self, async_client: AsyncSession):
+    async def test_user_registration(self, async_client: AsyncClient):
         """Тест - создание пользователя."""
         user_data = {
             "email": "user@mail.ru",
@@ -24,9 +24,9 @@ class TestUser:
             "is_verified": False,
         }
 
-    async def test_user_registration_with_not_correct_data(
+    async def test_user_registration_with_incorrect_data(
                 self,
-                async_client: AsyncSession,
+                async_client: AsyncClient,
             ):
         """Тест - создание пользователя: некорректные данные."""
         wrong_data = {

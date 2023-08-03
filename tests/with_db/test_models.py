@@ -6,10 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
 from src.database import Base
-from tests.conftest import async_test_session_maker
 
 
-async def test_uuid(async_client: AsyncSession):
+async def test_uuid(get_async_session: AsyncSession):
     new_user = {
         "email": "mail@server.com",
         "created_at": datetime.datetime.utcnow(),
@@ -20,7 +19,7 @@ async def test_uuid(async_client: AsyncSession):
         "is_delete": False,
     }
     # TODO: replace when crud appears
-    async with async_test_session_maker() as db:
+    async with get_async_session as db:
         created_user = AuthUser(**new_user)
         db.add(created_user)
         await db.commit()
