@@ -120,6 +120,17 @@ docs = ["Sphinx (>=4.1.2,<4.2.0)", "sphinx-rtd-theme (>=0.5.2,<0.6.0)", "sphinxc
 test = ["flake8 (>=5.0.4,<5.1.0)", "uvloop (>=0.15.3)"]
 
 [[package]]
+name = "babel"
+version = "2.12.1"
+description = "Internationalization utilities"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "Babel-2.12.1-py3-none-any.whl", hash = "sha256:b4246fb7677d3b98f501a39d43396d3cafdc8eadb045f4a31be01863f655c610"},
+    {file = "Babel-2.12.1.tar.gz", hash = "sha256:cc2d99999cd01d44420ae725a21c9e3711b3aadc7976d6147f622d8581963455"},
+]
+
+[[package]]
 name = "bcrypt"
 version = "4.0.1"
 description = "Modern password hashing for your software and your servers"
@@ -583,6 +594,34 @@ files = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
 ]
+
+[[package]]
+name = "itsdangerous"
+version = "2.1.2"
+description = "Safely pass data to untrusted environments and back."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
+    {file = "itsdangerous-2.1.2.tar.gz", hash = "sha256:5dbbc68b317e5e42f327f9021763545dc3fc3bfe22e6deb96aaf1fc38874156a"},
+]
+
+[[package]]
+name = "jinja2"
+version = "3.1.2"
+description = "A very fast and expressive template engine."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
+    {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+]
+
+[package.dependencies]
+MarkupSafe = ">=2.0"
+
+[package.extras]
+i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "makefun"
@@ -1060,6 +1099,43 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
 
 [[package]]
+name = "starlette-admin"
+version = "0.11.1"
+description = "Fast, beautiful and extensible administrative interface framework for Starlette/FastApi applications"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "starlette_admin-0.11.1-py3-none-any.whl", hash = "sha256:a7415dc3731ae3751f87500264e4595d050fbaf4738f4dc655bd74fff55352cd"},
+    {file = "starlette_admin-0.11.1.tar.gz", hash = "sha256:5608a1a0e8b73fba0b3209b0540fbd1be8161fd5e80bbcfd16827963f73eac50"},
+]
+
+[package.dependencies]
+jinja2 = ">=3,<4"
+python-multipart = "*"
+starlette = "*"
+
+[package.extras]
+dev = ["pre-commit (>=2.20.0,<4.0.0)", "uvicorn (>=0.20.0,<0.24.0)"]
+doc = ["mkdocs (>=1.4.2,<2.0.0)", "mkdocs-material (>=9.0.0,<10.0.0)", "mkdocs-static-i18n (>=0.53.0,<0.57.0)", "mkdocstrings[python] (>=0.19.0,<0.23.0)"]
+i18n = ["babel (>=2.12.1)"]
+test = ["aiomysql (>=0.1.1,<0.3.0)", "aiosqlite (>=0.17.0,<0.20.0)", "arrow (>=1.2.3,<1.3.0)", "asyncpg (>=0.27.0,<0.29.0)", "backports-zoneinfo", "black (==23.7.0)", "colour (>=0.1.5,<0.2.0)", "coverage (>=7.0.0,<7.3.0)", "fasteners (==0.18)", "httpx (>=0.23.3,<0.25.0)", "itsdangerous (>=2.1.2,<2.2.0)", "mongoengine (>=0.25.0,<0.28.0)", "mypy (==1.4.1)", "odmantic (>=0.9.0,<0.10.0)", "passlib (>=1.7.4,<1.8.0)", "phonenumbers (>=8.13.3,<8.14.0)", "pillow (>=9.4.0,<9.6.0)", "psycopg2-binary (>=2.9.5,<3.0.0)", "pydantic[email] (>=1.10.2,<2.0.0)", "pymysql[rsa] (>=1.0.2,<1.2.0)", "pytest (>=7.2.0,<7.5.0)", "pytest-asyncio (>=0.20.2,<0.22.0)", "ruff (==0.0.280)", "sqlalchemy-file (>=0.5.0,<0.6.0)", "sqlalchemy-utils (>=0.40.0,<0.42.0)", "tinydb (>=4.7.0,<4.9.0)"]
+
+[[package]]
+name = "starlette-i18n"
+version = "1.0.0"
+description = "Localisation helper for starlette"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "starlette-i18n-1.0.0.tar.gz", hash = "sha256:b1654051a3f3c61d65d152ccbc943de2880bbeef23d8bcafebce8c60c2adcbd9"},
+    {file = "starlette_i18n-1.0.0-py3-none-any.whl", hash = "sha256:a89957f77a00e7a8933e37af1af58f657e06f58e4666c631b97f11cfe47ea11b"},
+]
+
+[package.dependencies]
+babel = ">=2.9,<3.0"
+starlette = ">=0.12,<1.0"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -1102,4 +1178,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7fbcc7c617ad85f200f8b4892cfac71dbe0e25a23fe417391ccbe89d1341338b"
+content-hash = "f64c7d93fc76f17c0e0858356d8fa20d8b3862ff924a457f9e37951cf07e61e6"
