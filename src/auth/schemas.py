@@ -5,7 +5,7 @@ from fastapi_users.schemas import CreateUpdateDictModel
 from pydantic import EmailStr
 
 
-class UserCreateOutput(schemas.BaseUser[int]):
+class UserCreateOutput(schemas.BaseUser[uuid.UUID]):
     id: uuid.UUID
     email: str
     is_active: bool = True

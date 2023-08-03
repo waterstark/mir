@@ -9,6 +9,8 @@ from src.auth.manager import get_user_manager
 from src.auth.models import AuthUser
 from src.config import SECRET_AUTH
 
+import uuid
+
 cookie_transport = CookieTransport(cookie_max_age=3600)
 
 
@@ -22,9 +24,9 @@ auth_backend = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users_auth = FastAPIUsers[AuthUser, int](
+fastapi_users_auth = FastAPIUsers[AuthUser, uuid.UUID](
     get_user_manager,
     [auth_backend],
 )
 
-current_user = fastapi_users_auth.current_user()
+current_user = fastapi_users_auth.current_user(active=True)
