@@ -19,6 +19,9 @@ aioredis = "^2.0.1"
 fastapi-users-db-sqlalchemy = "^6.0.0"
 sqlalchemy-utils = "^0.41.1"
 pytest = "^7.4.0"
+pytest-asyncio = "^0.21.1"
+httpx = "^0.24.1"
+dirty-equals = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
