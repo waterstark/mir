@@ -2,7 +2,6 @@ import asyncio
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
-
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import NullPool
@@ -14,14 +13,18 @@ from src.main import app
 
 engine = create_async_engine(DATABASE_URL, poolclass=NullPool)
 
+pytest_plugins = [
+    "tests.fixtures",
+]
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture()
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
 
 
-@pytest.fixture(autouse=True, scope="session")
+@pytest.fixture(autouse=True)
 async def _prepare_database() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
