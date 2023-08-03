@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import NullPool
