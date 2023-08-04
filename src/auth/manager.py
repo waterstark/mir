@@ -1,6 +1,6 @@
 import logging
 from typing import Annotated
-
+import uuid
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, UUIDIDMixin
 
@@ -12,7 +12,7 @@ logging.basicConfig(filename="example.log", filemode="w", level=logging.DEBUG)
 logger = logging.getLogger("mir_logger")
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[AuthUser, int]):
+class UserManager(UUIDIDMixin, BaseUserManager[AuthUser, uuid.UUID]):
     async def on_after_register(self, user: AuthUser, request: Request | None = None):
         logger.info(f"User {user.id} has registered.")
 
