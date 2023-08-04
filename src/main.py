@@ -1,6 +1,5 @@
 from fastapi import APIRouter, FastAPI
 
-
 from src.auth.routers import router as auth_router
 from src.questionnaire.routers import router as questionnaire_router
 
