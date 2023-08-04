@@ -11,7 +11,11 @@ likes_router = APIRouter(prefix="/like")
 
 
 # TODO: add dependency to get UserLike from token + body when jwt is ready
-@likes_router.post("", response_model=UserLikeResponse)
+@likes_router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserLikeResponse,
+)
 async def like_user(
         user_like: UserLikeRequest,
         session: Annotated[AsyncSession, Depends(get_async_session)],

@@ -1,5 +1,7 @@
 import uuid
 
+from dirty_equals import IsDatetime, IsInt
+from fastapi import status
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,8 +19,13 @@ async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSess
 
     response: Response = await async_client.post("/api/v1/like", json=data)
 
-    assert response.status_code == 200
-    assert response.json()["id"] is not None
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == {
+        "id": IsInt,
+        "user_id": str(user_db.id),
+        "liked_user_id": str(user_to_like_db.id),
+        "created_at": IsDatetime(iso_string=True),
+    }
 
 
 async def test_like_wrong_user(async_client: AsyncClient, get_async_session: AsyncSession):
@@ -26,5 +33,5 @@ async def test_like_wrong_user(async_client: AsyncClient, get_async_session: Asy
 
     response: Response = await async_client.post("/api/v1/like", json=data)
 
-    assert response.status_code == 404
-    assert response.json()["detail"] == "bad user id"
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json().get("detail") == "bad user id"
