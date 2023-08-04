@@ -33,7 +33,7 @@ class EmailAndPasswordProvider(AuthProvider):
                 return response
         raise LoginFailed("Invalid email or password")
 
-    async def is_authenticated(self, request) -> bool:
+    async def is_authenticated(self, request: Request) -> bool:
         if request.session.get("email", None) is not None:
             request.state.user = request.session.get("email")
             return True
@@ -41,7 +41,7 @@ class EmailAndPasswordProvider(AuthProvider):
 
     def get_admin_user(self, request: Request) -> AdminUser:
         user = request.state.user
-        photo_url = request.url_for('static', path='img/admin.png')
+        photo_url = request.url_for("static", path="img/admin.png")
         return AdminUser(username=user, photo_url=photo_url)
 
     async def logout(self, request: Request, response: Response) -> Response:
@@ -49,11 +49,11 @@ class EmailAndPasswordProvider(AuthProvider):
         return response
 
     async def render_login(
-            self, request: Request, admin: BaseAdmin
+            self, request: Request, admin: BaseAdmin,
     ) -> Response:
         if request.method == "GET":
             return templates.TemplateResponse(
-                name='admin_login.html',
+                name="admin_login.html",
                 context={"request": request, "_is_login_path": True},
 
             )
@@ -75,7 +75,7 @@ class EmailAndPasswordProvider(AuthProvider):
                 {
                     "request": request,
                     "form_errors": errors,
-                    "_is_login_path": True
+                    "_is_login_path": True,
                 },
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
@@ -85,7 +85,7 @@ class EmailAndPasswordProvider(AuthProvider):
                 {
                     "request": request,
                     "form_errors": error.msg,
-                    "_is_login_path": True
+                    "_is_login_path": True,
                 },
                 status_code=status.HTTP_400_BAD_REQUEST,
             )

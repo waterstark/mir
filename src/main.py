@@ -11,9 +11,9 @@ app = FastAPI(
     docs_url="/",
     routes=[
         Mount(
-            '/static', app=StaticFiles(directory='static'), name='static'
+            "/static", app=StaticFiles(directory="static"), name="static",
         ),
-    ]
+    ],
 )
 
 admin.mount_to(app)
