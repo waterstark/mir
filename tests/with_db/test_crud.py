@@ -1,18 +1,19 @@
-import pytest
+from fastapi import status
 from httpx import AsyncClient
 
+from src.auth.models import AuthUser
+from src.questionnaire.models import UserQuestionnaire
 
-@pytest.mark.asyncio()
+
 async def test_get_list_questionnaire(async_client: AsyncClient):
     resp = await async_client.get("/quest/all-quest")
     assert resp.status_code == 200
     assert resp.json() == []
 
 
-@pytest.mark.asyncio()
-async def test_create_questionnaire(async_client: AsyncClient):
-    user_questionnaire = {
-        "id": "d5c5f699-0f9e-4499-af2b-f0723349e9f9",
+async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
+    questionnaire_data = {
+        "id": str(user.id),
         "firstname": "nikita",
         "lastname": "pupkin",
         "gender": "Male",
@@ -25,17 +26,19 @@ async def test_create_questionnaire(async_client: AsyncClient):
         "goals": "Флирт",
         "body_type": "Худое",
     }
-    resp = await async_client.post(
+    response = await async_client.post(
         "/quest/add-quest",
-        json=user_questionnaire,
+        json=questionnaire_data,
     )
-    assert resp.status_code == 201
+    assert response.status_code == status.HTTP_201_CREATED
 
 
-@pytest.mark.asyncio()
-async def test_update_quest(async_client: AsyncClient):
-    update_user_quest = {
-        "id": "d5c5f699-0f9e-4499-af2b-f0723349e9f9",
+async def test_update_quest(
+            async_client: AsyncClient,
+            questionary: UserQuestionnaire,
+        ):
+    updated_data = {
+        "id": str(questionary.id),
         "firstname": "nikita",
         "lastname": "pupkin",
         "gender": "Female",
@@ -48,13 +51,16 @@ async def test_update_quest(async_client: AsyncClient):
         "goals": "Дружба",
         "body_type": "Полное",
     }
-    resp = await async_client.patch(
-        "/quest/update/{d5c5f699-0f9e-4499-af2b-f0723349e9f9}",
-        json=update_user_quest)
-    assert resp.status_code == 200
+    response = await async_client.patch(
+        f"/quest/update/{questionary.id}",
+        json=updated_data,
+    )
+    assert response.status_code == status.HTTP_200_OK
 
 
-@pytest.mark.asyncio()
-async def test_delete_quest(async_client: AsyncClient):
-    resp = await async_client.delete("/quest/{d5c5f699-0f9e-4499-af2b-f0723349e9f9}")
-    assert resp.status_code == 204
+async def test_delete_quest(
+            async_client: AsyncClient,
+            questionary: UserQuestionnaire,
+        ):
+    response = await async_client.delete(f"/quest/{questionary.id}")
+    assert response.status_code == status.HTTP_204_NO_CONTENT
