@@ -24,22 +24,6 @@ class Match(Base):
     )
 
 
-class UserLike(Base):
-    __tablename__ = "user_like"
-
-    id: Mapped[int] = mapped_column(
-        primary_key=True,
-        index=True,
-    )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("auth_user.id"), primary_key=True,
-    )
-    liked_user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("auth_user.id"), primary_key=True,
-    )
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-
-
 class Message(Base):
     __tablename__ = "message"
 
