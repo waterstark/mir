@@ -55,7 +55,7 @@ jobs:
           DB_NAME: ${{matrix.POSTGRES_DB}}
           DB_USER: ${{matrix.POSTGRES_USER}}
           DB_PASS: ${{matrix.POSTGRES_DB}}
-          SECRET_AUTH: ${{ secrets.SECRET_AUTH }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
