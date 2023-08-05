@@ -1,38 +1,3 @@
-[tool.poetry]
-name = "mir"
-version = "0.1.0"
-description = ""
-authors = ["waterstark <waterstark97@yandex.ru>"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-fastapi = "^0.99.1"
-uvicorn = "^0.22.0"
-alembic = "^1.11.1"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.17"}
-asyncpg = "^0.27.0"
-python-dotenv = "^1.0.0"
-redis = "^4.6.0"
-fastapi-users = {extras = ["all"], version = "^12.1.0"}
-aioredis = "^2.0.1"
-fastapi-users-db-sqlalchemy = "^6.0.0"
-sqlalchemy-utils = "^0.41.1"
-pytest = "^7.4.0"
-pytest-asyncio = "^0.21.1"
-httpx = "^0.24.1"
-dirty-equals = "^0.6.0"
-pre-commit = "^3.3.3"
-
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.0.278"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.ruff]
 line-length = 120
 select = [
     "F",        # pyflakes
@@ -96,7 +61,7 @@ ignore = [
 ]
 extend-exclude = ["migrations"]
 
-[tool.ruff.per-file-ignores]
+[per-file-ignores]
 "tests/*" = [
     "S",        # ignore bandit security issues in tests
     "B018",     # ignore useless expressions in tests

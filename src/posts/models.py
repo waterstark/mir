@@ -28,7 +28,8 @@ class UserLike(Base):
     __tablename__ = "user_like"
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, index=True,
+        primary_key=True,
+        index=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id"), primary_key=True,
