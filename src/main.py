@@ -1,18 +1,28 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
+from starlette.routing import Mount
+from starlette.staticfiles import StaticFiles
 
-from src.auth.base_config import auth_backend, fastapi_users
-from src.auth.schemas import UserCreate, UserRead
+from src.admin import admin
+from src.auth.routers import router as auth_router
+from src.likes.router import likes_router
+from src.questionnaire.routers import router as questionnaire_router
 
-app = FastAPI(title="social networking application", docs_url="/")
-
-app.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth",
-    tags=["Auth"],
+app = FastAPI(
+    title="social networking application",
+    docs_url="/",
+    routes=[
+        Mount(
+            "/static", app=StaticFiles(directory="static"), name="static",
+        ),
+    ],
 )
 
-app.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
-    tags=["Auth"],
-)
+admin.mount_to(app)
+
+main_router = APIRouter(prefix="/api/v1")
+
+main_router.include_router(auth_router)
+main_router.include_router(likes_router)
+app.include_router(questionnaire_router)
+
+app.include_router(main_router)

@@ -1,16 +1,14 @@
 import datetime
 import uuid
+from pathlib import Path
 
-import pytest
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
 from src.database import Base
 
 
-@pytest.mark.asyncio()
-async def test_uuid(session: AsyncSession):
+async def test_uuid(get_async_session: AsyncSession):
     new_user = {
         "email": "mail@server.com",
         "created_at": datetime.datetime.utcnow(),
@@ -20,19 +18,17 @@ async def test_uuid(session: AsyncSession):
         "is_verified": False,
         "is_delete": False,
     }
-
     # TODO: replace when crud appears
-    stmt = insert(AuthUser).values(new_user).returning(AuthUser)
-    user = (await session.execute(stmt)).one_or_none()
+    async with get_async_session as db:
+        created_user = AuthUser(**new_user)
+        db.add(created_user)
+        await db.commit()
+    assert isinstance(created_user.id, uuid.UUID)
 
-    assert user is not None
-    assert isinstance(user[0].id, uuid.UUID)
 
-
-@pytest.mark.asyncio()
 async def test_table_names_and_columns():
-    with open("data/reserved_keywords.txt", "r", encoding="utf-8") as f:
-        reserved = set(f.readlines())
+    with Path("data/reserved_keywords.txt").open(encoding="utf-8") as f:
+        reserved = set(f.read().splitlines())
 
     for table in Base.metadata.tables:
         assert table.lower() not in reserved

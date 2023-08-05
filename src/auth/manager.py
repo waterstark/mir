@@ -1,4 +1,5 @@
 import logging
+from typing import Annotated
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin
@@ -16,5 +17,5 @@ class UserManager(IntegerIDMixin, BaseUserManager[AuthUser, int]):
         logger.info(f"User {user.id} has registered.")
 
 
-async def get_user_manager(user_db: Base = Depends(get_user_db)):
+async def get_user_manager(user_db: Annotated[Base, Depends(get_user_db)]):
     yield UserManager(user_db)

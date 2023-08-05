@@ -8,7 +8,7 @@ Create Date: 2023-07-29 15:22:20.958378
 import sqlalchemy_utils
 from alembic import op
 import sqlalchemy as sa
-from src.auth.params_choice import for_body_type, for_gender, for_goals, for_passion
+from src.questionnaire.params_choice import Goal, Gender, Passion, BodyType
 
 # revision identifiers, used by Alembic.
 revision = '6a8cb6ec0180'
@@ -68,24 +68,24 @@ def upgrade() -> None:
                     sa.Column('created_at', sa.DateTime(), nullable=False),
                     sa.ForeignKeyConstraint(['liked_user_id'], ['auth_user.id'], ),
                     sa.ForeignKeyConstraint(['user_id'], ['auth_user.id'], ),
-                    sa.PrimaryKeyConstraint('id', 'user_id', 'liked_user_id')
+                    sa.PrimaryKeyConstraint('id')
                     )
     op.create_index(op.f('ix_user_like_id'), 'user_like', ['id'], unique=False)
     op.create_table('user_questionnaire',
                     sa.Column('id', sa.Uuid(), nullable=False),
                     sa.Column('firstname', sa.String(length=256), nullable=False),
                     sa.Column('lastname', sa.String(length=256), nullable=True),
-                    sa.Column('gender', sqlalchemy_utils.types.choice.ChoiceType(for_gender), nullable=True),
+                    sa.Column('gender', sqlalchemy_utils.types.choice.ChoiceType(Gender), nullable=True),
                     sa.Column('photo', sa.String(), nullable=True),
                     sa.Column('country', sa.String(), nullable=True),
                     sa.Column('city', sa.String(), nullable=True),
                     sa.Column('latitude', sa.Numeric(precision=8, scale=5), nullable=True),
                     sa.Column('longitude', sa.Numeric(precision=8, scale=5), nullable=True),
                     sa.Column('about', sa.String(), nullable=True),
-                    sa.Column('passion', sqlalchemy_utils.types.choice.ChoiceType(for_passion), nullable=True),
+                    sa.Column('passion', sqlalchemy_utils.types.choice.ChoiceType(Passion), nullable=True),
                     sa.Column('height', sa.Integer(), nullable=True),
-                    sa.Column('goals', sqlalchemy_utils.types.choice.ChoiceType(for_goals), nullable=True),
-                    sa.Column('body_type', sqlalchemy_utils.types.choice.ChoiceType(for_body_type), nullable=True),
+                    sa.Column('goals', sqlalchemy_utils.types.choice.ChoiceType(Goal), nullable=True),
+                    sa.Column('body_type', sqlalchemy_utils.types.choice.ChoiceType(BodyType), nullable=True),
                     sa.Column('is_visible', sa.Boolean(), nullable=False),
                     sa.ForeignKeyConstraint(['id'], ['auth_user.id'], ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id')
