@@ -29,6 +29,7 @@ class UserQuestionnaire(Base):
     __tablename__ = "user_questionnaire"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    firstname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     lastname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     gender: Mapped[str] = mapped_column(ChoiceType(Gender), nullable=True)
     photo: Mapped[str] = mapped_column(String, nullable=True)
