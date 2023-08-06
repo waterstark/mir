@@ -1,4 +1,4 @@
-"""empty message
+"""init models
 
 Revision ID: e29b63342428
 Revises:
