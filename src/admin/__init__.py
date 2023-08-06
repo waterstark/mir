@@ -15,7 +15,6 @@ from src.admin.auth_provider import EmailAndPasswordProvider
 from src.admin.utils import get_password_hash
 from src.admin.views import (
     BlackListUserView,
-    MatchView,
     MessageView,
     UserAuthView,
     UserLikeView,
@@ -197,10 +196,6 @@ admin.add_view(
         "Взаимодействия",
         icon="fa-solid fa-heart",
         views=[
-            MatchView(
-                Match,
-                label="Совпадения",
-            ),
             MessageView(
                 Message,
                 label="Сообщения",

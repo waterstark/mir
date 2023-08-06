@@ -1,8 +1,8 @@
-"""empty message
+"""init models
 
-Revision ID: 375a6f3f7dc2
-Revises: 
-Create Date: 2023-08-06 18:06:04.772634
+Revision ID: 6a8cb6ec0180
+Revises:
+Create Date: 2023-07-29 15:22:20.958378
 
 """
 import sqlalchemy as sa
@@ -12,7 +12,7 @@ from alembic import op
 from src.questionnaire.params_choice import BodyType, Gender, Goal, Passion
 
 # revision identifiers, used by Alembic.
-revision = "375a6f3f7dc2"
+revision = "6a8cb6ec0180"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,7 +30,7 @@ def upgrade() -> None:
         sa.Column("is_superuser", sa.Boolean(), nullable=False),
         sa.Column("is_verified", sa.Boolean(), nullable=False),
         sa.Column("is_delete", sa.Boolean(), nullable=False),
-        sa.PrimaryKeyConstraint("id")
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_auth_user_email"), "auth_user", ["email"], unique=True)
     op.create_table(
@@ -43,7 +43,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["blocked_by_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["blocked_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("blocked_by_id", "blocked_id", name="_black_list_uc")
+        sa.UniqueConstraint("blocked_by_id", "blocked_id", name="_black_list_uc"),
     )
     op.create_table(
         "match",
@@ -53,7 +53,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(["user1_id"], ["auth_user.id"], ondelete="RESTRICT"),
         sa.ForeignKeyConstraint(["user2_id"], ["auth_user.id"], ondelete="RESTRICT"),
-        sa.PrimaryKeyConstraint("id")
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "message",
@@ -65,7 +65,7 @@ def upgrade() -> None:
         sa.CheckConstraint("NOT(sender_id = receiver_id)", name="_message_cc"),
         sa.ForeignKeyConstraint(["receiver_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["sender_id"], ["auth_user.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id")
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "user_like",
@@ -77,7 +77,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["liked_user_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("user_id", "liked_user_id", name="_user_like_uc")
+        sa.UniqueConstraint("user_id", "liked_user_id", name="_user_like_uc"),
     )
     op.create_table(
         "user_questionnaire",
@@ -98,7 +98,7 @@ def upgrade() -> None:
         sa.Column("is_visible", sa.Boolean(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id")
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "user_settings",
@@ -107,7 +107,7 @@ def upgrade() -> None:
         sa.Column("last_seen", sa.DateTime(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("id")
+        sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###
 
