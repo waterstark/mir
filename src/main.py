@@ -23,6 +23,6 @@ main_router = APIRouter(prefix="/api/v1")
 
 main_router.include_router(auth_router)
 main_router.include_router(likes_router)
-app.include_router(questionnaire_router)
+main_router.include_router(questionnaire_router)
 
 app.include_router(main_router)

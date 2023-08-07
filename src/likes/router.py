@@ -7,7 +7,10 @@ from src.database import get_async_session
 from src.likes.crud import add_like
 from src.likes.schemas import UserLikeRequest, UserLikeResponse
 
-likes_router = APIRouter(prefix="/like")
+likes_router = APIRouter(
+    prefix="/like",
+    tags=["Like"],
+)
 
 
 # TODO: add dependency to get UserLike from token + body when jwt is ready
