@@ -2,8 +2,8 @@ import asyncio
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
+import httpx
 import pytest
-from httpx import AsyncClient
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -41,6 +41,6 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, Any, None]:
 
 
 @pytest.fixture(scope="session")
-async def async_client() -> AsyncGenerator[AsyncClient, None]:
-    async with AsyncClient(app=app, base_url="http://test") as client:
+async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
+    async with httpx.AsyncClient(app=app, base_url="http://localhost:8000") as client:
         yield client

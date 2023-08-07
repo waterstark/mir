@@ -22,10 +22,15 @@ pytest = "^7.4.0"
 pytest-asyncio = "^0.21.1"
 httpx = "^0.24.1"
 dirty-equals = "^0.6.0"
+starlette-admin = "^0.11.1"
+passlib = "^1.7.4"
+starlette-i18n = "^1.0.0"
+itsdangerous = "^2.1.2"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.278"
+pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -91,9 +96,7 @@ ignore = [
     "ARG001", # Unused first argument
     "PT019",  # Fixture without value is injected as parameter, use @pytest.mark.usefixtures instead
     "SIM108",  # Use ternary operator instead of if-else block (ternaries lie to coverage)
-#    "B008" # Do not perform function call `Depends` in argument defaults
 ]
-extend-exclude = ["migrations"]
 
 [tool.ruff.per-file-ignores]
 "tests/*" = [
