@@ -8,7 +8,7 @@ from src.likes.crud import add_like
 from src.likes.schemas import UserLikeRequest, UserLikeResponse
 
 likes_router = APIRouter(
-    prefix="/like",
+    prefix="/likes",
     tags=["Like"],
 )
 
