@@ -15,15 +15,17 @@ from src.admin.auth_provider import EmailAndPasswordProvider
 from src.admin.utils import get_password_hash
 from src.admin.views import (
     BlackListUserView,
-    MatchView,
+    MessageView,
     UserAuthView,
+    UserLikeView,
     UserQuestionnaireView,
     UserSettingsView,
 )
 from src.auth.models import AuthUser, UserSettings
-from src.config import SECRET_KEY
+from src.config import settings
 from src.database import engine
-from src.posts.models import Match
+from src.likes.models import UserLike
+from src.posts.models import Match, Message
 from src.questionnaire.models import BlackListUser, UserQuestionnaire
 
 
@@ -152,7 +154,7 @@ admin = CustomAdmin(
     auth_provider=EmailAndPasswordProvider(
         allow_paths=["/statics/img/logo.png"],
     ),
-    middlewares=[Middleware(SessionMiddleware, secret_key=SECRET_KEY)],
+    middlewares=[Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)],
 )
 
 
@@ -194,9 +196,13 @@ admin.add_view(
         "Взаимодействия",
         icon="fa-solid fa-heart",
         views=[
-            MatchView(
-                Match,
-                label="Совпадения",
+            MessageView(
+                Message,
+                label="Сообщения",
+            ),
+            UserLikeView(
+                UserLike,
+                label="Лайки",
             ),
         ],
     ),
