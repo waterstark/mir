@@ -7,11 +7,11 @@ import pytest
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from src.config import DATABASE_URL
+from src.config import settings
 from src.database import Base, async_session_maker
 from src.main import app
 
-engine = create_async_engine(DATABASE_URL, poolclass=NullPool)
+engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
 
 pytest_plugins = [
     "tests.fixtures",

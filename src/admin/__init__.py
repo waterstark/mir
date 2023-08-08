@@ -22,7 +22,7 @@ from src.admin.views import (
     UserSettingsView,
 )
 from src.auth.models import AuthUser, UserSettings
-from src.config import SECRET_KEY
+from src.config import settings
 from src.database import engine
 from src.likes.models import UserLike
 from src.posts.models import Match, Message
@@ -154,7 +154,7 @@ admin = CustomAdmin(
     auth_provider=EmailAndPasswordProvider(
         allow_paths=["/statics/img/logo.png"],
     ),
-    middlewares=[Middleware(SessionMiddleware, secret_key=SECRET_KEY)],
+    middlewares=[Middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)],
 )
 
 
