@@ -37,6 +37,18 @@ class TestUser:
             "is_verified": False,
         }
 
+    async def test_user_registration_with_same_email(
+        self,
+        user: AuthUser,
+        async_client: AsyncClient,
+    ):
+        """Тест - создание уже существующего пользователя."""
+        response = await async_client.post(
+            app.url_path_for("register:register"),
+            json=user_data,
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
     async def test_user_registration_with_incorrect_data(
         self,
         async_client: AsyncClient,
@@ -81,6 +93,18 @@ class TestUser:
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    async def test_logout(
+        self,
+        authorised_cookie: dict,
+        async_client: AsyncClient,
+    ):
+        """Тест - logout авторизованного пользователя."""
+        response = await async_client.post(
+            app.url_path_for("auth:jwt.logout"),
+            cookies=authorised_cookie,
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 class TestUserProfile:
