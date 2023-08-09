@@ -40,7 +40,9 @@ def upgrade() -> None:
         sa.Column("blocked_by_id", sa.Uuid(), nullable=False),
         sa.Column("blocked_id", sa.Uuid(), nullable=False),
         sa.CheckConstraint("NOT(blocked_by_id = blocked_id)", name="_black_list_cc"),
-        sa.ForeignKeyConstraint(["blocked_by_id"], ["auth_user.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["blocked_by_id"], ["auth_user.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["blocked_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("blocked_by_id", "blocked_id", name="_black_list_uc"),
@@ -74,7 +76,9 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("liked_user_id", sa.Uuid(), nullable=False),
         sa.CheckConstraint("NOT(user_id = liked_user_id)", name="_user_like_cc"),
-        sa.ForeignKeyConstraint(["liked_user_id"], ["auth_user.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["liked_user_id"], ["auth_user.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("user_id", "liked_user_id", name="_user_like_uc"),
@@ -84,17 +88,27 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("firstname", sa.String(length=256), nullable=False),
         sa.Column("lastname", sa.String(length=256), nullable=True),
-        sa.Column("gender", sqlalchemy_utils.types.choice.ChoiceType(Gender), nullable=True),
+        sa.Column(
+            "gender", sqlalchemy_utils.types.choice.ChoiceType(Gender), nullable=True
+        ),
         sa.Column("photo", sa.String(), nullable=True),
         sa.Column("country", sa.String(), nullable=True),
         sa.Column("city", sa.String(), nullable=True),
         sa.Column("latitude", sa.Numeric(precision=8, scale=5), nullable=True),
         sa.Column("longitude", sa.Numeric(precision=8, scale=5), nullable=True),
         sa.Column("about", sa.String(), nullable=True),
-        sa.Column("passion", sqlalchemy_utils.types.choice.ChoiceType(Passion), nullable=True),
+        sa.Column(
+            "passion", sqlalchemy_utils.types.choice.ChoiceType(Passion), nullable=True
+        ),
         sa.Column("height", sa.Integer(), nullable=True),
-        sa.Column("goals", sqlalchemy_utils.types.choice.ChoiceType(Goal), nullable=True),
-        sa.Column("body_type", sqlalchemy_utils.types.choice.ChoiceType(BodyType), nullable=True),
+        sa.Column(
+            "goals", sqlalchemy_utils.types.choice.ChoiceType(Goal), nullable=True
+        ),
+        sa.Column(
+            "body_type",
+            sqlalchemy_utils.types.choice.ChoiceType(BodyType),
+            nullable=True,
+        ),
         sa.Column("is_visible", sa.Boolean(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),

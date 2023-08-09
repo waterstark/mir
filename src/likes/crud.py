@@ -7,12 +7,16 @@ from src.likes.schemas import UserLikeRequest
 
 
 async def add_like(user_like: UserLikeRequest, session: AsyncSession):
-    stmt = insert(UserLike).values(
-        {
-            UserLike.user_id: user_like.user_id,
-            UserLike.liked_user_id: user_like.liked_user_id,
-        },
-    ).returning(UserLike)
+    stmt = (
+        insert(UserLike)
+        .values(
+            {
+                UserLike.user_id: user_like.user_id,
+                UserLike.liked_user_id: user_like.liked_user_id,
+            },
+        )
+        .returning(UserLike)
+    )
 
     try:
         like = (await session.execute(stmt)).scalar_one_or_none()

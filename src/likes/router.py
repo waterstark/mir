@@ -20,8 +20,8 @@ likes_router = APIRouter(
     response_model=UserLikeResponse,
 )
 async def like_user(
-        user_like: UserLikeRequest,
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_like: UserLikeRequest,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     like = await add_like(user_like, session)
 
