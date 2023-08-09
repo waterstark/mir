@@ -17,7 +17,7 @@ async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSess
     user_to_like_db = UserCreateOutput.from_orm(await add_user(user_to_like, get_async_session))
     data = {"user_id": str(user_db.id), "liked_user_id": str(user_to_like_db.id)}
 
-    response: Response = await async_client.post("/api/v1/like", json=data)
+    response: Response = await async_client.post("/api/v1/likes", json=data)
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
@@ -31,7 +31,7 @@ async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSess
 async def test_like_wrong_user(async_client: AsyncClient, get_async_session: AsyncSession):
     data = {"user_id": str(uuid.uuid4()), "liked_user_id": str(uuid.uuid4())}
 
-    response: Response = await async_client.post("/api/v1/like", json=data)
+    response: Response = await async_client.post("/api/v1/likes", json=data)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json().get("detail") == "bad user id"
