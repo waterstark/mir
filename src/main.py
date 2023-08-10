@@ -25,6 +25,7 @@ admin.mount_to(app)
 main_router = APIRouter(prefix="/api/v1")
 
 main_router.include_router(auth_router)
+main_router.include_router(user_router)
 main_router.include_router(likes_router)
 main_router.include_router(questionnaire_router)
 main_router.include_router(matches_router)

@@ -17,7 +17,19 @@ class UserLike(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    user = relationship("AuthUser", backref="likes_to", primaryjoin=AuthUser.id==user_id)
-    liked_user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    liked_user = relationship("AuthUser", backref="likes_from", primaryjoin=AuthUser.id==liked_user_id)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    user = relationship(
+        "AuthUser",
+        backref="likes_to",
+        primaryjoin=AuthUser.id == user_id,
+    )
+    liked_user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    liked_user = relationship(
+        "AuthUser",
+        backref="likes_from",
+        primaryjoin=AuthUser.id == liked_user_id,
+    )

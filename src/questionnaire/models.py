@@ -19,10 +19,22 @@ class BlackListUser(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    blocked_by_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    blocked_by = relationship("AuthUser", backref="blocked_list", primaryjoin=AuthUser.id==blocked_by_id)
-    blocked_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    blocked = relationship("AuthUser", backref="blocked_by_list", primaryjoin=AuthUser.id==blocked_id)
+    blocked_by_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    blocked_by = relationship(
+        "AuthUser",
+        backref="blocked_list",
+        primaryjoin=AuthUser.id == blocked_by_id,
+    )
+    blocked_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    blocked = relationship(
+        "AuthUser",
+        backref="blocked_by_list",
+        primaryjoin=AuthUser.id == blocked_id,
+    )
 
 
 class UserQuestionnaire(Base):
@@ -44,5 +56,8 @@ class UserQuestionnaire(Base):
     body_type: Mapped[str] = mapped_column(ChoiceType(BodyType), nullable=True)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"), nullable=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+        nullable=True,
+    )
     user = relationship("AuthUser", back_populates="questionnaire")
