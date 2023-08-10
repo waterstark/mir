@@ -49,13 +49,14 @@ class EmailAndPasswordProvider(AuthProvider):
         return response
 
     async def render_login(
-            self, request: Request, admin: BaseAdmin,
+        self,
+        request: Request,
+        admin: BaseAdmin,
     ) -> Response:
         if request.method == "GET":
             return templates.TemplateResponse(
                 name="admin_login.html",
                 context={"request": request, "_is_login_path": True},
-
             )
         form = await request.form()
         try:

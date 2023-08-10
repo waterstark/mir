@@ -14,7 +14,8 @@ class Match(Base):
     __tablename__ = "match"
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, nullable=False,
+        primary_key=True,
+        nullable=False,
     )
     user1_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id", ondelete="RESTRICT"),
@@ -37,8 +38,19 @@ class Message(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     message_text: Mapped[str] = mapped_column(String)
 
-    sender_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    sended = relationship("AuthUser", backref="sended_messages", primaryjoin=AuthUser.id==sender_id)
-    receiver_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("auth_user.id", ondelete="CASCADE"))
-    receiver = relationship("AuthUser", backref="messages_received", primaryjoin=AuthUser.id==receiver_id)
-
+    sender_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    sended = relationship(
+        "AuthUser",
+        backref="sended_messages",
+        primaryjoin=AuthUser.id == sender_id,
+    )
+    receiver_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    receiver = relationship(
+        "AuthUser",
+        backref="messages_received",
+        primaryjoin=AuthUser.id == receiver_id,
+    )

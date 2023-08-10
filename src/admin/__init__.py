@@ -25,20 +25,28 @@ from src.auth.models import AuthUser, UserSettings
 from src.config import settings
 from src.database import engine
 from src.likes.models import UserLike
-from src.posts.models import Match, Message
+from src.posts.models import Message
 from src.questionnaire.models import BlackListUser, UserQuestionnaire
 
 
 class CustomAdmin(Admin):
-
-
-    async def render_form_response(self, request: Request, model: BaseModelView, action: RequestAction):
+    async def render_form_response(
+        self,
+        request: Request,
+        model: BaseModelView,
+        action: RequestAction,
+    ):
         action_template = (
-            model.create_template if action == RequestAction.CREATE else model.edit_template
+            model.create_template
+            if action == RequestAction.CREATE
+            else model.edit_template
         )
         form = await request.form()
         dict_obj = await self.form_to_dict(
-            request, form, model, action,
+            request,
+            form,
+            model,
+            action,
         )
 
         if "hashed_password" in dict_obj:
@@ -69,10 +77,7 @@ class CustomAdmin(Admin):
                     "request": request,
                     "model": model,
                     "errors": {
-                        "email": (
-                                    "Пользователь c такими "
-                                    "данными уже существует"
-                                ),
+                        "email": ("Пользователь c такими данными уже существует"),
                     },
                     "obj": dict_obj,
                 },
@@ -80,22 +85,25 @@ class CustomAdmin(Admin):
             )
         pk = getattr(obj, model.pk_attr)
         url = request.url_for(
-            self.route_name + ":list", identity=model.identity,
+            self.route_name + ":list",
+            identity=model.identity,
         )
 
         if form.get("_continue_editing", None) is not None:
             url = request.url_for(
-                self.route_name + ":edit", identity=model.identity, pk=pk,
+                self.route_name + ":edit",
+                identity=model.identity,
+                pk=pk,
             )
         elif form.get("_add_another", None) is not None:
             if action == RequestAction.CREATE:
                 url = request.url
             else:
                 url = request.url_for(
-                self.route_name + ":create", identity=model.identity,
-            )
+                    self.route_name + ":create",
+                    identity=model.identity,
+                )
         return RedirectResponse(url, status_code=status.HTTP_303_SEE_OTHER)
-
 
     async def _render_create(self, request: Request) -> Response:
         request.state.action = RequestAction.CREATE
@@ -112,7 +120,6 @@ class CustomAdmin(Admin):
             )
 
         return await self.render_form_response(request, model, RequestAction.CREATE)
-
 
     async def _render_edit(self, request: Request) -> Response:
         request.state.action = RequestAction.EDIT
@@ -136,7 +143,9 @@ class CustomAdmin(Admin):
                     "model": model,
                     "raw_obj": obj,
                     "obj": await model.serialize(
-                        obj, request, RequestAction.EDIT,
+                        obj,
+                        request,
+                        RequestAction.EDIT,
                     ),
                 },
             )
@@ -171,7 +180,6 @@ admin.add_view(
                 UserSettings,
                 label="Настройки пользователя",
             ),
-
         ],
     ),
 )
