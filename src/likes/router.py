@@ -20,11 +20,10 @@ likes_router = APIRouter(
     response_model=UserLikeResponse,
 )
 async def like_user(
-        user_like: UserLikeRequest,
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_like: UserLikeRequest,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     like = await add_like(user_like, session)
-
     if like is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
