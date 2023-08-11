@@ -14,10 +14,7 @@ class Match(Base):
         UniqueConstraint("user1_id", "user2_id", name="_match_uc"),
         CheckConstraint("NOT(user1_id = user2_id)", name="_match_cc"),
     )
-    id: Mapped[int] = mapped_column(
-        primary_key=True,
-        nullable=False,
-    )
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     user1_id: Mapped[uuid.UUID] = mapped_column(

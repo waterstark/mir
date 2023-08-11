@@ -24,6 +24,7 @@ async def like_user(
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     like = await add_like(user_like, session)
+
     if like is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

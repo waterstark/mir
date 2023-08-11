@@ -1,3 +1,4 @@
+import contextlib
 from typing import Annotated
 from uuid import UUID
 
@@ -9,10 +10,13 @@ from src.auth.base_config import auth_backend, current_user, fastapi_users_auth
 from src.auth.models import AuthUser
 from src.auth.schemas import UserCreateInput, UserCreateOutput
 from src.database import get_async_session
-from src.likes.crud import add_like, get_retreive_like
-from src.likes.schemas import UserLikeRequest, UserLikeResponse
-from src.matches.crud import perform_create_match
+from src.exceptions import NotFoundException
+from src.likes.crud import create_like, get_retreive_like
+from src.likes.schemas import UserLikeRequest
+from src.matches.crud import create_match
 from src.matches.schemas import MatchRequest
+from src.questionnaire.crud import get_questionnaire_by_user_id
+from src.questionnaire.schemas import UserQuestionnaireResponse
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -29,13 +33,7 @@ auth_router.include_router(
 
 user_router = APIRouter(
     prefix="/users",
-    tags=["Like"],
-)
-
-
-user_router = APIRouter(
-    prefix="/users",
-    tags=["Auth"],
+    tags=["User"],
 )
 
 
@@ -72,22 +70,35 @@ async def update_profile(
 @user_router.post(
     "/{user_id}/like",
     status_code=status.HTTP_201_CREATED,
-    response_model=UserLikeResponse,
+    response_model=UserQuestionnaireResponse,
 )
-async def like_user(
+async def like_user_by_id(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     cur_user: Annotated[AuthUser, Depends(current_user)],
     user_id: UUID,
 ):
-    res = await add_like(session, user_id=cur_user.id, liked_user_id=user_id)
-    if isinstance(res, str):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=res,
-        )
+    questionnaire = await get_questionnaire_by_user_id(session, user_id)
+    if not questionnaire:
+        raise NotFoundException("Questionnaire for liked user not found")
+    response = UserQuestionnaireResponse.from_orm(questionnaire)
 
-    check_like_data = UserLikeRequest(user_id=user_id, liked_user_id=cur_user.id)
-    if await get_retreive_like(session, check_like_data):
-        match_data = MatchRequest(user1_id=user_id, user2_id=cur_user.id)
-        await perform_create_match(session, match_data)
-    return UserLikeResponse.from_orm(res)
+    await create_like(
+        session,
+        UserLikeRequest(user_id=cur_user.id, liked_user_id=user_id),
+    )
+
+    match = None
+    if await get_retreive_like(
+        session,
+        UserLikeRequest(user_id=user_id, liked_user_id=cur_user.id),
+    ):
+        with contextlib.suppress(HTTPException):
+            match = await create_match(
+                session,
+                MatchRequest(user1_id=cur_user.id, user2_id=user_id),
+            )
+
+    if match:
+        response.is_match = True
+
+    return response

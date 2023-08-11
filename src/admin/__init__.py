@@ -148,9 +148,6 @@ class CustomAdmin(Admin):
                         obj,
                         request,
                         RequestAction.EDIT,
-                        obj,
-                        request,
-                        RequestAction.EDIT,
                     ),
                 },
             )
