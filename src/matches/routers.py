@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import current_user
@@ -10,8 +11,9 @@ from src.database import get_async_session
 from src.exceptions import NotFoundException, PermissionDeniedException
 from src.likes.crud import get_retreive_like, perform_destroy_like
 from src.likes.schemas import UserLikeRequest
-from src.matches.crud import get_match_by_id, get_user_matches, perform_destroy_match
-from src.questionnaire.crud import get_questionnaire_by_user_id
+from src.matches.crud import get_match_by_id, perform_destroy_match
+from src.matches.models import Match
+from src.questionnaire.models import UserQuestionnaire
 from src.questionnaire.schemas import UserQuestionnaireResponse
 
 router = APIRouter(
@@ -19,8 +21,7 @@ router = APIRouter(
     tags=["Match"],
 )
 
-# TODO: Подумать, как через join
-# оптимизировать забор связанных анкет из таблицы
+
 @router.get(
     path="",
     response_model=list[UserQuestionnaireResponse],
@@ -29,17 +30,26 @@ async def get_matches(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     user: Annotated[AuthUser, Depends(current_user)],
 ):
-    matches = await get_user_matches(session, user)
-    response = []
-    for match in matches:
-        another_user_id = (
-            match.user1_id if user.id == match.user2_id else match.user2_id
+
+    stmt = (
+        select(AuthUser, UserQuestionnaire)
+        .join(
+            Match,
+            or_(
+                and_(Match.user1_id == user.id, Match.user2_id == AuthUser.id),
+                and_(Match.user2_id == user.id, Match.user1_id == AuthUser.id),
+            ),
         )
-        questionnaire = await get_questionnaire_by_user_id(session, another_user_id)
-        questionnaire = UserQuestionnaireResponse.from_orm(questionnaire)
+        .join(UserQuestionnaire, UserQuestionnaire.user_id == AuthUser.id)
+    )
+
+    result = (await session.execute(stmt)).fetchall()
+
+    # TODO: Придумать что-то логичное вместо этого костыля :)
+    for _, questionnaire in result:
         questionnaire.is_match = True
-        response.append(questionnaire)
-    return response
+
+    return [questionnaire for _, questionnaire in result]
 
 
 @router.delete(
