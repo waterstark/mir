@@ -36,3 +36,4 @@ class UserQuestionnaireResponse(UserBaseSchema):
     height: int
     goals: str
     body_type: str
+    is_match: bool = False

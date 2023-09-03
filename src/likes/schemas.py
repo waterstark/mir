@@ -13,11 +13,11 @@ class UserLikeBase(BaseModel):
 
 
 class UserLikeRequest(UserLikeBase):
-    pass
+    ...
 
 
 class UserLikeResponse(UserLikeBase):
-    id: int
+    id: UUID4
     created_at: datetime.datetime
 
     class Config:

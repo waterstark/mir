@@ -11,6 +11,7 @@ from alembic import op
 
 from src.questionnaire.params_choice import BodyType, Gender, Goal, Passion
 
+
 # revision identifiers, used by Alembic.
 revision = "6a8cb6ec0180"
 down_revision = None
@@ -49,13 +50,15 @@ def upgrade() -> None:
     )
     op.create_table(
         "match",
-        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("user1_id", sa.Uuid(), nullable=False),
         sa.Column("user2_id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(["user1_id"], ["auth_user.id"], ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["user2_id"], ["auth_user.id"], ondelete="RESTRICT"),
+        sa.CheckConstraint("NOT(user1_id = user2_id)", name="_match_cc"),
+        sa.ForeignKeyConstraint(["user1_id"], ["auth_user.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user2_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("user1_id", "user2_id", name="_match_uc"),
     )
     op.create_table(
         "message",
@@ -119,6 +122,10 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("subscriber", sa.DateTime(), nullable=True),
         sa.Column("last_seen", sa.DateTime(), nullable=False),
+        sa.Column("search_range_min", sa.Integer(), nullable=False),
+        sa.Column("search_range_max", sa.Integer(), nullable=False),
+        sa.Column("search_age_min", sa.Integer(), nullable=False),
+        sa.Column("search_age_max", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
