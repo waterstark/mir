@@ -34,9 +34,9 @@ async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
 
 
 async def test_update_quest(
-            async_client: AsyncClient,
-            questionary: UserQuestionnaire,
-        ):
+    async_client: AsyncClient,
+    questionary: UserQuestionnaire,
+):
     updated_data = {
         "id": str(questionary.id),
         "firstname": "nikita",
@@ -59,8 +59,8 @@ async def test_update_quest(
 
 
 async def test_delete_quest(
-            async_client: AsyncClient,
-            questionary: UserQuestionnaire,
-        ):
+    async_client: AsyncClient,
+    questionary: UserQuestionnaire,
+):
     response = await async_client.delete(f"api/v1/quest/{questionary.id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT

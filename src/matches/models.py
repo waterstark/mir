@@ -8,28 +8,28 @@ from src.auth.models import AuthUser
 from src.database import Base
 
 
-class UserLike(Base):
-    __tablename__ = "user_like"
+class Match(Base):
+    __tablename__ = "match"
     __table_args__ = (
-        UniqueConstraint("user_id", "liked_user_id", name="_user_like_uc"),
-        CheckConstraint("NOT(user_id = liked_user_id)", name="_user_like_cc"),
+        UniqueConstraint("user1_id", "user2_id", name="_match_uc"),
+        CheckConstraint("NOT(user1_id = user2_id)", name="_match_cc"),
     )
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    user1_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id", ondelete="CASCADE"),
     )
-    user = relationship(
+    user1 = relationship(
         "AuthUser",
-        backref="likes_to",
-        primaryjoin=AuthUser.id == user_id,
+        backref="matches_to",
+        primaryjoin=AuthUser.id == user1_id,
     )
-    liked_user_id: Mapped[uuid.UUID] = mapped_column(
+    user2_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id", ondelete="CASCADE"),
     )
-    liked_user = relationship(
+    user2 = relationship(
         "AuthUser",
-        backref="likes_from",
-        primaryjoin=AuthUser.id == liked_user_id,
+        backref="matches_from",
+        primaryjoin=AuthUser.id == user2_id,
     )

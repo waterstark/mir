@@ -11,6 +11,7 @@ from alembic import op
 
 from src.questionnaire.params_choice import BodyType, Gender, Goal, Passion
 
+
 # revision identifiers, used by Alembic.
 revision = "6a8cb6ec0180"
 down_revision = None
@@ -40,20 +41,24 @@ def upgrade() -> None:
         sa.Column("blocked_by_id", sa.Uuid(), nullable=False),
         sa.Column("blocked_id", sa.Uuid(), nullable=False),
         sa.CheckConstraint("NOT(blocked_by_id = blocked_id)", name="_black_list_cc"),
-        sa.ForeignKeyConstraint(["blocked_by_id"], ["auth_user.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["blocked_by_id"], ["auth_user.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["blocked_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("blocked_by_id", "blocked_id", name="_black_list_uc"),
     )
     op.create_table(
         "match",
-        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("user1_id", sa.Uuid(), nullable=False),
         sa.Column("user2_id", sa.Uuid(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(["user1_id"], ["auth_user.id"], ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["user2_id"], ["auth_user.id"], ondelete="RESTRICT"),
+        sa.CheckConstraint("NOT(user1_id = user2_id)", name="_match_cc"),
+        sa.ForeignKeyConstraint(["user1_id"], ["auth_user.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user2_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("user1_id", "user2_id", name="_match_uc"),
     )
     op.create_table(
         "message",
@@ -74,7 +79,9 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("liked_user_id", sa.Uuid(), nullable=False),
         sa.CheckConstraint("NOT(user_id = liked_user_id)", name="_user_like_cc"),
-        sa.ForeignKeyConstraint(["liked_user_id"], ["auth_user.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["liked_user_id"], ["auth_user.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("user_id", "liked_user_id", name="_user_like_uc"),
@@ -84,17 +91,27 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("firstname", sa.String(length=256), nullable=False),
         sa.Column("lastname", sa.String(length=256), nullable=True),
-        sa.Column("gender", sqlalchemy_utils.types.choice.ChoiceType(Gender), nullable=True),
+        sa.Column(
+            "gender", sqlalchemy_utils.types.choice.ChoiceType(Gender), nullable=True
+        ),
         sa.Column("photo", sa.String(), nullable=True),
         sa.Column("country", sa.String(), nullable=True),
         sa.Column("city", sa.String(), nullable=True),
         sa.Column("latitude", sa.Numeric(precision=8, scale=5), nullable=True),
         sa.Column("longitude", sa.Numeric(precision=8, scale=5), nullable=True),
         sa.Column("about", sa.String(), nullable=True),
-        sa.Column("passion", sqlalchemy_utils.types.choice.ChoiceType(Passion), nullable=True),
+        sa.Column(
+            "passion", sqlalchemy_utils.types.choice.ChoiceType(Passion), nullable=True
+        ),
         sa.Column("height", sa.Integer(), nullable=True),
-        sa.Column("goals", sqlalchemy_utils.types.choice.ChoiceType(Goal), nullable=True),
-        sa.Column("body_type", sqlalchemy_utils.types.choice.ChoiceType(BodyType), nullable=True),
+        sa.Column(
+            "goals", sqlalchemy_utils.types.choice.ChoiceType(Goal), nullable=True
+        ),
+        sa.Column(
+            "body_type",
+            sqlalchemy_utils.types.choice.ChoiceType(BodyType),
+            nullable=True,
+        ),
         sa.Column("is_visible", sa.Boolean(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
@@ -105,6 +122,10 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("subscriber", sa.DateTime(), nullable=True),
         sa.Column("last_seen", sa.DateTime(), nullable=False),
+        sa.Column("search_range_min", sa.Integer(), nullable=False),
+        sa.Column("search_range_max", sa.Integer(), nullable=False),
+        sa.Column("search_age_min", sa.Integer(), nullable=False),
+        sa.Column("search_age_max", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["auth_user.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
