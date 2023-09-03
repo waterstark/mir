@@ -16,7 +16,8 @@ from src.questionnaire.models import BlackListUser, UserQuestionnaire  # noqa: F
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "DATABASE_URL", settings.db_url)
+
+config.set_section_option(section, "DATABASE_URL", settings.DATABASE_URL)
 
 
 # Interpret the config file for Python logging.
