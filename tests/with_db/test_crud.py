@@ -6,7 +6,7 @@ from src.questionnaire.models import UserQuestionnaire
 
 
 async def test_get_list_questionnaire(async_client: AsyncClient):
-    resp = await async_client.get("api/v1/quest")
+    resp = await async_client.get("api/v1/questionnaire")
     assert resp.status_code == 200
     assert resp.json() == []
 
@@ -27,7 +27,7 @@ async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
         "body_type": "Худое",
     }
     response = await async_client.post(
-        "api/v1/quest",
+        "api/v1/questionnaire",
         json=questionnaire_data,
     )
     assert response.status_code == status.HTTP_201_CREATED
@@ -52,7 +52,7 @@ async def test_update_quest(
         "body_type": "Полное",
     }
     response = await async_client.patch(
-        f"api/v1/quest/{questionary.id}",
+        f"api/v1/questionnaire/{questionary.id}",
         json=updated_data,
     )
     assert response.status_code == status.HTTP_200_OK
@@ -62,5 +62,11 @@ async def test_delete_quest(
     async_client: AsyncClient,
     questionary: UserQuestionnaire,
 ):
-    response = await async_client.delete(f"api/v1/quest/{questionary.id}")
+    response = await async_client.delete(f"api/v1/questionnaire/{questionary.id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+async def test_get_10_questionnaire(async_client: AsyncClient):
+    resp = await async_client.get("api/v1/questionnaire/10")
+    assert resp.status_code == 200
+    assert len(resp.json()) > 1
