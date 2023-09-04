@@ -1,6 +1,6 @@
 import uuid
 
-from dirty_equals import IsDatetime, IsInt
+from dirty_equals import IsDatetime, IsUUID
 from fastapi import status
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +23,7 @@ async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSess
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
-        "id": IsInt,
+        "id": IsUUID,
         "user_id": str(user_db.id),
         "liked_user_id": str(user_to_like_db.id),
         "created_at": IsDatetime(iso_string=True),
