@@ -8,6 +8,14 @@ class UserBaseSchema(BaseModel):
         orm_mode = True
 
 
+class UserQuestionnaireHobby(UserBaseSchema):
+    hobby_name: str
+
+
+class UserQuestionnaireHobbyResponse(UserQuestionnaireHobby):
+    id: uuid.UUID | None = None
+
+
 class UserQuestionnaireSchema(UserBaseSchema):
     id: uuid.UUID | None = None
     firstname: str
@@ -17,7 +25,7 @@ class UserQuestionnaireSchema(UserBaseSchema):
     country: str
     city: str
     about: str
-    passion: str
+    hobbies: list[UserQuestionnaireHobby]
     height: int
     goals: str
     body_type: str
@@ -32,7 +40,7 @@ class UserQuestionnaireResponse(UserBaseSchema):
     country: str
     city: str
     about: str
-    passion: str
+    hobbies: list[UserQuestionnaireHobbyResponse]
     height: int
     goals: str
     body_type: str
