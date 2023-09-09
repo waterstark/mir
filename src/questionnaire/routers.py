@@ -2,7 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -21,8 +21,8 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_questionnaire(
-        user_profile: UserQuestionnaireSchema,
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    user_profile: UserQuestionnaireSchema,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(**user_profile_dict)
@@ -41,7 +41,7 @@ async def create_questionnaire(
     status_code=status.HTTP_200_OK,
 )
 async def get_list_questionnaire(
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     query = select(UserQuestionnaire).order_by(UserQuestionnaire.city).fetch(10)
     result = await session.execute(query)
@@ -54,9 +54,9 @@ async def get_list_questionnaire(
     status_code=status.HTTP_200_OK,
 )
 async def update_quest(
-        quest_id: UUID,
-        update_value: UserQuestionnaireSchema,
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    quest_id: UUID,
+    update_value: UserQuestionnaireSchema,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     update_value_dict = update_value.dict(exclude={"hobbies"})
     stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
@@ -77,8 +77,8 @@ async def update_quest(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_quest(
-        quest_id: UUID,
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    quest_id: UUID,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     query = delete(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
     await session.execute(query)
