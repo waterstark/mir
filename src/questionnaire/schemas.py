@@ -12,12 +12,7 @@ class UserQuestionnaireHobby(UserBaseSchema):
     hobby_name: str
 
 
-class UserQuestionnaireHobbyResponse(UserQuestionnaireHobby):
-    id: uuid.UUID | None = None
-
-
 class UserQuestionnaireSchema(UserBaseSchema):
-    id: uuid.UUID | None = None
     firstname: str
     lastname: str
     gender: str
@@ -40,7 +35,7 @@ class UserQuestionnaireResponse(UserBaseSchema):
     country: str
     city: str
     about: str
-    hobbies: list[UserQuestionnaireHobbyResponse]
+    hobbies: list[UserQuestionnaireHobby]
     height: int
     goals: str
     body_type: str
