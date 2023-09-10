@@ -2,7 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -62,8 +62,10 @@ async def update_quest(
     stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
     result = await session.execute(stmt)
     questionnaire = result.scalar_one_or_none()
-    for key, value in update_value_dict.items():
-        setattr(questionnaire, key, value)
+    stmt = (
+        update(UserQuestionnaire).values(update_value_dict).returning(UserQuestionnaire)
+    )
+    await session.execute(stmt)
     questionnaire.hobbies = []
     for hobby in update_value.hobbies:
         hobby_item = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
