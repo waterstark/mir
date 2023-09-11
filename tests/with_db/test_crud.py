@@ -13,7 +13,6 @@ async def test_get_list_questionnaire(async_client: AsyncClient):
 
 async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
     questionnaire_data = {
-        "id": str(user.id),
         "firstname": "nikita",
         "lastname": "pupkin",
         "gender": "Male",
@@ -21,7 +20,11 @@ async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
         "country": "False",
         "city": "False",
         "about": "False",
-        "passion": "Путешествия",
+        "hobbies": [
+            {
+                "hobby_name": "string"
+            }
+        ],
         "height": 150,
         "goals": "Флирт",
         "body_type": "Худое",
@@ -34,11 +37,10 @@ async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
 
 
 async def test_update_quest(
-    async_client: AsyncClient,
-    questionary: UserQuestionnaire,
+        async_client: AsyncClient,
+        questionary: UserQuestionnaire,
 ):
     updated_data = {
-        "id": str(questionary.id),
         "firstname": "nikita",
         "lastname": "pupkin",
         "gender": "Female",
@@ -46,7 +48,11 @@ async def test_update_quest(
         "country": "False",
         "city": "False",
         "about": "False",
-        "passion": "Фотография",
+        "hobbies": [
+            {
+                "hobby_name": "string"
+            }
+        ],
         "height": 145,
         "goals": "Дружба",
         "body_type": "Полное",
@@ -59,8 +65,8 @@ async def test_update_quest(
 
 
 async def test_delete_quest(
-    async_client: AsyncClient,
-    questionary: UserQuestionnaire,
+        async_client: AsyncClient,
+        questionary: UserQuestionnaire,
 ):
     response = await async_client.delete(f"api/v1/quest/{questionary.id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
