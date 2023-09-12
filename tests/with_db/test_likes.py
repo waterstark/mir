@@ -17,7 +17,7 @@ async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSess
     user_to_like_db = UserCreateOutput.from_orm(
         await add_user(user_to_like, get_async_session),
     )
-    data = {"user_id": str(user_db.id), "liked_user_id": str(user_to_like_db.id)}
+    data = {"user_id": str(user_db.id), "liked_user_id": str(user_to_like_db.id), "is_like":True}
 
     response: Response = await async_client.post("/api/v1/likes", json=data)
 
@@ -25,6 +25,7 @@ async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSess
     assert response.json() == {
         "id": IsInt,
         "user_id": str(user_db.id),
+        "is_like":True,
         "liked_user_id": str(user_to_like_db.id),
         "created_at": IsDatetime(iso_string=True),
     }
@@ -34,7 +35,7 @@ async def test_like_wrong_user(
     async_client: AsyncClient,
     get_async_session: AsyncSession,
 ):
-    data = {"user_id": str(uuid.uuid4()), "liked_user_id": str(uuid.uuid4())}
+    data = {"user_id": str(uuid.uuid4()), "liked_user_id": str(uuid.uuid4()), "is_like":True}
 
     response: Response = await async_client.post("/api/v1/likes", json=data)
 

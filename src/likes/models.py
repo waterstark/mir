@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, ForeignKey, UniqueConstraint
+from sqlalchemy import CheckConstraint, ForeignKey, UniqueConstraint, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.auth.models import AuthUser
@@ -32,4 +32,8 @@ class UserLike(Base):
         "AuthUser",
         backref="likes_from",
         primaryjoin=AuthUser.id == liked_user_id,
+    )
+    is_like: Mapped[bool] = mapped_column(
+        Boolean,
+        doc="Like or Skip"
     )

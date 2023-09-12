@@ -13,6 +13,7 @@ async def add_like(user_like: UserLikeRequest, session: AsyncSession):
             {
                 UserLike.user_id: user_like.user_id,
                 UserLike.liked_user_id: user_like.liked_user_id,
+                UserLike.is_like: user_like.is_like
             },
         )
         .returning(UserLike)

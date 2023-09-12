@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_PASS: str
     SECRET_KEY: str
+    RABBITMQ_DEFAULT_USER: str
+    RABBITMQ_DEFAULT_PASS: str
+    RABBITMQ_DEFAULT_HOST: str
 
     @property
     def db_url(self) -> str:
@@ -15,6 +18,14 @@ class Settings(BaseSettings):
         return (
             f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@"
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        )
+    
+    @property
+    def rabbit_url(self) -> str:
+        """Product rabbit url."""
+        return (
+            f'amqp://{self.RABBITMQ_DEFAULT_USER}:{self.RABBITMQ_DEFAULT_PASS}@'
+            f"localhost:5672"
         )
 
     class Config:

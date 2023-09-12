@@ -7,6 +7,7 @@ from pydantic.types import UUID4
 class UserLikeBase(BaseModel):
     user_id: UUID4
     liked_user_id: UUID4
+    is_like:bool
 
     class Config:
         orm_mode = True
