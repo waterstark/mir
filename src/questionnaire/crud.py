@@ -15,7 +15,6 @@ async def get_list_questionnaire_first_10(
     user: AuthUser,
     session: AsyncSession,
 ):
-    id_count = 1
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
     is_visible = True
     query = (
@@ -28,7 +27,6 @@ async def get_list_questionnaire_first_10(
         )
         .limit(10)
     )
-    id_count += 10
     result = await session.execute(query)
     return result.scalars().fetchall()
 
