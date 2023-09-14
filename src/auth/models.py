@@ -32,6 +32,11 @@ class AuthUser(SQLAlchemyBaseUserTableUUID, Base):
 
     questionnaire = relationship("UserQuestionnaire", back_populates="user")
     settings = relationship("UserSettings", back_populates="user")
+    matches = relationship(
+        "Match",
+        primaryjoin="or_(AuthUser.id==Match.user1_id, AuthUser.id==Match.user2_id)",
+        viewonly=True,
+    )
 
 
 class UserSettings(Base):

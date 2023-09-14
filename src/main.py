@@ -4,7 +4,8 @@ from starlette.staticfiles import StaticFiles
 
 from src.admin import admin
 from src.auth.routers import auth_router, user_router
-from src.likes.router import likes_router
+from src.likes.routers import likes_router
+from src.matches.routers import router as matches_router
 from src.questionnaire.routers import router as questionnaire_router
 
 app = FastAPI(
@@ -27,5 +28,5 @@ main_router.include_router(auth_router)
 main_router.include_router(user_router)
 main_router.include_router(likes_router)
 main_router.include_router(questionnaire_router)
-
+main_router.include_router(matches_router)
 app.include_router(main_router)
