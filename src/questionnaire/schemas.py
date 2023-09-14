@@ -8,8 +8,7 @@ class UserBaseSchema(BaseModel):
         orm_mode = True
 
 
-class UserQuestionnaireSchema(UserBaseSchema):
-    id: uuid.UUID | None = None
+class CreateUserQuestionnaireSchema(UserBaseSchema):
     firstname: str
     lastname: str
     gender: str
@@ -24,16 +23,5 @@ class UserQuestionnaireSchema(UserBaseSchema):
     user_id: uuid.UUID
 
 
-class UserQuestionnaireResponse(UserBaseSchema):
-    id: uuid.UUID
-    firstname: str
-    lastname: str
-    gender: str
-    photo: str
-    country: str
-    city: str
-    about: str
-    passion: str
-    height: int
-    goals: str
-    body_type: str
+class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
+    id: uuid.UUID | None = None

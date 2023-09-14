@@ -40,7 +40,7 @@ async def user(async_client: AsyncClient):
 @pytest.fixture()
 async def questionary(get_async_session: AsyncSession, user: AuthUser):
     """User questionary."""
-    questionary_data["id"] = user.id
+    questionary_data["user_id"] = user.id
     async with get_async_session as db:
         questionary = UserQuestionnaire(**questionary_data)
         db.add(questionary)

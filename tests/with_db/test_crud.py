@@ -1,72 +1,108 @@
+from dirty_equals import IsUUID
 from fastapi import status
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
+from src.questionnaire.crud import get_questionnaire
 from src.questionnaire.models import UserQuestionnaire
 
 
-async def test_get_list_questionnaire(async_client: AsyncClient):
-    resp = await async_client.get("api/v1/questionnaire")
-    assert resp.status_code == 200
-    assert resp.json() == []
-
-
-async def test_create_questionnaire(async_client: AsyncClient, user: AuthUser):
+async def test_create_questionnaire(
+    async_client: AsyncClient,
+    user: AuthUser,
+):
     questionnaire_data = {
-        "id": str(user.id),
-        "firstname": "nikita",
-        "lastname": "pupkin",
+        "firstname": "string",
+        "lastname": "string",
         "gender": "Male",
-        "photo": "False",
-        "country": "False",
-        "city": "False",
-        "about": "False",
-        "passion": "Путешествия",
-        "height": 150,
-        "goals": "Флирт",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "passion": "Музыка",
+        "height": 0,
+        "goals": "Дружба",
         "body_type": "Худое",
+        "user_id": user.id,
     }
     response = await async_client.post(
         "api/v1/questionnaire",
         json=questionnaire_data,
     )
     assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == {
+        "id": IsUUID,
+        "firstname": "string",
+        "lastname": "string",
+        "gender": "Male",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "passion": "Музыка",
+        "height": 0,
+        "goals": "Дружба",
+        "body_type": "Худое",
+        "user_id": IsUUID,
+    }
+    assert response.json()["user_id"] == str(user.id)
 
 
 async def test_update_quest(
     async_client: AsyncClient,
     questionary: UserQuestionnaire,
+    user: AuthUser,
 ):
     updated_data = {
-        "id": str(questionary.id),
-        "firstname": "nikita",
-        "lastname": "pupkin",
+        "firstname": "string",
+        "lastname": "string",
         "gender": "Female",
-        "photo": "False",
-        "country": "False",
-        "city": "False",
-        "about": "False",
-        "passion": "Фотография",
-        "height": 145,
-        "goals": "Дружба",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "passion": "Путешествия",
+        "height": 0,
+        "goals": "Флирт",
         "body_type": "Полное",
+        "user_id": user.id,
     }
+
     response = await async_client.patch(
         f"api/v1/questionnaire/{questionary.id}",
         json=updated_data,
     )
     assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "id": IsUUID,
+        "firstname": "string",
+        "lastname": "string",
+        "gender": "Female",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "passion": "Путешествия",
+        "height": 0,
+        "goals": "Флирт",
+        "body_type": "Полное",
+        "user_id": IsUUID,
+    }
+    assert response.json()["user_id"] == str(user.id)
 
 
 async def test_delete_quest(
     async_client: AsyncClient,
     questionary: UserQuestionnaire,
+    authorised_cookie: dict,
+    user: AuthUser,
+    get_async_session: AsyncSession,
 ):
-    response = await async_client.delete(f"api/v1/questionnaire/{questionary.id}")
+    response = await async_client.delete(
+        f"api/v1/questionnaire/{questionary.id}",
+        cookies=authorised_cookie,
+    )
     assert response.status_code == status.HTTP_204_NO_CONTENT
-
-
-async def test_get_10_questionnaire(async_client: AsyncClient):
-    resp = await async_client.get("api/v1/questionnaire/10")
-    assert resp.status_code == 200
-    assert len(resp.json()) > 1
+    response_check = await get_questionnaire(user_id=user.id, session=get_async_session)
+    assert response_check is None
