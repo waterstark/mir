@@ -6,7 +6,9 @@ from sqlalchemy import engine_from_config, pool
 from src.auth.models import AuthUser, UserSettings  # noqa: F401
 from src.config import settings
 from src.database import Base
-from src.posts.models import Match, Message  # noqa: F401
+from src.posts.models import Message  # noqa: F401
+from src.matches.models import Match
+from src.likes.models import UserLike
 from src.questionnaire.models import BlackListUser, UserQuestionnaire  # noqa: F401
 
 # this is the Alembic Config object, which provides
@@ -14,7 +16,8 @@ from src.questionnaire.models import BlackListUser, UserQuestionnaire  # noqa: F
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "DATABASE_URL", settings.db_url)
+
+config.set_section_option(section, "DATABASE_URL", settings.DATABASE_URL)
 
 
 # Interpret the config file for Python logging.
