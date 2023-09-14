@@ -85,7 +85,7 @@ async def delete_quest(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Такой анкеты не существует",
         )
-    if user_questionnaire.id != quest_id:
+    if user_questionnaire.id == quest_id:
         query = delete(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
         await session.execute(query)
         await session.commit()
