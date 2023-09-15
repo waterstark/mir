@@ -25,3 +25,7 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
     id: uuid.UUID | None = None
+
+
+class ResponseQuestionnaireSchemaWithMatch(ResponseUserQuestionnaireSchema):
+    is_match: bool = False

@@ -16,7 +16,9 @@ from src.likes.schemas import UserLikeRequest
 from src.matches.crud import create_match
 from src.matches.schemas import MatchRequest
 from src.questionnaire.crud import get_questionnaire
-from src.questionnaire.schemas import ResponseUserQuestionnaireSchema
+from src.questionnaire.schemas import (
+    ResponseQuestionnaireSchemaWithMatch,
+)
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -70,7 +72,7 @@ async def update_profile(
 @user_router.post(
     "/{user_id}/like",
     status_code=status.HTTP_201_CREATED,
-    response_model=ResponseUserQuestionnaireSchema,
+    response_model=ResponseQuestionnaireSchemaWithMatch,
 )
 async def like_user_by_id(
     session: Annotated[AsyncSession, Depends(get_async_session)],
@@ -80,7 +82,7 @@ async def like_user_by_id(
     questionnaire = await get_questionnaire(user_id, session)
     if not questionnaire:
         raise NotFoundException("Questionnaire for liked user not found")
-    response = ResponseUserQuestionnaireSchema.from_orm(questionnaire)
+    response = ResponseQuestionnaireSchemaWithMatch.from_orm(questionnaire)
 
     await create_like(
         session,

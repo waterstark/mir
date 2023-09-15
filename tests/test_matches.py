@@ -1,4 +1,4 @@
-from dirty_equals import IsUUID
+from dirty_equals import IsTrueLike, IsUUID
 from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +17,7 @@ class TestMatch:
 
     matches_url = app.url_path_for("get_matches")
 
-    async def test_acces_not_authenticated_matches_list(
+    async def test_access_not_authenticated_matches_list(
         self,
         user2: AuthUser,
         async_client: AsyncClient,
@@ -72,8 +72,7 @@ class TestMatch:
             "c которыми нет совпадения"
         )
 
-        assert response_json[0] == {
-            "id": IsUUID,
+        assert response.json()[0] == {
             "firstname": questionary.firstname,
             "lastname": questionary.lastname,
             "gender": questionary.gender,
@@ -85,7 +84,9 @@ class TestMatch:
             "height": questionary.height,
             "goals": questionary.goals,
             "body_type": questionary.body_type,
-            "is_match": True,
+            "user_id": IsUUID,
+            "id": IsUUID,
+            "is_match": IsTrueLike,
         }, (
             "Проверьте, что GET-запрос авторизованного пользователя "
             f"к `{self.matches_url}` возвращает анкету c корректными данными"

@@ -95,14 +95,16 @@ async def test_update_quest(
 async def test_delete_quest(
     async_client: AsyncClient,
     questionary: UserQuestionnaire,
-    authorised_cookie: dict,
-    user: AuthUser,
+    authorised_cookie_user2: dict,
+    user2: AuthUser,
     get_async_session: AsyncSession,
 ):
     response = await async_client.delete(
         f"api/v1/questionnaire/{questionary.id}",
-        cookies=authorised_cookie,
+        cookies=authorised_cookie_user2,
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT
-    response_check = await get_questionnaire(user_id=user.id, session=get_async_session)
+    response_check = await get_questionnaire(
+        user_id=user2.id, session=get_async_session,
+    )
     assert response_check is None

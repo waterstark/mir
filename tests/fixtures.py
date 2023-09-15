@@ -57,6 +57,13 @@ async def authorised_cookie(user: AuthUser):
 
 
 @pytest.fixture()
+async def authorised_cookie_user2(user2: AuthUser):
+    """Cookie of authorized user."""
+    jwt = await get_jwt_strategy().write_token(user2)
+    return {"mir": jwt}
+
+
+@pytest.fixture()
 async def user2(async_client: AsyncClient):
     """Test user."""
     response = await async_client.post(
@@ -79,7 +86,7 @@ async def user3(async_client: AsyncClient):
 @pytest.fixture()
 async def questionary(get_async_session: AsyncSession, user2: AuthUser):
     """User questionary."""
-    questionary_data["user_id"] = user.id
+    user_questionary_data["user_id"] = user2.id
     async with get_async_session as db:
         questionary = UserQuestionnaire(**user_questionary_data)
         db.add(questionary)

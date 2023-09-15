@@ -76,6 +76,5 @@ async def check_like_data(session: AsyncSession, like_data: UserLikeRequest):
 
 
 async def perform_destroy_like(session: AsyncSession, like: UserLike):
-
     await session.delete(like)
     await session.commit()

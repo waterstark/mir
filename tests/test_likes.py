@@ -16,7 +16,7 @@ from src.questionnaire.models import UserQuestionnaire
 class TestLike:
     """Тесты эндпоинта users/{user_id}/like"""
 
-    async def test_acces_not_authenticated_like_create(
+    async def test_access_not_authenticated_like_create(
         self,
         user: AuthUser,
         async_client: AsyncClient,
@@ -78,6 +78,7 @@ class TestLike:
             "height": questionary.height,
             "goals": questionary.goals,
             "body_type": questionary.body_type,
+            "user_id": IsUUID,
             "is_match": False,
         }, (
             "Проверьте, что ответ на POST-запрос авторизованного пользователя к "

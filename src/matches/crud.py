@@ -58,7 +58,6 @@ async def create_match(session: AsyncSession, match_data: MatchRequest) -> Match
 
 
 async def check_match_data(session: AsyncSession, match_data: MatchRequest) -> None:
-
     if match_data.user1_id == match_data.user2_id:
         raise SelfMatchException
 
