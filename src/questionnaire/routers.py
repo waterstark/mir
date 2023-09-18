@@ -2,11 +2,11 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
-from src.questionnaire.models import UserQuestionnaire
+from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 from src.questionnaire.schemas import UserQuestionnaireResponse, UserQuestionnaireSchema
 
 router = APIRouter(
@@ -24,14 +24,15 @@ async def create_questionnaire(
     user_profile: UserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    stmt = (
-        insert(UserQuestionnaire)
-        .values(**user_profile.dict())
-        .returning(UserQuestionnaire)
-    )
-    result = await session.execute(stmt)
+    user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
+    questionnaire = UserQuestionnaire(**user_profile_dict)
+    hobbies = user_profile.hobbies
+    for hobby in hobbies:
+        hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
+        questionnaire.hobbies.append(hobby_obj)
+    session.add(questionnaire)
     await session.commit()
-    return result.scalar()
+    return UserQuestionnaireResponse(**questionnaire.__dict__)
 
 
 @router.get(
@@ -57,15 +58,20 @@ async def update_quest(
     update_value: UserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    stmt = (
-        update(UserQuestionnaire)
-        .values(**update_value.dict())
-        .returning(UserQuestionnaire)
-        .where(UserQuestionnaire.id == quest_id)
-    )
+    update_value_dict = update_value.dict(exclude={"hobbies"})
+    stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
     result = await session.execute(stmt)
+    questionnaire = result.scalar_one_or_none()
+    stmt = (
+        update(UserQuestionnaire).values(update_value_dict).returning(UserQuestionnaire)
+    )
+    await session.execute(stmt)
+    questionnaire.hobbies = []
+    for hobby in update_value.hobbies:
+        hobby_item = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
+        questionnaire.hobbies.append(hobby_item)
     await session.commit()
-    return result.scalar()
+    return UserQuestionnaireResponse(**questionnaire.__dict__)
 
 
 @router.delete(
