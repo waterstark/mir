@@ -32,7 +32,11 @@ user_questionary_data = {
     "country": "False",
     "city": "False",
     "about": "False",
-    "passion": "Путешествия",
+    "hobbies": [
+        {
+            "hobby_name": "string"
+        }
+    ],
     "height": 150,
     "goals": "Флирт",
     "body_type": "Худое",
