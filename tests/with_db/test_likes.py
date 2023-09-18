@@ -5,28 +5,26 @@ from fastapi import status
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.crud import add_user
-from src.auth.schemas import UserCreateInput, UserCreateOutput
+from src.auth.models import AuthUser
 
 
-async def test_like_user(async_client: AsyncClient, get_async_session: AsyncSession):
-    user = UserCreateInput(email="lol@kek.com", password="password")
-    user_to_like = UserCreateInput(email="lol2@kek2.com", password="password")
-
-    user_db = UserCreateOutput.from_orm(await add_user(user, get_async_session))
-    user_to_like_db = UserCreateOutput.from_orm(
-        await add_user(user_to_like, get_async_session),
-    )
-    data = {"user_id": str(user_db.id), "liked_user_id": str(user_to_like_db.id)}
+async def test_like_user(
+        async_client: AsyncClient,
+        get_async_session: AsyncSession,
+        user: AuthUser,
+        user2: AuthUser,
+):
+    data = {"user_id": str(user.id), "liked_user_id": str(user2.id), "is_liked": True}
 
     response: Response = await async_client.post("/api/v1/likes", json=data)
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
         "id": IsUUID,
-        "user_id": str(user_db.id),
-        "liked_user_id": str(user_to_like_db.id),
+        "user_id": str(user.id),
+        "liked_user_id": str(user2.id),
         "created_at": IsDatetime(iso_string=True),
+        "is_liked": True,
     }
 
 

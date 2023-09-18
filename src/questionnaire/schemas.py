@@ -16,7 +16,7 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     country: str
     city: str
     about: str
-    passion: str
+    hobbies: list[UserQuestionnaireHobby]
     height: int
     goals: str
     body_type: str

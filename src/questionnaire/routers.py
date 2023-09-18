@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import current_user
@@ -54,6 +55,7 @@ async def update_quest(
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     return await crud.update_questionnaire(quest_id, update_value, session)
+
 
 
 @router.delete(
