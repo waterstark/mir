@@ -16,7 +16,7 @@ from src.questionnaire.models import UserQuestionnaire
 class TestLike:
     """Тесты эндпоинта users/{user_id}/like"""
 
-    async def test_acces_not_authenticated_like_create(
+    async def test_access_not_authenticated_like_create(
         self,
         user: AuthUser,
         async_client: AsyncClient,
