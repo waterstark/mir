@@ -42,5 +42,5 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, Any, None]:
 
 @pytest.fixture(scope="session")
 async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
-    async with httpx.AsyncClient(app=app, base_url="http://test:8000") as client:
+    async with httpx.AsyncClient(app=app, base_url="http://localhost") as client:
         yield client

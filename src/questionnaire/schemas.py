@@ -8,6 +8,10 @@ class UserBaseSchema(BaseModel):
         orm_mode = True
 
 
+class UserHobby(UserBaseSchema):
+    hobby_name: str
+
+
 class CreateUserQuestionnaireSchema(UserBaseSchema):
     firstname: str
     lastname: str
@@ -16,7 +20,7 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     country: str
     city: str
     about: str
-    passion: str
+    hobbies: list[UserHobby]
     height: int
     goals: str
     body_type: str

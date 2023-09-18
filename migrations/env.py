@@ -17,7 +17,7 @@ config = context.config
 
 section = config.config_ini_section
 
-config.set_section_option(section, "DATABASE_URL", settings.DATABASE_URL)
+config.set_section_option(section=section, name="DATABASE_URL", value=settings.db_url)
 
 
 # Interpret the config file for Python logging.

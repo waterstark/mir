@@ -80,7 +80,14 @@ class TestMatch:
             "country": questionary.country,
             "city": questionary.city,
             "about": questionary.about,
-            "passion": questionary.passion,
+            "hobbies": [
+                {
+                    "hobby_name": questionary.hobbies[0].hobby_name,
+                },
+                {
+                    "hobby_name": questionary.hobbies[1].hobby_name,
+                },
+            ],
             "height": questionary.height,
             "goals": questionary.goals,
             "body_type": questionary.body_type,

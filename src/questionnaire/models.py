@@ -1,13 +1,21 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, ForeignKey, Numeric, String, UniqueConstraint
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    ForeignKey,
+    Numeric,
+    String,
+    Table,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import ChoiceType
 
 from src.auth.models import AuthUser
 from src.database import Base
-from src.questionnaire.params_choice import BodyType, Gender, Goal, Passion
+from src.questionnaire.params_choice import BodyType, Gender, Goal
 
 
 class BlackListUser(Base):
@@ -37,6 +45,22 @@ class BlackListUser(Base):
     )
 
 
+user_hobby = Table(
+    "user_hobby",
+    Base.metadata,
+    Column(
+        "user_id",
+        ForeignKey("user_questionnaire.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "hobby_id",
+        ForeignKey("user_questionnaire_hobby.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+)
+
+
 class UserQuestionnaire(Base):
     __tablename__ = "user_questionnaire"
 
@@ -53,14 +77,25 @@ class UserQuestionnaire(Base):
     latitude: Mapped[Numeric] = mapped_column(Numeric(8, 5), nullable=True)
     longitude: Mapped[Numeric] = mapped_column(Numeric(8, 5), nullable=True)
     about: Mapped[str] = mapped_column(String, nullable=True)
-    passion: Mapped[str] = mapped_column(ChoiceType(Passion), nullable=True)
     height: Mapped[int] = mapped_column(nullable=True)
     goals: Mapped[str] = mapped_column(ChoiceType(Goal), nullable=True)
     body_type: Mapped[str] = mapped_column(ChoiceType(BodyType), nullable=True)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
-
+    hobbies: Mapped[list["UserQuestionnaireHobby"]] = relationship(
+        secondary=user_hobby,
+        lazy="selectin",
+        cascade="all,delete-orphan",
+        single_parent=True,
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id", ondelete="CASCADE"),
         nullable=True,
     )
     user = relationship("AuthUser", back_populates="questionnaire")
+
+
+class UserQuestionnaireHobby(Base):
+    __tablename__ = "user_questionnaire_hobby"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    hobby_name: Mapped[str] = mapped_column(String(length=256), nullable=False)

@@ -1,13 +1,14 @@
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
-from src.questionnaire.models import UserQuestionnaire
+from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 from src.questionnaire.schemas import (
     CreateUserQuestionnaireSchema,
+    ResponseUserQuestionnaireSchema,
 )
 
 
@@ -46,14 +47,15 @@ async def create_questionnaire(
                 select_user_questionnaire.firstname,
             ),
         )
-    stmt = (
-        insert(UserQuestionnaire)
-        .values(**user_profile.dict())
-        .returning(UserQuestionnaire)
-    )
-    result = await session.execute(stmt)
+    user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
+    questionnaire = UserQuestionnaire(**user_profile_dict)
+    hobbies = user_profile.hobbies
+    for hobby in hobbies:
+        hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
+        questionnaire.hobbies.append(hobby_obj)
+    session.add(questionnaire)
     await session.commit()
-    return result.scalar()
+    return ResponseUserQuestionnaireSchema(**questionnaire.__dict__)
 
 
 async def update_questionnaire(
@@ -61,15 +63,20 @@ async def update_questionnaire(
     update_value: CreateUserQuestionnaireSchema,
     session: AsyncSession,
 ):
-    stmt = (
-        update(UserQuestionnaire)
-        .values(**update_value.dict())
-        .returning(UserQuestionnaire)
-        .where(UserQuestionnaire.id == quest_id)
-    )
+    update_value_dict = update_value.dict(exclude={"hobbies"})
+    stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
     result = await session.execute(stmt)
+    questionnaire = result.scalar_one_or_none()
+    stmt = (
+        update(UserQuestionnaire).values(update_value_dict).returning(UserQuestionnaire)
+    )
+    await session.execute(stmt)
+    questionnaire.hobbies = []
+    for hobby in update_value.hobbies:
+        hobby_item = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
+        questionnaire.hobbies.append(hobby_item)
     await session.commit()
-    return result.scalar()
+    return ResponseUserQuestionnaireSchema(**questionnaire.__dict__)
 
 
 async def delete_quest(
@@ -84,8 +91,10 @@ async def delete_quest(
             detail="Такой анкеты не существует",
         )
     if user_questionnaire.id == quest_id:
-        query = delete(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
-        await session.execute(query)
+        query_questionnaire = delete(UserQuestionnaire).where(
+            UserQuestionnaire.id == quest_id,
+        )
+        await session.execute(query_questionnaire)
         await session.commit()
     else:
         raise HTTPException(

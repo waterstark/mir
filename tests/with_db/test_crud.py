@@ -20,7 +20,7 @@ async def test_create_questionnaire(
         "country": "string",
         "city": "string",
         "about": "string",
-        "passion": "Музыка",
+        "hobbies": [{"hobby_name": "string"}],
         "height": 0,
         "goals": "Дружба",
         "body_type": "Худое",
@@ -40,7 +40,7 @@ async def test_create_questionnaire(
         "country": "string",
         "city": "string",
         "about": "string",
-        "passion": "Музыка",
+        "hobbies": [{"hobby_name": "string"}],
         "height": 0,
         "goals": "Дружба",
         "body_type": "Худое",
@@ -62,7 +62,14 @@ async def test_update_quest(
         "country": "string",
         "city": "string",
         "about": "string",
-        "passion": "Путешествия",
+        "hobbies": [
+            {
+                "hobby_name": "qwewasd",
+            },
+            {
+                "hobby_name": "asidpas",
+            },
+        ],
         "height": 0,
         "goals": "Флирт",
         "body_type": "Полное",
@@ -83,7 +90,14 @@ async def test_update_quest(
         "country": "string",
         "city": "string",
         "about": "string",
-        "passion": "Путешествия",
+        "hobbies": [
+            {
+                "hobby_name": "qwewasd",
+            },
+            {
+                "hobby_name": "asidpas",
+            },
+        ],
         "height": 0,
         "goals": "Флирт",
         "body_type": "Полное",
@@ -105,6 +119,7 @@ async def test_delete_quest(
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT
     response_check = await get_questionnaire(
-        user_id=user2.id, session=get_async_session,
+        user_id=user2.id,
+        session=get_async_session,
     )
     assert response_check is None

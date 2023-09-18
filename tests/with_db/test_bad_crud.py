@@ -7,18 +7,18 @@ from src.questionnaire.models import UserQuestionnaire
 
 async def test_create_questionnaire_bad_credentials(
     async_client: AsyncClient,
-    user: AuthUser,
+    user2: AuthUser,
     questionary: UserQuestionnaire,
 ):
     questionnaire_data = {
-        "firstname": "string",
+        "firstname": "s123123tring",
         "lastname": "string",
         "gender": "Male",
         "photo": "string",
         "country": "string",
         "city": "string",
         "about": "string",
-        "passion": "Музыка",
+        "hobbies": [{"hobby_name": "string"}],
         "height": 0,
         "goals": "Дружба",
         "body_type": "Худое",
