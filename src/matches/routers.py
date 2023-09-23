@@ -14,7 +14,9 @@ from src.likes.schemas import UserLikeRequest
 from src.matches.crud import get_match_by_id, perform_destroy_match
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire
-from src.questionnaire.schemas import UserQuestionnaireResponse
+from src.questionnaire.schemas import (
+    ResponseQuestionnaireSchemaWithMatch,
+)
 
 router = APIRouter(
     prefix="/matches",
@@ -24,13 +26,12 @@ router = APIRouter(
 
 @router.get(
     path="",
-    response_model=list[UserQuestionnaireResponse],
+    response_model=list[ResponseQuestionnaireSchemaWithMatch],
 )
 async def get_matches(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     user: Annotated[AuthUser, Depends(current_user)],
 ):
-
     stmt = (
         select(AuthUser, UserQuestionnaire)
         .join(

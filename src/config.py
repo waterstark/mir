@@ -3,10 +3,15 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     DB_HOST: str
+
     DB_PORT: str
-    DB_USER: str
+
     DB_NAME: str
+
+    DB_USER: str
+
     DB_PASS: str
+
     SECRET_KEY: str
 
     @property

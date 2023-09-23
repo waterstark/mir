@@ -2,76 +2,58 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.base_config import current_user
+from src.auth.models import AuthUser
 from src.database import get_async_session
-from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
-from src.questionnaire.schemas import UserQuestionnaireResponse, UserQuestionnaireSchema
+from src.questionnaire import crud
+from src.questionnaire.schemas import (
+    CreateUserQuestionnaireSchema,
+    ResponseUserQuestionnaireSchema,
+)
 
 router = APIRouter(
-    prefix="/quest",
+    prefix="/questionnaire",
     tags=["Questionnaire"],
 )
 
 
 @router.post(
     "",
-    response_model=UserQuestionnaireResponse,
+    response_model=ResponseUserQuestionnaireSchema,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_questionnaire(
-    user_profile: UserQuestionnaireSchema,
+    user_profile: CreateUserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
-    questionnaire = UserQuestionnaire(**user_profile_dict)
-    hobbies = user_profile.hobbies
-    for hobby in hobbies:
-        hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
-        questionnaire.hobbies.append(hobby_obj)
-    session.add(questionnaire)
-    await session.commit()
-    return UserQuestionnaireResponse(**questionnaire.__dict__)
+    return await crud.create_questionnaire(user_profile, session)
 
 
 @router.get(
-    "",
-    response_model=list[UserQuestionnaireResponse],
+    "/10",
+    response_model=list[ResponseUserQuestionnaireSchema],
     status_code=status.HTTP_200_OK,
 )
 async def get_list_questionnaire(
+    user: Annotated[AuthUser, Depends(current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    query = select(UserQuestionnaire).order_by(UserQuestionnaire.city).fetch(10)
-    result = await session.execute(query)
-    return result.scalars().fetchall()
+    return await crud.get_list_questionnaire_first_10(user, session)
 
 
 @router.patch(
     "/{quest_id}",
-    response_model=UserQuestionnaireResponse,
+    response_model=ResponseUserQuestionnaireSchema,
     status_code=status.HTTP_200_OK,
 )
 async def update_quest(
     quest_id: UUID,
-    update_value: UserQuestionnaireSchema,
+    update_value: CreateUserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    update_value_dict = update_value.dict(exclude={"hobbies"})
-    stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
-    result = await session.execute(stmt)
-    questionnaire = result.scalar_one_or_none()
-    stmt = (
-        update(UserQuestionnaire).values(update_value_dict).returning(UserQuestionnaire)
-    )
-    await session.execute(stmt)
-    questionnaire.hobbies = []
-    for hobby in update_value.hobbies:
-        hobby_item = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
-        questionnaire.hobbies.append(hobby_item)
-    await session.commit()
-    return UserQuestionnaireResponse(**questionnaire.__dict__)
+    return await crud.update_questionnaire(quest_id, update_value, session)
 
 
 @router.delete(
@@ -79,9 +61,8 @@ async def update_quest(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_quest(
+    user: Annotated[AuthUser, Depends(current_user)],
     quest_id: UUID,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    query = delete(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
-    await session.execute(query)
-    await session.commit()
+    return await crud.delete_quest(user, quest_id, session)
