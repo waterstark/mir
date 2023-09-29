@@ -2,7 +2,6 @@ from fastapi import HTTPException, status
 
 
 class BaseProjectException(HTTPException):
-
     default_message = None
     status_code = None
 

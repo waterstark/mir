@@ -7,7 +7,7 @@ from src.auth.models import AuthUser
 from src.likes.models import UserLike
 from src.main import app
 from src.matches.models import Match
-from src.questionnaire.models import UserQuestionnaire
+from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 
 user_data = {
     "email": "test_user@server.com",
@@ -32,14 +32,15 @@ user_questionary_data = {
     "country": "False",
     "city": "False",
     "about": "False",
-    "hobbies": [
-        {
-            "hobby_name": "string"
-        }
-    ],
     "height": 150,
     "goals": "Флирт",
     "body_type": "Худое",
+}
+hobbies_dict = {
+    "hobbies": [
+        {"hobby_name": "qwe"},
+        {"hobby_name": "asd"},
+    ],
 }
 
 
@@ -57,6 +58,13 @@ async def user(async_client: AsyncClient):
 async def authorised_cookie(user: AuthUser):
     """Cookie of authorized user."""
     jwt = await get_jwt_strategy().write_token(user)
+    return {"mir": jwt}
+
+
+@pytest.fixture()
+async def authorised_cookie_user2(user2: AuthUser):
+    """Cookie of authorized user."""
+    jwt = await get_jwt_strategy().write_token(user2)
     return {"mir": jwt}
 
 
@@ -85,10 +93,14 @@ async def questionary(get_async_session: AsyncSession, user2: AuthUser):
     """User questionary."""
     user_questionary_data["user_id"] = user2.id
     async with get_async_session as db:
-        questionary = UserQuestionnaire(**user_questionary_data)
-        db.add(questionary)
+        questionnaire = UserQuestionnaire(**user_questionary_data)
+        _hobbies: list = hobbies_dict["hobbies"]
+        for hobby in _hobbies:
+            hobby_obj = UserQuestionnaireHobby(hobby_name=hobby["hobby_name"])
+            questionnaire.hobbies.append(hobby_obj)
+        db.add(questionnaire)
         await db.commit()
-    return questionary
+    return questionnaire
 
 
 @pytest.fixture()

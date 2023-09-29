@@ -8,11 +8,11 @@ class UserBaseSchema(BaseModel):
         orm_mode = True
 
 
-class UserQuestionnaireHobby(UserBaseSchema):
+class UserHobby(UserBaseSchema):
     hobby_name: str
 
 
-class UserQuestionnaireSchema(UserBaseSchema):
+class CreateUserQuestionnaireSchema(UserBaseSchema):
     firstname: str
     lastname: str
     gender: str
@@ -20,23 +20,16 @@ class UserQuestionnaireSchema(UserBaseSchema):
     country: str
     city: str
     about: str
-    hobbies: list[UserQuestionnaireHobby]
+    hobbies: list[UserHobby]
     height: int
     goals: str
     body_type: str
+    user_id: uuid.UUID
 
 
-class UserQuestionnaireResponse(UserBaseSchema):
-    id: uuid.UUID
-    firstname: str
-    lastname: str
-    gender: str
-    photo: str
-    country: str
-    city: str
-    about: str
-    hobbies: list[UserQuestionnaireHobby]
-    height: int
-    goals: str
-    body_type: str
+class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
+    id: uuid.UUID | None = None
+
+
+class ResponseQuestionnaireSchemaWithMatch(ResponseUserQuestionnaireSchema):
     is_match: bool = False

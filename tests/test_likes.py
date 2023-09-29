@@ -74,11 +74,19 @@ class TestLike:
             "country": questionary.country,
             "city": questionary.city,
             "about": questionary.about,
-            "passion": questionary.passion,
             "height": questionary.height,
             "goals": questionary.goals,
             "body_type": questionary.body_type,
+            "user_id": IsUUID,
             "is_match": False,
+            "hobbies": [
+                {
+                    "hobby_name": questionary.hobbies[0].hobby_name,
+                },
+                {
+                    "hobby_name": questionary.hobbies[1].hobby_name,
+                },
+            ],
         }, (
             "Проверьте, что ответ на POST-запрос авторизованного пользователя к "
             f"`{create_like_url}` содержит анкету понравившегося пользователя "

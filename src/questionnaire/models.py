@@ -1,7 +1,15 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, ForeignKey, Numeric, String, UniqueConstraint, Table, Column
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    ForeignKey,
+    Numeric,
+    String,
+    Table,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import ChoiceType
 
@@ -38,9 +46,18 @@ class BlackListUser(Base):
 
 
 user_hobby = Table(
-    "user_hobby", Base.metadata,
-    Column("user_id", ForeignKey("user_questionnaire.id"), primary_key=True),
-    Column("hobby_id", ForeignKey("user_questionnaire_hobby.id"), primary_key=True),
+    "user_hobby",
+    Base.metadata,
+    Column(
+        "user_id",
+        ForeignKey("user_questionnaire.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "hobby_id",
+        ForeignKey("user_questionnaire_hobby.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 
@@ -48,6 +65,9 @@ class UserQuestionnaire(Base):
     __tablename__ = "user_questionnaire"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[datetime] = mapped_column(
+        default=datetime.utcnow,
+    )
     firstname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     lastname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     gender: Mapped[str] = mapped_column(ChoiceType(Gender), nullable=True)
@@ -61,12 +81,12 @@ class UserQuestionnaire(Base):
     goals: Mapped[str] = mapped_column(ChoiceType(Goal), nullable=True)
     body_type: Mapped[str] = mapped_column(ChoiceType(BodyType), nullable=True)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
-
     hobbies: Mapped[list["UserQuestionnaireHobby"]] = relationship(
-        secondary=user_hobby, lazy="selectin",
-        cascade='all,delete-orphan', single_parent=True
+        secondary=user_hobby,
+        lazy="selectin",
+        cascade="all,delete-orphan",
+        single_parent=True,
     )
-
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id", ondelete="CASCADE"),
         nullable=True,

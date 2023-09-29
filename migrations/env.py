@@ -4,9 +4,9 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from src.auth.models import AuthUser, UserSettings  # noqa: F401
+from src.chat.models import Message
 from src.config import settings
 from src.database import Base
-from src.posts.models import Message  # noqa: F401
 from src.matches.models import Match
 from src.likes.models import UserLike
 from src.questionnaire.models import BlackListUser, UserQuestionnaire  # noqa: F401
@@ -17,8 +17,7 @@ config = context.config
 
 section = config.config_ini_section
 
-config.set_section_option(section, "DATABASE_URL", settings.db_url)
-
+config.set_section_option(section=section, name="DATABASE_URL", value=settings.db_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -30,6 +29,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

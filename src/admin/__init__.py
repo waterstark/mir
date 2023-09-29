@@ -23,11 +23,11 @@ from src.admin.views import (
     UserSettingsView,
 )
 from src.auth.models import AuthUser, UserSettings
+from src.chat.models import Message
 from src.config import settings
 from src.database import engine
 from src.likes.models import UserLike
 from src.matches.models import Match
-from src.posts.models import Message
 from src.questionnaire.models import BlackListUser, UserQuestionnaire
 
 
