@@ -24,12 +24,12 @@ def upgrade() -> None:
     op.create_table('message',
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('match_id', sa.Uuid(), nullable=False),
-    sa.Column('from_id', sa.Uuid(), nullable=False),
+    sa.Column('user_id', sa.Uuid(), nullable=False),
     sa.Column('text', sa.String(length=4096), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('status', sqlalchemy_utils.types.choice.ChoiceType(MessageStatus), nullable=False),
     sa.Column('captions', postgresql.ARRAY(sa.String()), nullable=True),
-    sa.ForeignKeyConstraint(['from_id'], ['auth_user.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['user_id'], ['auth_user.id'], ondelete='RESTRICT'),
     sa.ForeignKeyConstraint(['match_id'], ['match.id'], ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('id')
     )
