@@ -11,7 +11,7 @@ poetry install
 ```
 Создать файл .env в корне проекта, и скопировать содержимое из .env-example
 ```sh
-cat .env-example > .env
+cat .example-env > .env
 ```
 Развернуть Postgres 
 ```sh
