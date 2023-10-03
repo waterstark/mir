@@ -20,6 +20,9 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str
 
+    class Config:
+        env_file = ".env"
+
     @property
     def db_url_postgresql(self) -> str:
         """Product db url."""
@@ -34,8 +37,7 @@ class Settings(BaseSettings):
         return f"mongodb://{self.MONGO_HOST}:{self.MONGO_PORT}"
 
 
-    class Config:
-        env_file = ".env"
+
 
 
 settings = Settings()
