@@ -37,7 +37,4 @@ class Settings(BaseSettings):
         return f"mongodb://{self.MONGO_HOST}:{self.MONGO_PORT}"
 
 
-
-
-
 settings = Settings()
