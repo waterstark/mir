@@ -15,7 +15,6 @@ class Redis:
             db=0,
             decode_responses=True,
         )
-        # self.redis_client.from_url('redis://' + self.path_to_conf_file)
 
     async def get(self, key: str):
         cached_data = await self.redis_client.get(key)
