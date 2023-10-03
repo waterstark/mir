@@ -43,13 +43,6 @@ hobbies_dict = {
     ],
 }
 
-data_for_redis = {
-    "TO_user_id": {
-        "message_update": ["Message(содержит from_user_id)"],
-        "message_delete": ["message_id"],
-        "message_create": ["Message"],
-    },
-}
 
 
 @pytest.fixture()
