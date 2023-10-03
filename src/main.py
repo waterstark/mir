@@ -4,6 +4,7 @@ from starlette.staticfiles import StaticFiles
 
 from src.admin import admin
 from src.auth.routers import auth_router, user_router
+from src.database import client_mongo
 from src.likes.routers import likes_router
 from src.matches.routers import router as matches_router
 from src.questionnaire.routers import router as questionnaire_router
@@ -30,3 +31,4 @@ main_router.include_router(likes_router)
 main_router.include_router(questionnaire_router)
 main_router.include_router(matches_router)
 app.include_router(main_router)
+app.state.mongo_client = client_mongo

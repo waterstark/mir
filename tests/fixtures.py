@@ -8,6 +8,7 @@ from src.likes.models import UserLike
 from src.main import app
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
+from src.redis.redis import Redis
 
 user_data = {
     "email": "test_user@server.com",
@@ -41,6 +42,14 @@ hobbies_dict = {
         {"hobby_name": "qwe"},
         {"hobby_name": "asd"},
     ],
+}
+
+data_for_redis = {
+    "TO_user_id": {
+        "message_update": ["Message(содержит from_user_id)"],
+        "message_delete": ["message_id"],
+        "message_create": ["Message"],
+    },
 }
 
 
@@ -161,3 +170,8 @@ async def like2(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
         db.add(like)
         await db.commit()
     return like
+
+
+@pytest.fixture()
+def redis_client():
+    return Redis()

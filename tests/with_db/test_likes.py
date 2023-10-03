@@ -9,10 +9,10 @@ from src.auth.models import AuthUser
 
 
 async def test_like_user(
-        async_client: AsyncClient,
-        get_async_session: AsyncSession,
-        user: AuthUser,
-        user2: AuthUser,
+    async_client: AsyncClient,
+    get_async_session: AsyncSession,
+    user: AuthUser,
+    user2: AuthUser,
 ):
     data = {"user_id": str(user.id), "liked_user_id": str(user2.id), "is_liked": True}
 

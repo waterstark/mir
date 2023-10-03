@@ -10,6 +10,7 @@ from src.questionnaire.schemas import (
     CreateUserQuestionnaireSchema,
     ResponseUserQuestionnaireSchema,
 )
+from src.redis.redis import Redis
 
 
 async def get_list_questionnaire_first_10(
@@ -55,6 +56,8 @@ async def create_questionnaire(
         questionnaire.hobbies.append(hobby_obj)
     session.add(questionnaire)
     await session.commit()
+    await Redis().redis_client.set("questionnaire", str(user_profile), ex=100)
+
     return ResponseUserQuestionnaireSchema(**questionnaire.__dict__)
 
 
