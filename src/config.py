@@ -34,8 +34,8 @@ class Settings(BaseSettings):
         return f"mongodb://{self.MONGO_HOST}:{self.MONGO_PORT}"
 
 
-class Config:
-    env_file = ".env"
+    class Config:
+        env_file = ".env"
 
 
 settings = Settings()
