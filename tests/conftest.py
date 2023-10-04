@@ -4,6 +4,7 @@ from typing import Any
 
 import httpx
 import pytest
+from async_asgi_testclient import TestClient
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -43,4 +44,10 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, Any, None]:
 @pytest.fixture(scope="session")
 async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
     async with httpx.AsyncClient(app=app, base_url="http://localhost") as client:
+        yield client
+
+
+@pytest.fixture(scope="session")
+async def ws_client() -> AsyncGenerator[TestClient, None]:
+    async with TestClient(app) as client:
         yield client
