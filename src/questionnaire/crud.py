@@ -13,8 +13,8 @@ from src.questionnaire.schemas import (
 
 
 async def get_list_questionnaire_first_10(
-        user: AuthUser,
-        session: AsyncSession,
+    user: AuthUser,
+    session: AsyncSession,
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
     is_visible = True
@@ -33,8 +33,8 @@ async def get_list_questionnaire_first_10(
 
 
 async def create_questionnaire(
-        user_profile: CreateUserQuestionnaireSchema,
-        session: AsyncSession,
+    user_profile: CreateUserQuestionnaireSchema,
+    session: AsyncSession,
 ):
     select_user_questionnaire = await get_questionnaire(
         user_id=user_profile.user_id,
@@ -59,9 +59,9 @@ async def create_questionnaire(
 
 
 async def update_questionnaire(
-        quest_id: UUID,
-        update_value: CreateUserQuestionnaireSchema,
-        session: AsyncSession,
+    quest_id: UUID,
+    update_value: CreateUserQuestionnaireSchema,
+    session: AsyncSession,
 ):
     update_value_dict = update_value.dict(exclude={"hobbies"})
     stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
@@ -80,9 +80,9 @@ async def update_questionnaire(
 
 
 async def delete_quest(
-        user: AuthUser,
-        quest_id: UUID,
-        session: AsyncSession,
+    user: AuthUser,
+    quest_id: UUID,
+    session: AsyncSession,
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
     if not user_questionnaire:

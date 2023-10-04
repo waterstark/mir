@@ -44,7 +44,6 @@ hobbies_dict = {
 }
 
 
-
 @pytest.fixture()
 async def user(async_client: AsyncClient):
     """Test user."""

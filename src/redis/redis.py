@@ -1,4 +1,3 @@
-import json
 import os
 from typing import Any
 
@@ -11,20 +10,22 @@ class Redis:
     def __init__(self):
         self.redis_client = aioredis.Redis(
             host=os.getenv("REDIS_HOST"),
-            port=6379,
+            port=int(os.getenv("REDIS_PORT")),
             db=0,
             decode_responses=True,
         )
 
-    async def get(self, key: str):
-        cached_data = await self.redis_client.get(key)
-        if cached_data:
-            return json.loads(cached_data)
+    async def get(self, name: str, key: str):
+        data: dict = await self.redis_client.hget(name=name, key=key)
+        if data:
+            return data
         return None
 
-    async def set(self, key: str, value: Any):
-        value_to_string = json.dumps(value)
-        await self.redis_client.set(key, value_to_string)
+    async def set(self, name: str, key: str, value: Any):
+        await self.redis_client.hset(name=name, key=key, value=value)
 
-    async def delete(self, key: str):
-        await self.redis_client.delete(key)
+    async def delete(self, name: str):
+        await self.redis_client.hdel(name)
+
+
+redis = Redis()
