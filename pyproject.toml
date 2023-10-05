@@ -27,13 +27,10 @@ starlette-admin = "^0.11.1"
 passlib = "^1.7.4"
 starlette-i18n = "^1.0.0"
 itsdangerous = "^2.1.2"
-<<<<<<< HEAD
 pymongo = "^4.5.0"
 motor = "^3.3.1"
-=======
 orjson = "^3.9.7"
 async-asgi-testclient = "^1.4.11"
->>>>>>> 7d0394575e10efa52b93535a9da976cb489a89c5
 
 
 [tool.poetry.group.dev.dependencies]
