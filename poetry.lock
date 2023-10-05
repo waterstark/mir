@@ -970,7 +970,6 @@ files = [
 ]
 
 [[package]]
-<<<<<<< HEAD
 name = "motor"
 version = "3.3.1"
 description = "Non-blocking MongoDB driver for Tornado or asyncio"
@@ -994,7 +993,6 @@ srv = ["pymongo[srv] (>=4.5,<5)"]
 test = ["aiohttp", "mockupdb", "motor[encryption]", "pytest (>=7)", "tornado (>=5)"]
 zstd = ["pymongo[zstd] (>=4.5,<5)"]
 
-=======
 name = "multidict"
 version = "6.0.4"
 description = "multidict implementation"
@@ -1077,7 +1075,6 @@ files = [
     {file = "multidict-6.0.4.tar.gz", hash = "sha256:3666906492efb76453c0e7b97f2cf459b0682e7402c0489a95484965dbc1da49"},
 ]
 
->>>>>>> 7d0394575e10efa52b93535a9da976cb489a89c5
 [[package]]
 name = "nodeenv"
 version = "1.8.0"
