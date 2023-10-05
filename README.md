@@ -11,11 +11,11 @@ poetry install
 ```
 Создать файл .env в корне проекта, и скопировать содержимое из .env-example
 ```sh
-cat .example-env > .env
+cat .env-example > .env
 ```
-Развернуть Postgres 
+Развернуть контейнеры для подключения к базам данных 
 ```sh
-docker compose up -d
+docker compose up -d --build --remove-orphans
 ```
 Сделать миграции
 ```sh
