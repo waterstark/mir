@@ -12,18 +12,29 @@ class Settings(BaseSettings):
 
     DB_PASS: str
 
-    SECRET_KEY: str
+    MONGO_HOST: str
 
-    @property
-    def db_url(self) -> str:
-        """Product db url."""
-        return (
-            f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@"
-            f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-        )
+    MONGO_PORT: str
+
+    MONGO_DATABASE: str
+
+    SECRET_KEY: str
 
     class Config:
         env_file = ".env"
+
+    @property
+    def db_url_postgresql(self) -> str:
+        """Product db url."""
+        return (
+            f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}"
+            f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        )
+
+    @property
+    def db_url_mongo(self) -> str:
+        """Product db url."""
+        return f"mongodb://{self.MONGO_HOST}:{self.MONGO_PORT}"
 
 
 settings = Settings()

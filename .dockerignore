@@ -1,6 +1,6 @@
 .git/
 pg_data/
 .env
-.env-example
+#.env-example
 .gitignore
 venv/

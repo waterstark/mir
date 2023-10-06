@@ -13,9 +13,9 @@ poetry install
 ```sh
 cat .env-example > .env
 ```
-Развернуть Postgres 
+Развернуть контейнеры для подключения к базам данных 
 ```sh
-docker compose up -d
+docker compose up -d --build --remove-orphans
 ```
 Сделать миграции
 ```sh

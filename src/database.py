@@ -1,7 +1,7 @@
 from collections.abc import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 from src.config import settings
 
@@ -10,8 +10,12 @@ class Base(DeclarativeBase):
     pass
 
 
-engine = create_async_engine(settings.db_url)
-async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+engine = create_async_engine(settings.db_url_postgresql, echo=True)
+async_session_maker = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

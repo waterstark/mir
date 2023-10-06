@@ -17,7 +17,9 @@ config = context.config
 
 section = config.config_ini_section
 
-config.set_section_option(section=section, name="DATABASE_URL", value=settings.db_url)
+config.set_section_option(
+    section=section, name="DATABASE_URL", value=settings.db_url_postgresql
+)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
