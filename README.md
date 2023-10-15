@@ -1,5 +1,13 @@
 # mir
 
+
+## Dependencies
+* python 3.10+
+* python-poetry
+* postgresql
+* mongodb
+* redis
+
 ## Установка   
 Активация виртуального окружения
 ```sh

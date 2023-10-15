@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from src.config import settings
 from src.database import Base, async_session_maker
 from src.main import app
+from src.mongodb.mongodb import Mongo
 
 engine = create_async_engine(settings.db_url_postgresql, poolclass=NullPool)
 
@@ -51,3 +52,9 @@ async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
 async def ws_client() -> AsyncGenerator[TestClient, None]:
     async with TestClient(app) as client:
         yield client
+
+
+@pytest.fixture(scope="session")
+async def mongo() -> AsyncGenerator[Mongo, None]:
+    from src.database import mongo
+    return mongo

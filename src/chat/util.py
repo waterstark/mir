@@ -9,6 +9,7 @@ class MessageStatus(str, Enum):
     SENT = "SENT"
     DELIVERED = "DELIVERED"
     READ = "READ"
+    DELETED = "DELETED"
 
     def __str__(self):
         return self
@@ -38,6 +39,7 @@ class WebSocketConnectionManager:
         user_id = self.parse_user_id_on_connect(await ws.receive_bytes())
         if user_id is not None:
             self.active_connections[user_id] = ws
+        # TODO: get user's matches and save to redis
         return user_id
 
     # TODO: change to jwt parse when ready
