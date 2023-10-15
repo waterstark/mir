@@ -20,6 +20,11 @@ jobs:
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     services:
+      mongo:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        # options: --health-cmd "echo 'db.runCommand(\'ping\').ok' | mongo localhost:27017/productiondb --quiet" --health-interval 10s --health-timeout 5s --health-retries 5
       postgres:
         image: postgres:15
         env:
@@ -29,11 +34,6 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      mongo:
-        image: mongo:7.0
-        ports:
-          - 27017:27017
-        options: --health-cmd "echo 'db.runCommand(\'ping\').ok' | mongo localhost:27017/productiondb --quiet" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout a Git repo
         uses: actions/checkout@v3
