@@ -33,11 +33,7 @@ jobs:
         image: mongo:7.0
         ports:
           - 27017:27017
-        healthcheck: 
-          test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/productiondb --quiet
-          interval: 5s
-          timeout: 5s
-          retries: 3
+        options: --health-cmd "echo 'db.runCommand(\'ping\').ok' | mongo localhost:27017/productiondb --quiet" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout a Git repo
         uses: actions/checkout@v3
