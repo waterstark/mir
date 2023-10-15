@@ -60,8 +60,8 @@ jobs:
           DB_NAME: ${{matrix.POSTGRES_DB}}
           DB_USER: ${{matrix.POSTGRES_USER}}
           DB_PASS: ${{matrix.POSTGRES_DB}}
-          MONGO_HOST: 192.168.0.18
-          MONGO_PORT: '27017'
+          MONGO_HOST: localhost
+          MONGO_PORT: 27017
           MONGO_DATABASE: mongodb
           REDIS_HOST: redis
           REDIS_PORT: '6379'
