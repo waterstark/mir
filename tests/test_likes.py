@@ -1,7 +1,7 @@
 import pytest
+from async_asgi_testclient import TestClient
 from dirty_equals import IsUUID
 from fastapi import status
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
@@ -20,7 +20,7 @@ class TestLike:
     async def test_access_not_authenticated_like_create(
         self,
         user: AuthUser,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Проверка существования эндпоинта users/{user_id}/like и наличия
         доступа к нему неавторизованного пользователя
@@ -42,7 +42,7 @@ class TestLike:
         user2: AuthUser,
         questionary: UserQuestionnaire,
         authorised_cookie: dict,
-        async_client: AsyncClient,
+        async_client: TestClient,
         get_async_session: AsyncSession,
     ):
         """Проверка валидного POST-запроса к эндпоинту users/{user_id}/like"""
@@ -102,7 +102,7 @@ class TestLike:
         like2: UserLike,
         questionary: UserQuestionnaire,
         authorised_cookie: dict,
-        async_client: AsyncClient,
+        async_client: TestClient,
         get_async_session: AsyncSession,
     ):
         """Проверка создания объекта Match в случае, когда при

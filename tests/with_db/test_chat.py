@@ -43,9 +43,9 @@ async def test_ws_msg_create(ws_client: TestClient, user: AuthUser, user2: AuthU
     }
 
 
-async def test_ws_bad_user_credentials(ws_client: TestClient):
+async def test_ws_bad_user_credentials(async_client: TestClient):
     with mock.patch.object(ws_manager, "parse_user_id_on_connect", return_value=None):
-        async with ws_client.websocket_connect("/chat/ws") as ws:
+        async with async_client.websocket_connect("/chat/ws") as ws:
             await ws.send_bytes(orjson.dumps({
                 "user_id": uuid.uuid4(),
             }))

@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 
 import pytest
+from async_asgi_testclient import TestClient
 from dirty_equals import IsUUID
 from fastapi import status
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.crud import get_user_profile
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class TestUser:
     """Тесты на пользователя."""
 
-    async def test_user_registration(self, async_client: AsyncClient):
+    async def test_user_registration(self, async_client: TestClient):
         """Тест - создание пользователя."""
         user_data = {
             "email": "user@mail.ru",
@@ -40,7 +40,7 @@ class TestUser:
     async def test_user_registration_with_same_email(
         self,
         user: AuthUser,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Тест - создание уже существующего пользователя."""
         response = await async_client.post(
@@ -51,7 +51,7 @@ class TestUser:
 
     async def test_user_registration_with_incorrect_data(
         self,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Тест - создание пользователя: некорректные данные."""
         wrong_data = {
@@ -67,37 +67,37 @@ class TestUser:
     async def test_login(
         self,
         user: AuthUser,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Тест - авторизация зарегистрированного пользователя."""
         response = await async_client.post(
             app.url_path_for("auth:jwt.login"),
-            data={
-                "username": user.email,
-                "password": user_data.get("password"),
-            },
+            form=[
+                ("username", user.email),
+                ("password", user_data.get("password")),
+            ],
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     async def test_login_wrong_password(
         self,
         user: AuthUser,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Тест - вход c неправильным паролем."""
         response = await async_client.post(
             app.url_path_for("auth:jwt.login"),
-            data={
-                "username": user.email,
-                "password": "wrong_password",
-            },
+            form=[
+                ("username", user.email),
+                ("password", "wrong_password"),
+            ],
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     async def test_logout(
         self,
         authorised_cookie: dict,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Тест - logout авторизованного пользователя."""
         response = await async_client.post(
@@ -114,7 +114,7 @@ class TestUserProfile:
         self,
         user: AuthUser,
         authorised_cookie: dict,
-        async_client: AsyncClient,
+        async_client: TestClient,
         get_async_session: AsyncSession,
     ):
         """Тест - получение профиля пользователя."""
@@ -141,7 +141,7 @@ class TestUserProfile:
         self,
         user: AuthUser,
         authorised_cookie: dict,
-        async_client: AsyncClient,
+        async_client: TestClient,
         get_async_session: AsyncSession,
     ):
         """Тест - обновление профиля пользователя."""
@@ -189,7 +189,7 @@ class TestUserProfile:
         range_min: int,
         range_max: int,
         authorised_cookie: dict,
-        async_client: AsyncClient,
+        async_client: TestClient,
     ):
         """Тест - обновление профиля пользователя."""
         wrong_data = {

@@ -36,6 +36,7 @@ user_questionary_data = {
     "goals": "Флирт",
     "body_type": "Худое",
 }
+
 hobbies_dict = {
     "hobbies": [
         {"hobby_name": "qwe"},
