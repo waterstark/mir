@@ -63,6 +63,9 @@ user_hobby = Table(
 
 class UserQuestionnaire(Base):
     __tablename__ = "user_questionnaire"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="_user_id_uc"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     created_at: Mapped[datetime] = mapped_column(

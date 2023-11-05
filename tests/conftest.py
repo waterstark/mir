@@ -20,17 +20,12 @@ pytest_plugins = [
 ]
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True, scope="module")
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_maker() as session:
-        yield session
-
-
-@pytest.fixture(autouse=True)
-async def _prepare_database() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    yield
+    async with async_session_maker() as session:
+        yield session
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 

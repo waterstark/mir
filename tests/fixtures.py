@@ -44,7 +44,7 @@ hobbies_dict = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def user(async_client: AsyncClient):
     """Test user."""
     response = await async_client.post(
@@ -54,21 +54,21 @@ async def user(async_client: AsyncClient):
     return AuthUser(**response.json())
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def authorised_cookie(user: AuthUser):
     """Cookie of authorized user."""
     jwt = await get_jwt_strategy().write_token(user)
     return {"mir": jwt}
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def authorised_cookie_user2(user2: AuthUser):
     """Cookie of authorized user."""
     jwt = await get_jwt_strategy().write_token(user2)
     return {"mir": jwt}
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def user2(async_client: AsyncClient):
     """Test user."""
     response = await async_client.post(
@@ -78,7 +78,7 @@ async def user2(async_client: AsyncClient):
     return AuthUser(**response.json())
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def user3(async_client: AsyncClient):
     """Test user."""
     response = await async_client.post(
@@ -88,7 +88,7 @@ async def user3(async_client: AsyncClient):
     return AuthUser(**response.json())
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def questionary(get_async_session: AsyncSession, user2: AuthUser):
     """User questionary."""
     user_questionary_data["user_id"] = user2.id
@@ -103,7 +103,7 @@ async def questionary(get_async_session: AsyncSession, user2: AuthUser):
     return questionnaire
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser):
     async with get_async_session as db:
         match = Match(
@@ -115,7 +115,7 @@ async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
     return match
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def match1(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUser):
     async with get_async_session as db:
         match = Match(
@@ -127,7 +127,7 @@ async def match1(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUs
     return match
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def match2(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUser):
     async with get_async_session as db:
         match = Match(
@@ -139,7 +139,7 @@ async def match2(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUs
     return match
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def like1(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser):
     async with get_async_session as db:
         like = UserLike(
@@ -151,7 +151,7 @@ async def like1(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
     return like
 
 
-@pytest.fixture()
+@pytest.fixture(scope="module")
 async def like2(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser):
     async with get_async_session as db:
         like = UserLike(

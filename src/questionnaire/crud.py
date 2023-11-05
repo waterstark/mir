@@ -63,12 +63,15 @@ async def update_questionnaire(
     update_value: CreateUserQuestionnaireSchema,
     session: AsyncSession,
 ):
-    update_value_dict = update_value.dict(exclude={"hobbies"})
+    update_value_dict = update_value.dict(exclude={"hobbies", "user_id"})
     stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
     result = await session.execute(stmt)
     questionnaire = result.scalar_one_or_none()
     stmt = (
-        update(UserQuestionnaire).values(update_value_dict).returning(UserQuestionnaire)
+        update(UserQuestionnaire)
+        .values(update_value_dict)
+        .where(UserQuestionnaire.id == quest_id)
+        .returning(UserQuestionnaire)
     )
     await session.execute(stmt)
     questionnaire.hobbies = []

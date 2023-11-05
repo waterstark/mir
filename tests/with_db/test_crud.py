@@ -52,7 +52,7 @@ async def test_create_questionnaire(
 async def test_update_quest(
     async_client: AsyncClient,
     questionary: UserQuestionnaire,
-    user: AuthUser,
+    user2: AuthUser,
 ):
     updated_data = {
         "firstname": "string",
@@ -73,7 +73,7 @@ async def test_update_quest(
         "height": 0,
         "goals": "Флирт",
         "body_type": "Полное",
-        "user_id": user.id,
+        "user_id": user2.id,
     }
 
     response = await async_client.patch(
@@ -103,7 +103,7 @@ async def test_update_quest(
         "body_type": "Полное",
         "user_id": IsUUID,
     }
-    assert response.json()["user_id"] == str(user.id)
+    assert response.json()["user_id"] == str(user2.id)
 
 
 async def test_delete_quest(
