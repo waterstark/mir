@@ -26,8 +26,12 @@ class Message(Base):
         ForeignKey("auth_user.id", ondelete="RESTRICT"),
         nullable=False,
     )
-    text: Mapped[str] = mapped_column(String(length=4096), nullable=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(
+    to_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    text: Mapped[str] = mapped_column(String(length=4096), nullable=True)
+    updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime,
         default=datetime.datetime.utcnow,
         nullable=False,
