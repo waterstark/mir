@@ -36,7 +36,7 @@ services:
     env_file:
       - .env
     ports:
-      - ${DB_HOST}:${DB_HOST}
+      - ${DB_PORT}:${DB_PORT}
     networks:
       mir_network:
         ipv4_address: 192.168.0.10
