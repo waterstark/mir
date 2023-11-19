@@ -1,6 +1,5 @@
 # mir
 
-
 ## Dependencies
 * python 3.10+
 * python-poetry
@@ -8,7 +7,8 @@
 * mongodb
 * redis
 
-## Установка   
+
+## Локальная установка
 Активация виртуального окружения
 ```sh
 poetry shell
@@ -34,7 +34,17 @@ alembic upgrade head
 uvicorn src.main:app --reload
 ```
 
-#### Работа с pgAdmin
+## Запуск в докере
+```shell
+docker-compose up
+```
+
+## Запуск тестов в докере
+```sh
+docker-compose up test_app
+```
+
+### Работа с pgAdmin
 1. Вход в систему  
 Логин - указать значение PGADMIN_DEFAULT_EMAIL из файла .env
 Пароль - указать значение PGADMIN_DEFAULT_PASSWORD из файла .env
