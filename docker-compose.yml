@@ -7,16 +7,45 @@ services:
       dockerfile: Dockerfile
     container_name: app_mir
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_HOST=${DB_HOST}
-      - DATABASE_PORT=${DB_PORT}
-    env_file:
-      - .env
+      - DB_HOST=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - TEST_DB_NAME=${TEST_DB_NAME}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - SECRET_KEY=${SECRET_KEY}
     ports:
       - '8000:8000'
     entrypoint: sh -c "alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8000"
+    networks:
+      - mir_network
+    depends_on:
+      - postgresql_db
+      - redis_app
+      - mongo_db
+
+  test_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test_app_mir
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - TEST_DB_NAME=${TEST_DB_NAME}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - SECRET_KEY=${SECRET_KEY}
+    ports:
+      - '8000:8000'
+    entrypoint: sh -c "alembic upgrade head && pytest"
     networks:
       - mir_network
     depends_on:
@@ -31,12 +60,8 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_HOST=${DB_HOST}
-      - DATABASE_PORT=${DB_PORT}
-    env_file:
-      - .env
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - ${CONTAINER_DB_PORT}:${DB_PORT}
     networks:
       mir_network:
         ipv4_address: 192.168.0.10
@@ -45,7 +70,7 @@ services:
     container_name: redis_mir
     image: redis:latest
     ports:
-      - "6379:6379"
+      - ${CONTAINER_REDIS_PORT}:${REDIS_PORT}
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli", "ping"]
       interval: 5s
@@ -59,7 +84,7 @@ services:
     container_name: mongo_db_mir
     image: mongo:latest
     ports:
-      - ${MONGO_PORT}:${MONGO_PORT}
+      - ${CONTAINER_MONGO_PORT}:${MONGO_PORT}
     networks:
       mir_network:
         ipv4_address: 192.168.0.18
