@@ -13,15 +13,15 @@ from src.chat.util import MessageStatus, WSAction, WSStatus
 from src.mongodb.mongodb import Mongo
 
 
-async def test_ws_msg_create(ws_client: TestClient, user: AuthUser, user2: AuthUser):
-    msg = {
-        "match_id": uuid.uuid4(),
-        "from_id": user.id,
-        "to_id": user2.id,
-        "text": "lol",
-    }
+async def test_ws_msg_create(
+        async_client: TestClient,
+        user: AuthUser,
+        user2: AuthUser,
+):
+    msg = {"match_id": uuid.uuid4(), "text": "lol",
+           "from_id": user.id, "to_id": user2.id}
 
-    async with ws_client.websocket_connect("/chat/ws") as ws:
+    async with async_client.websocket_connect("/chat/ws") as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
@@ -61,14 +61,15 @@ async def test_ws_bad_user_credentials(async_client: TestClient):
     assert str(exc.value) == "{'type': 'websocket.close', 'code': 1000, 'reason': ''}"
 
 
-async def test_ws_unknown_action(ws_client: TestClient, user: AuthUser, user2: AuthUser):
-    msg = {
-        "match_id": uuid.uuid4(),
-        "from_id": user.id,
-        "to_id": user2.id,
-        "text": "lol",
-    }
-    async with ws_client.websocket_connect("/chat/ws") as ws:
+async def test_ws_unknown_action(
+        async_client: TestClient,
+        user: AuthUser,
+        user2: AuthUser,
+):
+    msg = {"match_id": uuid.uuid4(), "text": "lol",
+           "from_id": user.id, "to_id": user2.id}
+
+    async with async_client.websocket_connect("/chat/ws") as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
@@ -83,7 +84,7 @@ async def test_ws_unknown_action(ws_client: TestClient, user: AuthUser, user2: A
 
 
 async def test_ws_message_delete(
-        ws_client: TestClient,
+        async_client: TestClient,
         user: AuthUser,
         user2: AuthUser,
         mongo: Mongo,
@@ -100,7 +101,7 @@ async def test_ws_message_delete(
     msg["id"] = result.id
     msg.pop("text")
 
-    async with ws_client.websocket_connect("/chat/ws") as ws:
+    async with async_client.websocket_connect("/chat/ws") as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
@@ -113,7 +114,11 @@ async def test_ws_message_delete(
     assert resp["status"] == WSStatus.OK
 
 
-async def test_ws_message_wrong_delete(ws_client: TestClient, user: AuthUser, user2: AuthUser):
+async def test_ws_message_wrong_delete(
+        async_client: TestClient,
+        user: AuthUser,
+        user2: AuthUser,
+):
     msg = {
         "id": uuid.uuid4(),
         "match_id": uuid.uuid4(),
@@ -121,7 +126,7 @@ async def test_ws_message_wrong_delete(ws_client: TestClient, user: AuthUser, us
         "to_id": user2.id,
     }
 
-    async with ws_client.websocket_connect("/chat/ws") as ws:
+    async with async_client.websocket_connect("/chat/ws") as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
@@ -136,7 +141,7 @@ async def test_ws_message_wrong_delete(ws_client: TestClient, user: AuthUser, us
 
 
 async def test_ws_message_update(
-        ws_client: TestClient,
+        async_client: TestClient,
         user: AuthUser,
         user2: AuthUser,
         mongo: Mongo,
@@ -153,7 +158,7 @@ async def test_ws_message_update(
     msg.text = "lol"
     msg.status = MessageStatus.READ
 
-    async with ws_client.websocket_connect("/chat/ws") as ws:
+    async with async_client.websocket_connect("/chat/ws") as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
@@ -175,7 +180,11 @@ async def test_ws_message_update(
     }
 
 
-async def test_ws_message_update_error(ws_client: TestClient, user: AuthUser, user2: AuthUser):
+async def test_ws_message_update_error(
+        async_client: TestClient,
+        user: AuthUser,
+        user2: AuthUser,
+):
     msg = {
         "id": uuid.uuid4(),
         "match_id": uuid.uuid4(),
@@ -185,7 +194,7 @@ async def test_ws_message_update_error(ws_client: TestClient, user: AuthUser, us
         "status": MessageStatus.READ,
     }
 
-    async with ws_client.websocket_connect("/chat/ws") as ws:
+    async with async_client.websocket_connect("/chat/ws") as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
