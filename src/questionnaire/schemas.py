@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 
 
 class UserBaseSchema(BaseModel):
@@ -25,6 +25,7 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     goals: str
     body_type: str
     user_id: uuid.UUID
+    age: conint(ge=18, le=99)
 
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
