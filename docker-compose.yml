@@ -44,7 +44,7 @@ services:
       - MONGO_DATABASE=${MONGO_DATABASE}
       - SECRET_KEY=${SECRET_KEY}
     ports:
-      - '8000:8000'
+      - '8080:8080'
     entrypoint: sh -c "alembic upgrade head && pytest"
     networks:
       - mir_network

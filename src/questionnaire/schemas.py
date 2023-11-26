@@ -24,7 +24,6 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     height: int
     goals: str
     body_type: str
-    user_id: uuid.UUID
 
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
