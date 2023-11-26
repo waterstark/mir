@@ -33,11 +33,12 @@ async def get_list_questionnaire_first_10(
 
 
 async def create_questionnaire(
+    user: AuthUser,
     user_profile: CreateUserQuestionnaireSchema,
     session: AsyncSession,
 ):
     select_user_questionnaire = await get_questionnaire(
-        user_id=user_profile.user_id,
+        user_id=user.id,
         session=session,
     )
     if select_user_questionnaire:
@@ -48,6 +49,7 @@ async def create_questionnaire(
             ),
         )
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
+    user_profile_dict['user_id'] = user.id
     questionnaire = UserQuestionnaire(**user_profile_dict)
     hobbies = user_profile.hobbies
     for hobby in hobbies:
@@ -59,18 +61,22 @@ async def create_questionnaire(
 
 
 async def update_questionnaire(
-    quest_id: UUID,
+    # quest_id: UUID,
+    user: AuthUser,
     update_value: CreateUserQuestionnaireSchema,
     session: AsyncSession,
 ):
     update_value_dict = update_value.dict(exclude={"hobbies", "user_id"})
-    stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
+    stmt = select(UserQuestionnaire).where(UserQuestionnaire.user_id == user.id)
+    print(user.id)
     result = await session.execute(stmt)
+    print(stmt)
     questionnaire = result.scalar_one_or_none()
+    print(questionnaire)
     stmt = (
         update(UserQuestionnaire)
         .values(update_value_dict)
-        .where(UserQuestionnaire.id == quest_id)
+        .where(UserQuestionnaire.user_id == user.id)
         .returning(UserQuestionnaire)
     )
     await session.execute(stmt)
@@ -84,7 +90,6 @@ async def update_questionnaire(
 
 async def delete_quest(
     user: AuthUser,
-    quest_id: UUID,
     session: AsyncSession,
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
@@ -93,17 +98,13 @@ async def delete_quest(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Такой анкеты не существует",
         )
-    if user_questionnaire.id == quest_id:
-        query_questionnaire = delete(UserQuestionnaire).where(
-            UserQuestionnaire.id == quest_id,
-        )
-        await session.execute(query_questionnaire)
-        await session.commit()
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Нет доступа к данной анкете!!! {quest_id}",
-        )
+
+    query_questionnaire = delete(UserQuestionnaire).where(
+        UserQuestionnaire.user_id == user.id,
+    )
+    await session.execute(query_questionnaire)
+    await session.commit()
+
 
 
 async def get_questionnaire(user_id: UUID, session: AsyncSession):
