@@ -27,8 +27,9 @@ router = APIRouter(
 async def create_questionnaire(
     user_profile: CreateUserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
+    user: AuthUser = Depends(current_user),
 ):
-    return await crud.create_questionnaire(user_profile, session)
+    return await crud.create_questionnaire(user, user_profile, session)
 
 
 @router.get(
@@ -44,25 +45,27 @@ async def get_list_questionnaire(
 
 
 @router.patch(
-    "/{quest_id}",
+    "",
     response_model=ResponseUserQuestionnaireSchema,
     status_code=status.HTTP_200_OK,
 )
 async def update_quest(
-    quest_id: UUID,
+    # quest_id: UUID,
     update_value: CreateUserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
+    user: AuthUser = Depends(current_user),
 ):
-    return await crud.update_questionnaire(quest_id, update_value, session)
+    print(user.id)
+    return await crud.update_questionnaire(user, update_value, session)
 
 
 @router.delete(
-    "/{quest_id}",
+    "",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_quest(
     user: Annotated[AuthUser, Depends(current_user)],
-    quest_id: UUID,
+    # quest_id: UUID,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
-    return await crud.delete_quest(user, quest_id, session)
+    return await crud.delete_quest(user, session)
