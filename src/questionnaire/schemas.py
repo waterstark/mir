@@ -24,8 +24,8 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     height: int
     goals: str
     body_type: str
-    user_id: uuid.UUID
     age: conint(ge=18, le=99)
+    user_id: uuid.UUID
 
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):

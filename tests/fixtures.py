@@ -35,6 +35,7 @@ user_questionary_data = {
     "height": 150,
     "goals": "Флирт",
     "body_type": "Худое",
+    "age": 20,
 }
 
 hobbies_dict = {

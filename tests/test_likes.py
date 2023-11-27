@@ -80,6 +80,7 @@ class TestLike:
             "body_type": questionary.body_type,
             "user_id": IsUUID,
             "is_match": False,
+            "age": questionary.age,
             "hobbies": [
                 {
                     "hobby_name": questionary.hobbies[0].hobby_name,

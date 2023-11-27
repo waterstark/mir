@@ -81,6 +81,7 @@ class TestMatch:
             "country": questionary.country,
             "city": questionary.city,
             "about": questionary.about,
+            "age": questionary.age,
             "hobbies": [
                 {
                     "hobby_name": questionary.hobbies[0].hobby_name,
