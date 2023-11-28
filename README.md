@@ -17,7 +17,7 @@ poetry shell
 ```sh
 poetry install
 ```
-Создать файл .env в корне проекта, и скопировать содержимое из .env-example
+Создать файл .env в корне проекта: скопировать содержимое из .env-example и настроить под себя, если надо
 ```sh
 cat .env-example > .env
 ```
@@ -40,6 +40,11 @@ docker-compose up
 ```
 
 ## Запуск тестов в докере
+Создать файл .env в корне проекта: скопировать содержимое из .env-example и настроить под себя, если надо
+```sh
+cat .env-example > .env
+```
+Поднять контейнеры
 ```sh
 docker-compose up test_app
 ```
