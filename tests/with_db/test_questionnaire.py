@@ -24,6 +24,7 @@ async def test_create_questionnaire(
         "height": 0,
         "goals": "Дружба",
         "body_type": "Худое",
+        "age": 20,
         "user_id": user.id,
     }
     response = await async_client.post(
@@ -44,6 +45,7 @@ async def test_create_questionnaire(
         "height": 0,
         "goals": "Дружба",
         "body_type": "Худое",
+        "age": 20,
         "user_id": IsUUID,
     }
     assert response.json()["user_id"] == str(user.id)
@@ -66,6 +68,7 @@ async def test_create_questionnaire_bad_credentials(
         "height": 0,
         "goals": "Дружба",
         "body_type": "Худое",
+        "age": 20,
         "user_id": questionary.user_id,
     }
     response = await async_client.post(
@@ -103,6 +106,7 @@ async def test_update_quest(
         "height": 0,
         "goals": "Флирт",
         "body_type": "Полное",
+        "age": 20,
         "user_id": user2.id,
     }
 
@@ -131,6 +135,7 @@ async def test_update_quest(
         "height": 0,
         "goals": "Флирт",
         "body_type": "Полное",
+        "age": 20,
         "user_id": IsUUID,
     }
     assert response.json()["user_id"] == str(user2.id)
