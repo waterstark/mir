@@ -1,5 +1,4 @@
 import asyncio
-import unittest.mock
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
 
@@ -20,8 +19,6 @@ async_session_maker = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
-
-unittest.mock.patch("src.database.async_session_maker", async_session_maker)
 
 pytest_plugins = [
     "tests.fixtures",
