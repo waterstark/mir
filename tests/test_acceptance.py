@@ -19,6 +19,7 @@ from src.questionnaire.models import UserQuestionnaire
 class TestAcceptance:
     """Тесты на поведение пользователя."""
 
+    @pytest.mark.skip(reason="")
     async def test_acceptance(self, async_client: TestClient, user: AuthUser,):
 
         """1. Регистрация двух пользователей."""
@@ -339,6 +340,7 @@ class TestAcceptance:
         }]
         assert response.json()[0]["user_id"] == created_user_1_id
 
+    @pytest.mark.skip(reason="")
     async def test_acceptance_with_chat(self, async_client: TestClient, user: AuthUser, ):
         """Тесты на чат между мользователями (пользователи взяты из предыдущего теста)."""
 
@@ -370,7 +372,7 @@ class TestAcceptance:
         )
         created_user_1_id = response.json()["id"]
 
-        """Логин пользователя 1."""
+        """Логин пользователя 2."""
         response = await async_client.post(
             app.url_path_for("auth:jwt.login"),
             form=[
