@@ -1,11 +1,10 @@
 import pytest
-from httpx import AsyncClient
+from async_asgi_testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import get_jwt_strategy
 from src.auth.models import AuthUser
 from src.likes.models import UserLike
-from src.main import app
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 
@@ -47,10 +46,10 @@ hobbies_dict = {
 
 
 @pytest.fixture(scope="module")
-async def user(async_client: AsyncClient):
+async def user(async_client: TestClient):
     """Test user."""
     response = await async_client.post(
-        app.url_path_for("register:register"),
+        async_client.application.url_path_for("register:register"),
         json=user_data,
     )
     return AuthUser(**response.json())
@@ -71,20 +70,27 @@ async def authorised_cookie_user2(user2: AuthUser):
 
 
 @pytest.fixture(scope="module")
-async def user2(async_client: AsyncClient):
+async def authorised_cookie_user3(user3: AuthUser):
+    """Cookie of authorized user."""
+    jwt = await get_jwt_strategy().write_token(user3)
+    return {"mir": jwt}
+
+
+@pytest.fixture(scope="module")
+async def user2(async_client: TestClient):
     """Test user."""
     response = await async_client.post(
-        app.url_path_for("register:register"),
+        async_client.application.url_path_for("register:register"),
         json=user2_data,
     )
     return AuthUser(**response.json())
 
 
 @pytest.fixture(scope="module")
-async def user3(async_client: AsyncClient):
+async def user3(async_client: TestClient):
     """Test user."""
     response = await async_client.post(
-        app.url_path_for("register:register"),
+        async_client.application.url_path_for("register:register"),
         json=user3_data,
     )
     return AuthUser(**response.json())

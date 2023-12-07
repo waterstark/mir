@@ -34,7 +34,7 @@ class Settings(BaseSettings):
         )
 
     @property
-    def test_db_url_postgres(self) -> str:
+    def test_db_url_postgresql(self) -> str:
         """Test db url.
         For local testing:
          - if you have TEST_DB_NAME, tests will use this db.

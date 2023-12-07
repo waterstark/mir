@@ -162,6 +162,7 @@ class TestMatch:
         )
 
     # incorrect table state
+    # this endpoint should not exist
     @pytest.mark.skip()
     async def test_invalid_match_delete(
         self,
