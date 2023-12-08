@@ -48,8 +48,8 @@ async def get_list_questionnaire(
     status_code=status.HTTP_200_OK,
 )
 async def get_questionnaire(
-        user: Annotated[AuthUser, Depends(current_user)],
-        session: Annotated[AsyncSession, Depends(get_async_session)],
+    user: Annotated[AuthUser, Depends(current_user)],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
 ):
     return await crud.get_questionnaire(user.id, session)
 

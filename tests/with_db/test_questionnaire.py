@@ -3,6 +3,8 @@ from dirty_equals import IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.main import app
+
 from src.auth.models import AuthUser
 from src.questionnaire.crud import get_questionnaire
 from src.questionnaire.models import UserQuestionnaire
@@ -53,7 +55,6 @@ async def test_create_questionnaire(
 
 async def test_create_questionnaire_bad_credentials(
     async_client: TestClient,
-    user2: AuthUser,
     questionary: UserQuestionnaire,
 ):
     questionnaire_data = {

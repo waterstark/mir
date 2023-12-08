@@ -19,7 +19,6 @@ from src.questionnaire.models import UserQuestionnaire
 class TestAcceptance:
     """Тесты на поведение пользователя."""
 
-    @pytest.mark.skip(reason="")
     async def test_acceptance(self, async_client: TestClient, user: AuthUser,):
 
         """1. Регистрация двух пользователей."""
@@ -102,15 +101,8 @@ class TestAcceptance:
             "goals": questionnaire_1_data["goals"],
             "body_type": questionnaire_1_data["body_type"],
             "age": questionnaire_1_data["age"],
-<<<<<<< Updated upstream
-            "user_id": IsUUID,
-        }
-        assert response.json()["user_id"] == created_user_1_id
-=======
             "user_id": created_user_1_id,
         }
-
->>>>>>> Stashed changes
         questionnaire_2_data = {
             "firstname": "Аня",
             "lastname": "Каренина",
@@ -145,14 +137,8 @@ class TestAcceptance:
             "goals": questionnaire_2_data["goals"],
             "body_type": questionnaire_2_data["body_type"],
             "age": questionnaire_2_data["age"],
-<<<<<<< Updated upstream
-            "user_id": IsUUID,
-        }
-        assert response.json()["user_id"] == created_user_2_id
-=======
             "user_id": created_user_2_id,
         }
->>>>>>> Stashed changes
 
         """Логин пользователя 1."""
         response = await async_client.post(
@@ -184,14 +170,8 @@ class TestAcceptance:
             "goals": questionnaire_2_data["goals"],
             "body_type": questionnaire_2_data["body_type"],
             "age": questionnaire_2_data["age"],
-<<<<<<< Updated upstream
-            "user_id": IsUUID,
-        }]
-        assert response.json()[0]["user_id"] == created_user_2_id
-=======
             "user_id": created_user_2_id,
         }]
->>>>>>> Stashed changes
 
         """Первый пользователь лайкает второго."""
 
@@ -217,16 +197,15 @@ class TestAcceptance:
             "goals": questionnaire_2_data["goals"],
             "body_type": questionnaire_2_data["body_type"],
             "age": questionnaire_2_data["age"],
-            "user_id": IsUUID,
+            "user_id": created_user_2_id,
             "is_match": False
         }"""
 
         """Новый лайк(Вроде Маки уже сделал)."""
 
         like_1 = {
-            "user_id": created_user_1_id,
             "liked_user_id": created_user_2_id,
-            "is_liked": False
+            "is_liked": True
         }
 
         """Возможно поле is_like нужно будет убрать."""
@@ -239,9 +218,8 @@ class TestAcceptance:
         assert response.json() == {
             "created_at": IsStr,
             "id": IsUUID,
-            "user_id": created_user_1_id,
             "liked_user_id": created_user_2_id,
-            "is_liked": False
+            "is_liked": True
         }
 
 
@@ -275,14 +253,8 @@ class TestAcceptance:
             "goals": questionnaire_1_data["goals"],
             "body_type": questionnaire_1_data["body_type"],
             "age": questionnaire_1_data["age"],
-<<<<<<< Updated upstream
-            "user_id": IsUUID,
-        }]
-        assert response.json()[0]["user_id"] == created_user_1_id
-=======
             "user_id": created_user_1_id,
         }]
->>>>>>> Stashed changes
 
         """Второй пользователь лайкает первого."""
 
@@ -316,9 +288,8 @@ class TestAcceptance:
         """Новый лайк(Вроде Маки уже сделал)."""
 
         like_2 = {
-            "user_id": created_user_2_id,
-            "liked_user_id": created_user_1_id,
-            "is_liked": False
+             "liked_user_id": created_user_1_id,
+             "is_liked": True
         }
 
         """Возможно поле is_like нужно будет убрать."""
@@ -331,9 +302,8 @@ class TestAcceptance:
         assert response.json() == {
             "created_at": IsStr,
             "id": IsUUID,
-            "user_id": created_user_2_id,
             "liked_user_id": created_user_1_id,
-            "is_liked": False
+            "is_liked": True
         }
 
         """Проверка матча вторым пользователем."""
@@ -356,19 +326,10 @@ class TestAcceptance:
             "goals": questionnaire_1_data["goals"],
             "body_type": questionnaire_1_data["body_type"],
             "age": questionnaire_1_data["age"],
-<<<<<<< Updated upstream
-            "user_id": IsUUID,
-            "is_match": True
-        }]
-        assert response.json()[0]["user_id"] == created_user_1_id
-=======
             "user_id": created_user_1_id,
             "is_match": True
         }]
 
->>>>>>> Stashed changes
-
-    @pytest.mark.skip(reason="")
     async def test_acceptance_with_chat(self, async_client: TestClient, user: AuthUser, ):
         """Тесты на чат между мользователями (пользователи взяты из предыдущего теста)."""
 
