@@ -9,8 +9,7 @@ from src.auth.base_config import current_user
 from src.auth.models import AuthUser
 from src.database import get_async_session
 from src.exceptions import NotFoundException, PermissionDeniedException
-from src.likes.crud import get_retreive_like, perform_destroy_like
-from src.likes.schemas import UserLikeRequest
+from src.likes.crud import get_like_by_user_ids, perform_destroy_like
 from src.matches.crud import get_match_by_id, perform_destroy_match
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire
@@ -70,9 +69,10 @@ async def match_delete(
         raise PermissionDeniedException
 
     another_user_id = match.user1_id if user.id == match.user2_id else match.user2_id
-    like = await get_retreive_like(
+    like = await get_like_by_user_ids(
         session,
-        UserLikeRequest(user_id=user.id, liked_user_id=another_user_id),
+        user_id=user.id,
+        liked_user_id=another_user_id,
     )
 
     if not like:

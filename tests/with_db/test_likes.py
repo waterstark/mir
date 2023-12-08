@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 
 from dirty_equals import IsDatetime, IsUUID
@@ -6,22 +7,23 @@ from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
+from src.matches.crud import get_match_by_user_ids
 
 
 async def test_like_user(
     async_client: AsyncClient,
-    get_async_session: AsyncSession,
-    user: AuthUser,
+    authorised_cookie: dict,
     user2: AuthUser,
 ):
-    data = {"user_id": str(user.id), "liked_user_id": str(user2.id), "is_liked": True}
+    """Проверка корректного выставления лайка.
+    """
+    data = {"liked_user_id": str(user2.id), "is_liked": True}
 
-    response: Response = await async_client.post("/api/v1/likes", json=data)
+    response: Response = await async_client.post("/api/v1/likes", json=data, cookies=authorised_cookie)
 
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
         "id": IsUUID,
-        "user_id": str(user.id),
         "liked_user_id": str(user2.id),
         "created_at": IsDatetime(iso_string=True),
         "is_liked": True,
@@ -30,11 +32,53 @@ async def test_like_user(
 
 async def test_like_wrong_user(
     async_client: AsyncClient,
-    get_async_session: AsyncSession,
+    authorised_cookie: dict,
 ):
-    data = {"user_id": str(uuid.uuid4()), "liked_user_id": str(uuid.uuid4())}
+    """Проверка того, что пользователь не может лайкнуть несуществующего пользователя.
+    """
+    data = {"liked_user_id": str(uuid.uuid4())}
 
-    response: Response = await async_client.post("/api/v1/likes", json=data)
+    response: Response = await async_client.post("/api/v1/likes", json=data, cookies=authorised_cookie)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json().get("detail") == "bad user id"
+
+
+async def test_self_like(
+    async_client: AsyncClient,
+    authorised_cookie: dict,
+    user: AuthUser,
+):
+    """Проверка того, что пользователь не может лайкнуть себя.
+    """
+    data = {"liked_user_id": str(user.id)}
+
+    response: Response = await async_client.post("/api/v1/likes", json=data, cookies=authorised_cookie)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json().get("detail") == "bad user id"
+
+
+async def test_match_creation_after_double_like(
+    async_client: AsyncClient,
+    authorised_cookie_user2: dict,
+    user2: AuthUser,
+    authorised_cookie_user3: dict,
+    user3: AuthUser,
+    get_async_session: AsyncSession,
+):
+    """Проверка корректного создания match после взаимного лайка двух пользователей.
+    """
+    data1 = {"liked_user_id": str(user2.id), "is_liked": True}
+    data2 = {"liked_user_id": str(user3.id), "is_liked": True}
+
+    response1: Response = await async_client.post("/api/v1/likes", json=data1, cookies=authorised_cookie_user3)
+    response2: Response = await async_client.post("/api/v1/likes", json=data2, cookies=authorised_cookie_user2)
+
+    assert response1.status_code == status.HTTP_201_CREATED
+    assert response2.status_code == status.HTTP_201_CREATED
+
+    await asyncio.sleep(0.05)
+    match = await get_match_by_user_ids(get_async_session, user1_id=user3.id, user2_id=user2.id)
+
+    assert match is not None

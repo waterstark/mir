@@ -1,12 +1,11 @@
 from uuid import UUID
 
-from sqlalchemy import insert, or_, select
+from sqlalchemy import and_, insert, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
 from src.exceptions import AlreadyExistsException, SelfMatchException
 from src.matches.models import Match
-from src.matches.schemas import MatchRequest
 
 
 async def get_all_matches(session: AsyncSession) -> list[Match]:
@@ -21,14 +20,20 @@ async def get_user_matches(session: AsyncSession, user: AuthUser) -> list[Match]
     return matches.scalars().all()
 
 
-async def get_retreive_match(
+async def get_match_by_user_ids(
     session: AsyncSession,
-    match_data: MatchRequest,
+    user1_id: UUID,
+    user2_id: UUID,
 ) -> Match | None:
-    stmt = select(Match).where(
-        Match.user1_id == match_data.user1_id,
-        Match.user2_id == match_data.user2_id,
-    )
+    stmt = select(Match).where(or_(
+        and_(
+            Match.user1_id == user1_id,
+            Match.user2_id == user2_id,
+        ), and_(
+            Match.user1_id == user2_id,
+            Match.user2_id == user1_id,
+        ),
+    ))
     return (await session.execute(stmt)).scalar_one_or_none()
 
 
@@ -48,26 +53,24 @@ async def perform_destroy_match(session: AsyncSession, match: Match) -> None:
     await session.commit()
 
 
-async def create_match(session: AsyncSession, match_data: MatchRequest) -> Match:
-    await check_match_data(session, match_data)
-    stmt = insert(Match).values(match_data.dict()).returning(Match)
+async def create_match(session: AsyncSession, user1_id: UUID, user2_id: UUID) -> Match:
+    await check_match_data(session, user1_id, user2_id)
+    stmt = insert(Match).values({
+        Match.user1_id: user1_id,
+        Match.user2_id: user2_id,
+    }).returning(Match)
 
     match = (await session.execute(stmt)).scalar_one_or_none()
     await session.commit()
     return match
 
 
-async def check_match_data(session: AsyncSession, match_data: MatchRequest) -> None:
-    if match_data.user1_id == match_data.user2_id:
+async def check_match_data(session: AsyncSession, user1_id: UUID, user2_id: UUID) -> None:
+    if user1_id == user2_id:
         raise SelfMatchException
 
     matches = await get_all_matches(session)
-    if [
-        match
-        for match in matches
-        if match.user1_id == match.user1_id
-        and match.user2_id == match.user2_id
-        or match.user1_id == match.user2_id
-        and match.user2_id == match.user1_id
-    ]:
-        raise AlreadyExistsException
+    for match in matches:
+        if match.user1_id == user1_id and match.user2_id == user2_id \
+                or match.user1_id == user2_id and match.user2_id == user1_id:
+            raise AlreadyExistsException

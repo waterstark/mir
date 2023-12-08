@@ -5,17 +5,18 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.models import AuthUser
 from src.exceptions import AlreadyExistsException, SelfLikeException
 from src.likes.models import UserLike
 from src.likes.schemas import UserLikeRequest
 
 
-async def add_like(user_like: UserLikeRequest, session: AsyncSession):
+async def add_like(user: AuthUser, user_like: UserLikeRequest, session: AsyncSession):
     stmt = (
         insert(UserLike)
         .values(
             {
-                UserLike.user_id: user_like.user_id,
+                UserLike.user_id: user.id,
                 UserLike.liked_user_id: user_like.liked_user_id,
                 UserLike.is_liked: user_like.is_liked,
             },
@@ -35,13 +36,14 @@ async def get_all_likes(session: AsyncSession) -> list[UserLike]:
     return (await session.execute(select(UserLike))).scalars().all()
 
 
-async def get_retreive_like(
+async def get_like_by_user_ids(
     session: AsyncSession,
-    like_data: UserLikeRequest,
+    user_id: UUID,
+    liked_user_id: UUID,
 ) -> UserLike | None:
     stmt = select(UserLike).where(
-        UserLike.liked_user_id == like_data.liked_user_id,
-        UserLike.user_id == like_data.user_id,
+        UserLike.liked_user_id == liked_user_id,
+        UserLike.user_id == user_id,
     )
     return (await session.execute(stmt)).scalar_one_or_none()
 

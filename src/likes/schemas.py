@@ -5,7 +5,6 @@ from pydantic.types import UUID4
 
 
 class UserLikeBase(BaseModel):
-    user_id: UUID4
     liked_user_id: UUID4
     is_liked: bool = Field(default=False)
 

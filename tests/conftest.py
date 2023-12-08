@@ -5,14 +5,20 @@ from typing import Any
 import pytest
 from async_asgi_testclient import TestClient
 from sqlalchemy import NullPool
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import settings
-from src.database import Base, async_session_maker
-from src.main import app
 from src.mongodb.mongodb import Mongo
 
-engine = create_async_engine(settings.db_url_postgresql, poolclass=NullPool)
+if settings.TEST_DB_NAME:
+    settings.DB_NAME = settings.TEST_DB_NAME
+
+engine = create_async_engine(settings.test_db_url_postgresql, poolclass=NullPool)
+async_session_maker = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
 
 pytest_plugins = [
     "tests.fixtures",
@@ -21,6 +27,8 @@ pytest_plugins = [
 
 @pytest.fixture(autouse=True, scope="module")
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    from src.database import Base
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     async with async_session_maker() as session:
@@ -38,6 +46,8 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, Any, None]:
 
 @pytest.fixture(scope="session")
 async def async_client() -> AsyncGenerator[TestClient, None]:
+    from src.main import app
+
     async with TestClient(app) as client:
         yield client
 

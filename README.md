@@ -8,6 +8,16 @@
 * redis
 
 
+## Запуск в докере
+Создать файл .env в корне проекта: скопировать содержимое из .env-example и настроить под себя, если надо
+```sh
+cat .env-example > .env
+```
+Поднять контейнеры
+```shell
+docker-compose up
+```
+
 ## Локальная установка
 Активация виртуального окружения
 ```sh
@@ -34,17 +44,7 @@ alembic upgrade head
 uvicorn src.main:app --reload
 ```
 
-## Запуск в докере
-```shell
-docker-compose up
-```
-
 ## Запуск тестов в докере
-Создать файл .env в корне проекта: скопировать содержимое из .env-example и настроить под себя, если надо
-```sh
-cat .env-example > .env
-```
-Поднять контейнеры
 ```sh
 docker-compose up test_app
 ```
