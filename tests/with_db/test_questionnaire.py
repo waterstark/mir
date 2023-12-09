@@ -3,7 +3,7 @@ from dirty_equals import IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.main import app
+
 
 from src.auth.models import AuthUser
 from src.questionnaire.crud import get_questionnaire
@@ -82,9 +82,12 @@ async def test_create_questionnaire_bad_credentials(
         == f"Объект уже существует в базе данных!!!{questionary.firstname}"
     )
 
-async def test_get_quest_authenticated_user(async_client: TestClient, authorised_cookie, questionary: UserQuestionnaire):
+async def test_get_quest_authenticated_user(
+        async_client: TestClient,
+        authorised_cookie: dict,
+):
     response = await async_client.get(
-        "/api/v1/questionnaire/get_quest",
+        "/api/v1/questionnaire/get_my_quest",
         cookies=authorised_cookie,
     )
 
