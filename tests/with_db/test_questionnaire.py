@@ -3,8 +3,6 @@ from dirty_equals import IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-
 from src.auth.models import AuthUser
 from src.questionnaire.crud import get_questionnaire
 from src.questionnaire.models import UserQuestionnaire
