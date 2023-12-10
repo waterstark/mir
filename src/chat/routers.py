@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from starlette.websockets import WebSocketDisconnect
 
 from src.auth.models import AuthUser
+from src.chat.exceptions import NoMatchError
 from src.chat.schemas import (
     MessageCreateRequest,
     MessageDeleteRequest,
@@ -18,7 +19,8 @@ from src.chat.schemas import (
     WSStatus,
 )
 from src.chat.utils import get_user_from_ws_cookie, ws_manager
-from src.database import mongo
+from src.database import get_async_session, mongo
+from src.matches.crud import get_match_by_user_ids
 
 ws_router = APIRouter(
     prefix="/chat",
@@ -46,11 +48,11 @@ async def websocket_chat(
             ws_msg = WSMessageRequest.parse_obj(data)
             match ws_msg.action:
                 case WSAction.CREATE:
-                    await create_message(ws_msg, ws)
+                    await create_message(ws_msg, ws, user)
                 case WSAction.DELETE:
-                    await delete_message(ws_msg, ws)
+                    await delete_message(ws_msg, ws, user)
                 case WSAction.UPDATE:
-                    await update_message(ws_msg, ws)
+                    await update_message(ws_msg, ws, user)
         except (RuntimeError, WebSocketDisconnect):  # ws connection error
             await ws_manager.disconnect(ws, user.id)
             break
@@ -59,13 +61,26 @@ async def websocket_chat(
                 "status": WSStatus.ERROR,
                 "detail": "unknown action or message format",
             }))
+        except NoMatchError as e:
+            await ws.send_bytes(orjson.dumps({
+                "status": WSStatus.ERROR,
+                "detail": str(e),
+            }))
+        except Exception:  # noqa: BLE001
+            # TODO: log this shit
+            await ws_manager.disconnect(ws, user.id)
 
 
-async def create_message(ws_msg: WSMessageRequest, ws: WebSocket):
+async def create_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser):
     if not isinstance(ws_msg.message, MessageCreateRequest):
         raise ValidationError
 
     # TODO: get user's matches from redis and check if he can send message to 'to_id'
+    session_gen = get_async_session()
+    session = await session_gen.asend(None)
+    match = await get_match_by_user_ids(session, user.id, ws_msg.message.to_id)
+    if match is None:
+        raise NoMatchError(user.id, ws_msg.message.to_id)
 
     msg = await mongo.create_message(ws_msg.message)
 
@@ -78,11 +93,17 @@ async def create_message(ws_msg: WSMessageRequest, ws: WebSocket):
     # TODO: add bg task to insta-message who is online
 
 
-async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket):
+async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser):
     if not isinstance(ws_msg.message, MessageDeleteRequest):
         raise ValidationError
 
     # TODO: get user's matches from redis and check if he can delete message to 'to_id'
+    session_gen = get_async_session()
+    session = await session_gen.asend(None)
+    match = await get_match_by_user_ids(session, user.id, ws_msg.message.to_id)
+    if match is None:
+        raise NoMatchError(user.id, ws_msg.message.to_id)
+
     result = await mongo.delete_message(ws_msg.message.id)
 
     if not result.deleted_count:
@@ -96,11 +117,16 @@ async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket):
     }))
 
 
-async def update_message(ws_msg: WSMessageRequest, ws: WebSocket):
+async def update_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser):
     if not isinstance(ws_msg.message, MessageUpdateRequest):
         raise ValidationError
 
     # TODO: get user's matches from redis and check if he can send message to 'to_id'
+    session_gen = get_async_session()
+    session = await session_gen.asend(None)
+    match = await get_match_by_user_ids(session, user.id, ws_msg.message.to_id)
+    if match is None:
+        raise NoMatchError(user.id, ws_msg.message.to_id)
 
     result = await mongo.get_message(ws_msg.message.id)
     if result is None:
