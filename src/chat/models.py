@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import ChoiceType
 
-from src.chat.util import MessageStatus
+from src.chat.schemas import MessageStatus
 from src.database import Base
 
 

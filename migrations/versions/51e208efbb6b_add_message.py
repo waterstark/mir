@@ -10,7 +10,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
-from src.chat.util import MessageStatus
+from src.chat.schemas import MessageStatus
 
 # revision identifiers, used by Alembic.
 revision = "51e208efbb6b"

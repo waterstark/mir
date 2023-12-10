@@ -4,8 +4,7 @@ import uuid
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.results import DeleteResult, UpdateResult
 
-from src.chat.schemas import MessageCreateRequest, MessageResponse
-from src.chat.util import MessageStatus
+from src.chat.schemas import MessageCreateRequest, MessageResponse, MessageStatus
 from src.config import settings
 
 
