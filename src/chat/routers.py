@@ -27,6 +27,10 @@ ws_router = APIRouter(
     tags=["WebSocket chat"],
 )
 
+ws_router = APIRouter(
+    prefix="/chat",
+    tags=["WebSocket chat"],
+)
 
 @ws_router.websocket("/ws")
 async def websocket_chat(

@@ -53,7 +53,6 @@ async def test_create_questionnaire(
 
 async def test_create_questionnaire_bad_credentials(
     async_client: TestClient,
-    user2: AuthUser,
     questionary: UserQuestionnaire,
 ):
     questionnaire_data = {
@@ -81,6 +80,32 @@ async def test_create_questionnaire_bad_credentials(
         == f"Объект уже существует в базе данных!!!{questionary.firstname}"
     )
 
+async def test_get_quest_authenticated_user(
+        async_client: TestClient,
+        authorised_cookie: dict,
+):
+    response = await async_client.get(
+        "/api/v1/questionnaire/get_my_quest",
+        cookies=authorised_cookie,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {
+        "firstname": "string",
+        "lastname": "string",
+        "gender": "Male",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 0,
+        "goals": "Дружба",
+        "body_type": "Худое",
+        "age": 20,
+        "user_id": IsUUID,
+        "id": IsUUID
+    }
 
 async def test_update_quest(
     async_client: TestClient,

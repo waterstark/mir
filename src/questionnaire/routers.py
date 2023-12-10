@@ -42,6 +42,17 @@ async def get_list_questionnaire(
 ):
     return await crud.get_list_questionnaire_first_10(user, session)
 
+@router.get(
+    "/get_my_quest",
+    response_model=ResponseUserQuestionnaireSchema,
+    status_code=status.HTTP_200_OK,
+)
+async def get_questionnaire(
+    user: Annotated[AuthUser, Depends(current_user)],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    return await crud.get_questionnaire(user.id, session)
+
 
 @router.patch(
     "/{quest_id}",
