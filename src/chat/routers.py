@@ -1,26 +1,41 @@
 import datetime
+from typing import Annotated
 
+from fastapi import APIRouter, Depends
 from fastapi.websockets import WebSocket
 from orjson import orjson
 from pydantic import ValidationError
 from starlette.websockets import WebSocketDisconnect
 
+from src.auth.models import AuthUser
 from src.chat.schemas import (
     MessageCreateRequest,
     MessageDeleteRequest,
     MessageResponse,
     MessageUpdateRequest,
+    WSAction,
     WSMessageRequest,
+    WSStatus,
 )
-from src.chat.util import WSAction, WSStatus, ws_manager
+from src.chat.utils import get_user_from_ws_cookie, ws_manager
 from src.database import mongo
 
+ws_router = APIRouter(
+    prefix="/chat",
+    tags=["WebSocket chat"],
+)
 
-async def websocket_chat(ws: WebSocket):
-    user_id = await ws_manager.connect(ws)
-    if user_id is None:
+
+@ws_router.websocket("/ws")
+async def websocket_chat(
+    ws: WebSocket,
+    user: Annotated[AuthUser, Depends(get_user_from_ws_cookie)],
+):
+    if user is None:
         await ws.close()
         return
+
+    await ws_manager.connect(ws, user)
 
     # TODO: recieve message updates
 
@@ -37,15 +52,13 @@ async def websocket_chat(ws: WebSocket):
                 case WSAction.UPDATE:
                     await update_message(ws_msg, ws)
         except (RuntimeError, WebSocketDisconnect):  # ws connection error
-            ws_manager.disconnect(user_id)
+            await ws_manager.disconnect(ws, user.id)
             break
         except ValidationError:  # pydantic schema parse error + unknown action
             await ws.send_bytes(orjson.dumps({
                 "status": WSStatus.ERROR,
                 "detail": "unknown action or message format",
             }))
-
-    await ws.close()
 
 
 async def create_message(ws_msg: WSMessageRequest, ws: WebSocket):
@@ -61,6 +74,8 @@ async def create_message(ws_msg: WSMessageRequest, ws: WebSocket):
         "status": WSStatus.OK,
         "message": msg.dict(),
     }))
+
+    # TODO: add bg task to insta-message who is online
 
 
 async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket):

@@ -1,9 +1,29 @@
 import datetime
 import uuid
+from enum import Enum
 
 from pydantic import BaseModel
 
-from src.chat.util import MessageStatus, WSAction, WSStatus
+
+class MessageStatus(str, Enum):
+    SENT = "SENT"
+    DELIVERED = "DELIVERED"
+    READ = "READ"
+    DELETED = "DELETED"
+
+    def __str__(self):
+        return self
+
+
+class WSAction(str, Enum):
+    CREATE = "CREATE"
+    DELETE = "DELETE"
+    UPDATE = "UPDATE"
+
+
+class WSStatus(str, Enum):
+    OK = "OK"
+    ERROR = "ERROR"
 
 
 class BaseMessage(BaseModel):
