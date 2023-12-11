@@ -32,15 +32,16 @@ async def create_questionnaire(
 
 
 @router.get(
-    "/10",
+    "/{page_number}",
     response_model=list[ResponseUserQuestionnaireSchema],
     status_code=status.HTTP_200_OK,
 )
 async def get_list_questionnaire(
     user: Annotated[AuthUser, Depends(current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
+    page_number: int,
 ):
-    return await crud.get_list_questionnaire_first_10(user, session)
+    return await crud.get_list_questionnaire(user, session, page_number)
 
 
 @router.patch(

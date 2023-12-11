@@ -12,9 +12,10 @@ from src.questionnaire.schemas import (
 )
 
 
-async def get_list_questionnaire_first_10(
+async def get_list_questionnaire(
     user: AuthUser,
     session: AsyncSession,
+    page_number: int = 0
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
     is_visible = True
@@ -26,7 +27,7 @@ async def get_list_questionnaire_first_10(
             UserQuestionnaire.gender != user_questionnaire.gender,
             UserQuestionnaire.is_visible == is_visible,
         )
-        .limit(10)
+        .limit(10).offset(page_number)
     )
     result = await session.execute(query)
     return result.scalars().fetchall()
