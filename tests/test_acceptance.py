@@ -175,44 +175,14 @@ class TestAcceptance:
 
         """Первый пользователь лайкает второго."""
 
-        """Старый лайк"""
-
-        """response = await async_client.post(
-             f"/api/v1/users/{created_user_2_id}/like",
-            form=[
-                ("user_id", created_user_1_id)
-            ])
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.json() == {
-            "id": IsUUID,
-            "firstname": questionnaire_2_data["firstname"],
-            "lastname": questionnaire_2_data["lastname"],
-            "gender": questionnaire_2_data["gender"],
-            "photo": questionnaire_2_data["photo"],
-            "country": questionnaire_2_data["country"],
-            "city": questionnaire_2_data["city"],
-            "about": questionnaire_2_data["about"],
-            "hobbies": questionnaire_2_data["hobbies"],
-            "height": questionnaire_2_data["height"],
-            "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
-            "age": questionnaire_2_data["age"],
-            "user_id": created_user_2_id,
-            "is_match": False
-        }"""
-
-        """Новый лайк(Вроде Маки уже сделал)."""
-
         like_1 = {
             "liked_user_id": created_user_2_id,
             "is_liked": True
         }
 
-        """Возможно поле is_like нужно будет убрать."""
-
         response = await async_client.post(
             f"/api/v1/likes",
-        json = like_1,
+            json = like_1,
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -258,41 +228,10 @@ class TestAcceptance:
 
         """Второй пользователь лайкает первого."""
 
-        """Старый лайк"""
-
-        """response = await async_client.post(
-            f"/api/v1/users/{created_user_1_id}/like",
-            form=[
-                ("user_id", str(created_user_2_id))
-            ]
-        )
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.json() == {
-            "id": IsUUID,
-            "firstname": questionnaire_1_data["firstname"],
-            "lastname": questionnaire_1_data["lastname"],
-            "gender": questionnaire_1_data["gender"],
-            "photo": questionnaire_1_data["photo"],
-            "country": questionnaire_1_data["country"],
-            "city": questionnaire_1_data["city"],
-            "about": questionnaire_1_data["about"],
-            "hobbies": questionnaire_1_data["hobbies"],
-            "height": questionnaire_1_data["height"],
-            "goals": questionnaire_1_data["goals"],
-            "body_type": questionnaire_1_data["body_type"],
-            "age": questionnaire_1_data["age"],
-            "user_id": IsUUID,
-            "is_match": True
-        }"""
-
-        """Новый лайк(Вроде Маки уже сделал)."""
-
         like_2 = {
              "liked_user_id": created_user_1_id,
              "is_liked": True
         }
-
-        """Возможно поле is_like нужно будет убрать."""
 
         response = await async_client.post(
             f"/api/v1/likes",
@@ -330,8 +269,8 @@ class TestAcceptance:
             "is_match": True
         }]
 
-    async def test_acceptance_with_chat(self, async_client: TestClient, user: AuthUser, ):
-        """Тесты на чат между мользователями (пользователи взяты из предыдущего теста)."""
+    async def test_acceptance_with_chat(self, async_client: TestClient):
+        """Тесты на чат между пользователями (пользователи взяты из предыдущего теста)."""
 
         """1. Логины двух пользователей."""
         """2. Получение различных id."""

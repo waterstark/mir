@@ -43,7 +43,7 @@ async def get_list_questionnaire(
     return await crud.get_list_questionnaire_first_10(user, session)
 
 @router.get(
-    "/get_quest",
+    "/get_my_quest",
     response_model=ResponseUserQuestionnaireSchema,
     status_code=status.HTTP_200_OK,
 )
