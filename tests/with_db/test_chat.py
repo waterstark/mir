@@ -1,5 +1,4 @@
 import uuid
-from unittest import mock
 
 import orjson
 import pytest
@@ -7,24 +6,20 @@ from async_asgi_testclient import TestClient
 from dirty_equals import IsStr, IsUUID
 
 from src.auth.models import AuthUser
-from src.chat.routers import ws_manager
-from src.chat.schemas import MessageCreateRequest
-from src.chat.util import MessageStatus, WSAction, WSStatus
+from src.chat.schemas import MessageCreateRequest, MessageStatus, WSAction, WSStatus
 from src.mongodb.mongodb import Mongo
 
 
 async def test_ws_msg_create(
-        async_client: TestClient,
-        user: AuthUser,
-        user2: AuthUser,
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user2: AuthUser,
 ):
     msg = {"match_id": uuid.uuid4(), "text": "lol",
            "from_id": user.id, "to_id": user2.id}
 
-    async with async_client.websocket_connect("/chat/ws") as ws:
-        await ws.send_bytes(orjson.dumps({
-            "user_id": user.id,
-        }))
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_bytes(orjson.dumps({
             "action": WSAction.CREATE,
             "message": msg,
@@ -43,33 +38,25 @@ async def test_ws_msg_create(
     }
 
 
-async def test_ws_bad_user_credentials(async_client: TestClient):
-    with mock.patch.object(ws_manager, "parse_user_id_on_connect", return_value=None):
-        async with async_client.websocket_connect("/chat/ws") as ws:
-            await ws.send_bytes(orjson.dumps({
-                "user_id": uuid.uuid4(),
-            }))
-            await ws.send_bytes(orjson.dumps({
-                "action": WSAction.CREATE,
-                "message": {},
-            }))
+async def test_ws_connect_without_token(async_client: TestClient):
+    """App does not accept ws connection if there is no token."""
+    with pytest.raises(AssertionError) as exc:
+        async with async_client.websocket_connect("/chat/ws"):
+            pass
 
-            # websocket raises "Exception", so here it is
-            with pytest.raises(Exception) as exc:  # noqa: PT011
-                await ws.receive_bytes()
-
-    assert str(exc.value) == "{'type': 'websocket.close', 'code': 1000, 'reason': ''}"
+    assert str(exc.value) == ""
 
 
 async def test_ws_unknown_action(
-        async_client: TestClient,
-        user: AuthUser,
-        user2: AuthUser,
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user2: AuthUser,
 ):
     msg = {"match_id": uuid.uuid4(), "text": "lol",
            "from_id": user.id, "to_id": user2.id}
 
-    async with async_client.websocket_connect("/chat/ws") as ws:
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_bytes(orjson.dumps({
             "user_id": user.id,
         }))
@@ -84,10 +71,11 @@ async def test_ws_unknown_action(
 
 
 async def test_ws_message_delete(
-        async_client: TestClient,
-        user: AuthUser,
-        user2: AuthUser,
-        mongo: Mongo,
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user2: AuthUser,
+    mongo: Mongo,
 ):
     msg = {
         "match_id": uuid.uuid4(),
@@ -101,10 +89,7 @@ async def test_ws_message_delete(
     msg["id"] = result.id
     msg.pop("text")
 
-    async with async_client.websocket_connect("/chat/ws") as ws:
-        await ws.send_bytes(orjson.dumps({
-            "user_id": user.id,
-        }))
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_bytes(orjson.dumps({
             "action": WSAction.DELETE,
             "message": msg,
@@ -114,10 +99,11 @@ async def test_ws_message_delete(
     assert resp["status"] == WSStatus.OK
 
 
-async def test_ws_message_wrong_delete(
-        async_client: TestClient,
-        user: AuthUser,
-        user2: AuthUser,
+async def test_ws_unknown_message_delete(
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user2: AuthUser,
 ):
     msg = {
         "id": uuid.uuid4(),
@@ -126,10 +112,7 @@ async def test_ws_message_wrong_delete(
         "to_id": user2.id,
     }
 
-    async with async_client.websocket_connect("/chat/ws") as ws:
-        await ws.send_bytes(orjson.dumps({
-            "user_id": user.id,
-        }))
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_bytes(orjson.dumps({
             "action": WSAction.DELETE,
             "message": msg,
@@ -141,10 +124,11 @@ async def test_ws_message_wrong_delete(
 
 
 async def test_ws_message_update(
-        async_client: TestClient,
-        user: AuthUser,
-        user2: AuthUser,
-        mongo: Mongo,
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user2: AuthUser,
+    mongo: Mongo,
 ):
     msg = {
         "match_id": uuid.uuid4(),
@@ -158,10 +142,7 @@ async def test_ws_message_update(
     msg.text = "lol"
     msg.status = MessageStatus.READ
 
-    async with async_client.websocket_connect("/chat/ws") as ws:
-        await ws.send_bytes(orjson.dumps({
-            "user_id": user.id,
-        }))
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_bytes(orjson.dumps({
             "action": WSAction.UPDATE,
             "message": msg.dict(exclude={"updated_at"}),
@@ -180,10 +161,11 @@ async def test_ws_message_update(
     }
 
 
-async def test_ws_message_update_error(
-        async_client: TestClient,
-        user: AuthUser,
-        user2: AuthUser,
+async def test_ws_unknown_message_update(
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user2: AuthUser,
 ):
     msg = {
         "id": uuid.uuid4(),
@@ -194,10 +176,7 @@ async def test_ws_message_update_error(
         "status": MessageStatus.READ,
     }
 
-    async with async_client.websocket_connect("/chat/ws") as ws:
-        await ws.send_bytes(orjson.dumps({
-            "user_id": user.id,
-        }))
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_bytes(orjson.dumps({
             "action": WSAction.UPDATE,
             "message": msg,
