@@ -12,7 +12,6 @@ from src.questionnaire.schemas import (
     ResponseUserQuestionnaireSchema,
 )
 
-
 async def get_list_questionnaire_first_10(
     user: AuthUser,
     session: AsyncSession,
