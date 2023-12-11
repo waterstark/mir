@@ -93,7 +93,7 @@ class UserQuestionnaire(Base):
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("auth_user.id", ondelete="CASCADE"),
-        nullable=True,
+        nullable=False,
     )
     user = relationship("AuthUser", back_populates="questionnaire")
 
