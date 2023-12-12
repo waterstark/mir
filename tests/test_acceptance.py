@@ -6,7 +6,7 @@ from async_asgi_testclient import TestClient
 from dirty_equals import IsUUID, IsStr, IsStr
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.chat.util import MessageStatus, WSAction, WSStatus
+from src.chat.schemas import MessageStatus, WSAction, WSStatus
 from src.auth.crud import get_user_profile
 from src.auth.models import AuthUser
 from src.main import app
@@ -19,7 +19,7 @@ from src.questionnaire.models import UserQuestionnaire
 class TestAcceptance:
     """Тесты на поведение пользователя."""
 
-    async def test_acceptance(self, async_client: TestClient, user: AuthUser,):
+    async def test_acceptance(self, async_client: TestClient,):
 
         """1. Регистрация двух пользователей."""
         """2. Создание анкет двух пользователей."""
@@ -269,7 +269,7 @@ class TestAcceptance:
             "is_match": True
         }]
 
-    async def test_acceptance_with_chat(self, async_client: TestClient):
+    async def test_acceptance_with_chat(self, async_client: TestClient, authorised_cookie: dict):
         """Тесты на чат между пользователями (пользователи взяты из предыдущего теста)."""
 
         """1. Логины двух пользователей."""
@@ -322,10 +322,7 @@ class TestAcceptance:
         msg = {"match_id": created_match_id, "text": "Пр, го встр?",
                "from_id": created_user_1_id, "to_id": created_user_2_id}
 
-        async with async_client.websocket_connect("/chat/ws") as ws:
-            await ws.send_bytes(orjson.dumps({
-                "user_id": created_user_1_id,
-            }))
+        async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
             await ws.send_bytes(orjson.dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
@@ -342,15 +339,13 @@ class TestAcceptance:
             "status": str(MessageStatus.SENT),
             "updated_at": IsStr(),
         }
-        """Создание сообщений вторым пользователем."""
+
+        """Создание сообщений первым пользователем."""
 
         msg = {"match_id": created_match_id, "text": "Го)))",
                "from_id": created_user_2_id, "to_id": created_user_1_id}
 
-        async with async_client.websocket_connect("/chat/ws") as ws:
-            await ws.send_bytes(orjson.dumps({
-                "user_id": created_user_1_id,
-            }))
+        async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
             await ws.send_bytes(orjson.dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
