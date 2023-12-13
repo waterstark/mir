@@ -15,7 +15,7 @@ from src.questionnaire.schemas import (
 async def get_list_questionnaire(
     user: AuthUser,
     session: AsyncSession,
-    page_number: int = 0
+    page_number: int,
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
     is_visible = True

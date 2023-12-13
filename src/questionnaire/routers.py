@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from pydantic import conint
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import current_user
@@ -32,16 +33,17 @@ async def create_questionnaire(
 
 
 @router.get(
-    "/{page_number}",
+    "/get_list/{page_number}",
     response_model=list[ResponseUserQuestionnaireSchema],
     status_code=status.HTTP_200_OK,
 )
 async def get_list_questionnaire(
     user: Annotated[AuthUser, Depends(current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-    page_number: int,
+    page_number: conint(ge=0),
 ):
     return await crud.get_list_questionnaire(user, session, page_number)
+
 
 @router.get(
     "/get_my_quest",
