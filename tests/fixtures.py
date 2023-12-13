@@ -46,7 +46,7 @@ hobbies_dict = {
 
 
 @pytest.fixture(scope="module")
-async def user(async_client: TestClient):
+async def user(async_client: TestClient) -> AuthUser:
     """Test user."""
     response = await async_client.post(
         async_client.application.url_path_for("register:register"),
@@ -56,28 +56,28 @@ async def user(async_client: TestClient):
 
 
 @pytest.fixture(scope="module")
-async def authorised_cookie(user: AuthUser):
+async def authorised_cookie(user: AuthUser) -> dict:
     """Cookie of authorized user."""
     jwt = await get_jwt_strategy().write_token(user)
     return {"mir": jwt}
 
 
 @pytest.fixture(scope="module")
-async def authorised_cookie_user2(user2: AuthUser):
+async def authorised_cookie_user2(user2: AuthUser) -> dict:
     """Cookie of authorized user."""
     jwt = await get_jwt_strategy().write_token(user2)
     return {"mir": jwt}
 
 
 @pytest.fixture(scope="module")
-async def authorised_cookie_user3(user3: AuthUser):
+async def authorised_cookie_user3(user3: AuthUser) -> dict:
     """Cookie of authorized user."""
     jwt = await get_jwt_strategy().write_token(user3)
     return {"mir": jwt}
 
 
 @pytest.fixture(scope="module")
-async def user2(async_client: TestClient):
+async def user2(async_client: TestClient) -> AuthUser:
     """Test user."""
     response = await async_client.post(
         async_client.application.url_path_for("register:register"),
@@ -87,7 +87,7 @@ async def user2(async_client: TestClient):
 
 
 @pytest.fixture(scope="module")
-async def user3(async_client: TestClient):
+async def user3(async_client: TestClient) -> AuthUser:
     """Test user."""
     response = await async_client.post(
         async_client.application.url_path_for("register:register"),
@@ -97,7 +97,7 @@ async def user3(async_client: TestClient):
 
 
 @pytest.fixture(scope="module")
-async def questionary(get_async_session: AsyncSession, user2: AuthUser):
+async def questionary(get_async_session: AsyncSession, user2: AuthUser) -> UserQuestionnaire:
     """User questionary."""
     user_questionary_data["user_id"] = user2.id
     async with get_async_session as db:
@@ -112,7 +112,7 @@ async def questionary(get_async_session: AsyncSession, user2: AuthUser):
 
 
 @pytest.fixture(scope="module")
-async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser):
+async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser) -> Match:
     async with get_async_session as db:
         match = Match(
             user1_id=user.id,
@@ -124,7 +124,7 @@ async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
 
 
 @pytest.fixture(scope="module")
-async def match1(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUser):
+async def match1(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUser) -> Match:
     async with get_async_session as db:
         match = Match(
             user1_id=user3.id,
@@ -136,7 +136,7 @@ async def match1(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUs
 
 
 @pytest.fixture(scope="module")
-async def match2(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUser):
+async def match2(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUser) -> Match:
     async with get_async_session as db:
         match = Match(
             user1_id=user2.id,
@@ -148,7 +148,7 @@ async def match2(get_async_session: AsyncSession, user2: AuthUser, user3: AuthUs
 
 
 @pytest.fixture(scope="module")
-async def like1(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser):
+async def like1(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser) -> UserLike:
     async with get_async_session as db:
         like = UserLike(
             user_id=user.id,
@@ -160,7 +160,7 @@ async def like1(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
 
 
 @pytest.fixture(scope="module")
-async def like2(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser):
+async def like2(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser) -> UserLike:
     async with get_async_session as db:
         like = UserLike(
             user_id=user2.id,
