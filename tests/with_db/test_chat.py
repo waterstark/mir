@@ -7,6 +7,7 @@ from dirty_equals import IsStr, IsUUID
 
 from src.auth.models import AuthUser
 from src.chat.schemas import MessageCreateRequest, MessageStatus, WSAction, WSStatus
+from src.matches.models import Match
 from src.mongodb.mongodb import Mongo
 
 
@@ -15,8 +16,9 @@ async def test_ws_msg_create(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
+    match: Match,
 ):
-    msg = {"match_id": uuid.uuid4(), "text": "lol",
+    msg = {"match_id": match.id, "text": "lol",
            "from_id": user.id, "to_id": user2.id}
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
@@ -47,13 +49,34 @@ async def test_ws_connect_without_token(async_client: TestClient):
     assert str(exc.value) == ""
 
 
+async def test_ws_msg_create_without_match(
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+    user3: AuthUser,
+):
+    msg = {"match_id": uuid.uuid4(), "text": "kek",
+           "from_id": user.id, "to_id": user3.id}
+
+    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
+        await ws.send_bytes(orjson.dumps({
+            "action": WSAction.CREATE,
+            "message": msg,
+        }))
+        resp = orjson.loads(await ws.receive_bytes())
+
+    assert resp["status"] == WSStatus.ERROR
+    assert resp["detail"] == f"No match for users {user.id} and {user3.id}"
+
+
 async def test_ws_unknown_action(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
+    match: Match,
 ):
-    msg = {"match_id": uuid.uuid4(), "text": "lol",
+    msg = {"match_id": match.id, "text": "lol",
            "from_id": user.id, "to_id": user2.id}
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
@@ -75,6 +98,7 @@ async def test_ws_message_delete(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
+    match: Match,
     mongo: Mongo,
 ):
     msg = {
@@ -103,6 +127,7 @@ async def test_ws_unknown_message_delete(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
+    match: Match,
     user2: AuthUser,
 ):
     msg = {
@@ -128,6 +153,7 @@ async def test_ws_message_update(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
+    match: Match,
     mongo: Mongo,
 ):
     msg = {
@@ -165,6 +191,7 @@ async def test_ws_unknown_message_update(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
+    match: Match,
     user2: AuthUser,
 ):
     msg = {
