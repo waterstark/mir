@@ -8,7 +8,7 @@ from src.auth.models import AuthUser
 from src.likes.crud import get_like_by_id
 from src.likes.models import UserLike
 from src.main import app
-from src.matches.crud import get_match_by_id
+from src.matches.crud import get_match_by_match_id
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire
 
@@ -144,7 +144,7 @@ class TestMatch:
             "код 204"
         )
 
-        assert await get_match_by_id(get_async_session, match.id) is None, (
+        assert await get_match_by_match_id(get_async_session, match.id) is None, (
             "Проверьте, что валидный DELETE-запрос авторизованного "
             f"пользователя к `{match_delete_url}` удаляет объект Match"
         )
@@ -186,7 +186,7 @@ class TestMatch:
             "возвращается код 403"
         )
 
-        assert await get_match_by_id(get_async_session, match1.id), (
+        assert await get_match_by_match_id(get_async_session, match1.id), (
             "Проверьте, что DELETE-запрос некорректного "
             f"пользователя к `{match_delete_url}` не удаляет объект Match"
         )

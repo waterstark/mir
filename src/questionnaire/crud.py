@@ -27,7 +27,7 @@ async def get_list_questionnaire(
             UserQuestionnaire.gender != user_questionnaire.gender,
             UserQuestionnaire.is_visible == is_visible,
         )
-        .limit(10).offset(page_number)
+        .limit(5).offset(page_number)
     )
     result = await session.execute(query)
     return result.scalars().fetchall()

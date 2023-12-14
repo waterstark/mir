@@ -9,10 +9,9 @@ from src.auth.base_config import current_user
 from src.auth.models import AuthUser
 from src.database import get_async_session
 from src.exceptions import NotFoundException, PermissionDeniedException
+# TODO логика из likes?
 from src.likes.crud import get_like_by_user_ids, perform_destroy_like
-from src.matches.crud import get_match_by_id, perform_destroy_match
-from src.matches.models import Match
-from src.questionnaire.models import UserQuestionnaire
+from src.matches.crud import get_match_by_match_id, delete_match, get_questionnaires_by_user_matched
 from src.questionnaire.schemas import (
     ResponseQuestionnaireSchemaWithMatch,
 )
@@ -31,25 +30,7 @@ async def get_matches(
     session: Annotated[AsyncSession, Depends(get_async_session)],
     user: Annotated[AuthUser, Depends(current_user)],
 ):
-    stmt = (
-        select(AuthUser, UserQuestionnaire)
-        .join(
-            Match,
-            or_(
-                and_(Match.user1_id == user.id, Match.user2_id == AuthUser.id),
-                and_(Match.user2_id == user.id, Match.user1_id == AuthUser.id),
-            ),
-        )
-        .join(UserQuestionnaire, UserQuestionnaire.user_id == AuthUser.id)
-    )
-
-    result = (await session.execute(stmt)).fetchall()
-
-    # TODO: Придумать что-то логичное вместо этого костыля :)
-    for _, questionnaire in result:
-        questionnaire.is_match = True
-
-    return [questionnaire for _, questionnaire in result]
+    return await get_questionnaires_by_user_matched(session=session, user=user)
 
 
 @router.delete(
@@ -61,7 +42,8 @@ async def match_delete(
     user: Annotated[AuthUser, Depends(current_user)],
     match_id: UUID,
 ):
-    match = await get_match_by_id(session, match_id)
+    # TODO выносим в crud / или переорганизуем логику -> сделаем атомарной
+    match = await get_match_by_match_id(session, match_id)
     if not match:
         raise NotFoundException(f"Match with id={match_id} doesn't found")
 
@@ -80,5 +62,5 @@ async def match_delete(
             f"Like from user {user.id} to user {another_user_id} not found",
         )
 
-    await perform_destroy_match(session, match)
+    await delete_match(session, match)
     await perform_destroy_like(session, like)
