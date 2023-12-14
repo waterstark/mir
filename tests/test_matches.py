@@ -110,7 +110,7 @@ class TestMatch:
         """Проверка существования эндпоинта удаления match и
         доступа к нему неавторизованного пользователя
         """
-        match_delete_url = app.url_path_for("match_delete", match_id=match.id)
+        match_delete_url = app.url_path_for("delete_match", match_id=match.id)
         response = await async_client.delete(match_delete_url)
 
         assert (
@@ -132,7 +132,7 @@ class TestMatch:
         get_async_session: AsyncSession,
     ):
         """Проверка валидного DELETE-запроса к эндпоинту matches/{match_id}"""
-        match_delete_url = app.url_path_for("match_delete", match_id=match.id)
+        match_delete_url = app.url_path_for("delete_match", match_id=match.id)
         response = await async_client.delete(
             match_delete_url,
             cookies=authorised_cookie,

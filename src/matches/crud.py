@@ -5,7 +5,8 @@ from sqlalchemy import and_, insert, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
-from src.exceptions import AlreadyExistsException, SelfMatchException
+from src.exceptions import AlreadyExistsException, SelfMatchException, NotFoundException, PermissionDeniedException
+from src.likes.crud import get_like_by_user_ids, _delete_like
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire
 
@@ -77,20 +78,13 @@ async def get_matches_by_user(
     return (await session.execute(stmt)).scalars().all()
 
 
-async def get_all_matches(
-        session: AsyncSession
-) -> Sequence[Match]:
-    """Получение всех Метчей из базы данных."""
-    return (await session.execute(select(Match))).scalars().all()
-
-
 async def create_match(
         session: AsyncSession,
         user1_id: UUID,
         user2_id: UUID
 ) -> Match:
     """Создание Метча и занесение его в базу данных Match."""
-    await check_match_data(session, user1_id, user2_id)
+    await _check_match_data(session, user1_id, user2_id)
     stmt = insert(Match).values({
         Match.user1_id: user1_id,
         Match.user2_id: user2_id,
@@ -101,7 +95,14 @@ async def create_match(
     return match
 
 
-async def check_match_data(
+async def _get_all_matches(
+        session: AsyncSession
+) -> Sequence[Match]:
+    """Получение всех Метчей из базы данных."""
+    return (await session.execute(select(Match))).scalars().all()
+
+
+async def _check_match_data(
         session: AsyncSession,
         user1_id: UUID,
         user2_id: UUID
@@ -113,17 +114,45 @@ async def check_match_data(
     if user1_id == user2_id:
         raise SelfMatchException
 
-    matches = await get_all_matches(session)
+    matches = await _get_all_matches(session)
     for match in matches:
         if match.user1_id == user1_id and match.user2_id == user2_id \
                 or match.user1_id == user2_id and match.user2_id == user1_id:
             raise AlreadyExistsException
 
 
-async def delete_match(
+async def delete_match_from_database(
+        session: AsyncSession,
+        user: AuthUser,
+        match_id: UUID
+) -> None:
+    """Удаление Метча из базы данных."""
+    match = await get_match_by_match_id(session, match_id)
+    if not match:
+        raise NotFoundException(f"Match with id={match_id} doesn't found")
+
+    if user.id not in (match.user1_id, match.user2_id):
+        raise PermissionDeniedException
+
+    liked_user_id = match.user1_id if user.id == match.user2_id else match.user2_id
+    like = await get_like_by_user_ids(
+        session,
+        user_id=user.id,
+        liked_user_id=liked_user_id,
+    )
+
+    if not like:
+        raise NotFoundException(
+            f"Like from user {user.id} to user {liked_user_id} not found",
+        )
+
+    await _delete_match(session, match)
+    await _delete_like(session, like)
+
+
+async def _delete_match(
         session: AsyncSession,
         match: Match
 ) -> None:
-    """Удаление Метча."""
     await session.delete(match)
     await session.commit()
