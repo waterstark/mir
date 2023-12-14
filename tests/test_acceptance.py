@@ -192,7 +192,6 @@ class TestAcceptance:
             "is_liked": True
         }
 
-
         """Логин пользователя 2."""
         response = await async_client.post(
             app.url_path_for("auth:jwt.login"),
@@ -269,7 +268,7 @@ class TestAcceptance:
             "is_match": True
         }]
 
-    async def test_acceptance_with_chat(self, async_client: TestClient, authorised_cookie: dict):
+    async def test_acceptance_with_chat(self, async_client: TestClient):
         """Тесты на чат между пользователями (пользователи взяты из предыдущего теста)."""
 
         """1. Логины двух пользователей."""
@@ -285,6 +284,7 @@ class TestAcceptance:
             ],
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
+        user1_cookie = {'mir': async_client.cookie_jar['mir'].value}
 
         """Получаем id матча."""
 
@@ -298,7 +298,7 @@ class TestAcceptance:
         response = await async_client.get(
             f"/api/v1/users/me",
         )
-        created_user_1_id = response.json()["id"]
+        created_user_1_id = response.json()["user_id"]
 
         """Логин пользователя 2."""
         response = await async_client.post(
@@ -309,20 +309,20 @@ class TestAcceptance:
             ],
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
-
+        user2_cookie = {'mir': async_client.cookie_jar['mir'].value}
         """Получаем id Второго пользователя."""
 
         response = await async_client.get(
             f"/api/v1/users/me",
         )
-        created_user_2_id = response.json()["id"]
+        created_user_2_id = response.json()["user_id"]
 
         """Создание сообщений первым пользователем."""
 
         msg = {"match_id": created_match_id, "text": "Пр, го встр?",
                "from_id": created_user_1_id, "to_id": created_user_2_id}
 
-        async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
+        async with async_client.websocket_connect("/chat/ws", cookies=user1_cookie) as ws:
             await ws.send_bytes(orjson.dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
@@ -345,7 +345,7 @@ class TestAcceptance:
         msg = {"match_id": created_match_id, "text": "Го)))",
                "from_id": created_user_2_id, "to_id": created_user_1_id}
 
-        async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
+        async with async_client.websocket_connect("/chat/ws", cookies=user2_cookie) as ws:
             await ws.send_bytes(orjson.dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
