@@ -153,7 +153,7 @@ class TestAcceptance:
         """Проверка анкет первым пользователем."""
 
         response = await async_client.get(
-            f"/api/v1/questionnaire/get_list/0",
+            f"/api/v1/questionnaire/list/0",
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -205,7 +205,7 @@ class TestAcceptance:
         """Проверка анкет вторым пользователем."""
 
         response = await async_client.get(
-            f"/api/v1/questionnaire/get_list/0",
+            f"/api/v1/questionnaire/list/0",
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{

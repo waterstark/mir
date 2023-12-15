@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.base_config import current_user
 from src.auth.models import AuthUser
 from src.database import get_async_session
-from src.matches.crud import get_questionnaires_by_user_matched, delete_match_from_database
+from src.matches.crud import get_questionnaires_by_user_matched, remove_match
 from src.questionnaire.schemas import (
     ResponseQuestionnaireSchemaWithMatch,
 )
@@ -38,4 +38,4 @@ async def delete_match(
     user: Annotated[AuthUser, Depends(current_user)],
     match_id: UUID,
 ):
-    return await delete_match_from_database(session=session, user=user, match_id=match_id)
+    return await remove_match(session=session, user=user, match_id=match_id)

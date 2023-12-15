@@ -83,7 +83,7 @@ async def create_match(
     user1_id: UUID,
     user2_id: UUID
 ) -> Match:
-    """Создание Метча и занесение его в базу данных Match."""
+    """Создание Метча."""
     await check_match_data(session, user1_id, user2_id)
     stmt = insert(Match).values({
         Match.user1_id: user1_id,
@@ -93,13 +93,6 @@ async def create_match(
     match = (await session.execute(stmt)).scalar_one_or_none()
     await session.commit()
     return match
-
-
-async def get_all_matches(
-    session: AsyncSession
-) -> Sequence[Match]:
-    """Получение всех Метчей из базы данных."""
-    return (await session.execute(select(Match))).scalars().all()
 
 
 async def check_match_data(
@@ -114,14 +107,18 @@ async def check_match_data(
     if user1_id == user2_id:
         raise SelfMatchException
 
-    matches = await get_all_matches(session)
-    for match in matches:
-        if match.user1_id == user1_id and match.user2_id == user2_id \
-                or match.user1_id == user2_id and match.user2_id == user1_id:
-            raise AlreadyExistsException
+    query = select(Match).where(
+            or_(
+                and_(Match.user1_id == user1_id, Match.user2_id == user2_id),
+                and_(Match.user2_id == user1_id, Match.user1_id == user2_id),
+            ))
+    matches = (await session.execute(query)).all()
+
+    if matches:
+        raise AlreadyExistsException
 
 
-async def delete_match_from_database(
+async def remove_match(
     session: AsyncSession,
     user: AuthUser,
     match_id: UUID

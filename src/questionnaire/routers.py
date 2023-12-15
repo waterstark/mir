@@ -32,7 +32,7 @@ async def create_questionnaire(
 
 
 @router.get(
-    "/get_list/{page_number}",
+    "/list/{page_number}",
     response_model=list[ResponseUserQuestionnaireSchema],
     status_code=status.HTTP_200_OK,
 )
