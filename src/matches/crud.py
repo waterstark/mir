@@ -6,15 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
 from src.exceptions import AlreadyExistsException, SelfMatchException, NotFoundException, PermissionDeniedException
-from src.likes.crud import get_like_by_user_ids, _delete_like
+from src.likes.crud import get_like_by_user_ids, delete_like
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire
 
 
 async def get_match_by_user_ids(
-        session: AsyncSession,
-        user1_id: UUID,
-        user2_id: UUID,
+    session: AsyncSession,
+    user1_id: UUID,
+    user2_id: UUID,
 ) -> Match | None:
     """Получение Метча между пользователем1 и пользователем2 по их ID."""
     stmt = select(Match).where(or_(
@@ -30,8 +30,8 @@ async def get_match_by_user_ids(
 
 
 async def get_questionnaires_by_user_matched(
-        session: AsyncSession,
-        user: AuthUser
+    session: AsyncSession,
+    user: AuthUser
 ) -> list[UserQuestionnaire]:
     """Получение всех анкет, по которым произошел Метч."""
     query = (
@@ -47,12 +47,12 @@ async def get_questionnaires_by_user_matched(
     )
     result = (await session.execute(query)).fetchall()
 
-    await _change_questionnaire_match_info(result)
+    await change_questionnaire_match_info(result)
 
     return [questionnaire for _, questionnaire in result]
 
 
-async def _change_questionnaire_match_info(query_result) -> None:
+async def change_questionnaire_match_info(query_result) -> None:
     # TODO: Придумать что-то логичное вместо этого костыля, возможно перенести логику в likes
     """Функция меняет значение is_match в модели Questionnaire на True"""
     for _, questionnaire in query_result:
@@ -60,16 +60,16 @@ async def _change_questionnaire_match_info(query_result) -> None:
 
 
 async def get_match_by_match_id(
-        session: AsyncSession,
-        match_id: UUID
+    session: AsyncSession,
+    match_id: UUID
 ) -> Match | None:
     """Получение Метча по его Match_ID."""
     return await session.get(Match, match_id)
 
 
 async def get_matches_by_user(
-        session: AsyncSession,
-        user: AuthUser
+    session: AsyncSession,
+    user: AuthUser
 ) -> Sequence[Match]:
     """Получение списка всех Метчей пользователя."""
     stmt = select(Match).where(
@@ -79,12 +79,12 @@ async def get_matches_by_user(
 
 
 async def create_match(
-        session: AsyncSession,
-        user1_id: UUID,
-        user2_id: UUID
+    session: AsyncSession,
+    user1_id: UUID,
+    user2_id: UUID
 ) -> Match:
     """Создание Метча и занесение его в базу данных Match."""
-    await _check_match_data(session, user1_id, user2_id)
+    await check_match_data(session, user1_id, user2_id)
     stmt = insert(Match).values({
         Match.user1_id: user1_id,
         Match.user2_id: user2_id,
@@ -95,17 +95,17 @@ async def create_match(
     return match
 
 
-async def _get_all_matches(
-        session: AsyncSession
+async def get_all_matches(
+    session: AsyncSession
 ) -> Sequence[Match]:
     """Получение всех Метчей из базы данных."""
     return (await session.execute(select(Match))).scalars().all()
 
 
-async def _check_match_data(
-        session: AsyncSession,
-        user1_id: UUID,
-        user2_id: UUID
+async def check_match_data(
+    session: AsyncSession,
+    user1_id: UUID,
+    user2_id: UUID
 ) -> None:
     """
     Проверка на отсутствие Метча с самим собой
@@ -114,7 +114,7 @@ async def _check_match_data(
     if user1_id == user2_id:
         raise SelfMatchException
 
-    matches = await _get_all_matches(session)
+    matches = await get_all_matches(session)
     for match in matches:
         if match.user1_id == user1_id and match.user2_id == user2_id \
                 or match.user1_id == user2_id and match.user2_id == user1_id:
@@ -122,9 +122,9 @@ async def _check_match_data(
 
 
 async def delete_match_from_database(
-        session: AsyncSession,
-        user: AuthUser,
-        match_id: UUID
+    session: AsyncSession,
+    user: AuthUser,
+    match_id: UUID
 ) -> None:
     """Удаление Метча из базы данных."""
     match = await get_match_by_match_id(session, match_id)
@@ -146,13 +146,13 @@ async def delete_match_from_database(
             f"Like from user {user.id} to user {liked_user_id} not found",
         )
 
-    await _delete_match(session, match)
-    await _delete_like(session, like)
+    await delete_match(session, match)
+    await delete_like(session, like)
 
 
-async def _delete_match(
-        session: AsyncSession,
-        match: Match
+async def delete_match(
+    session: AsyncSession,
+    match: Match
 ) -> None:
     await session.delete(match)
     await session.commit()

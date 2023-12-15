@@ -78,6 +78,6 @@ async def check_like_data(session: AsyncSession, like_data: UserLikeRequest):
         raise AlreadyExistsException
 
 
-async def _delete_like(session: AsyncSession, like: UserLike):
+async def delete_like(session: AsyncSession, like: UserLike):
     await session.delete(like)
     await session.commit()
