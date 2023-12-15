@@ -37,6 +37,20 @@ user_questionary_data = {
     "age": 20,
 }
 
+user3_questionary_data = {
+    "firstname": "Anton",
+    "lastname": "Pupkin",
+    "gender": "Female",
+    "photo": "False",
+    "country": "False",
+    "city": "False",
+    "about": "False",
+    "height": 150,
+    "goals": "Флирт",
+    "body_type": "Худое",
+    "age": 20,
+}
+
 hobbies_dict = {
     "hobbies": [
         {"hobby_name": "qwe"},
@@ -110,6 +124,19 @@ async def questionary(get_async_session: AsyncSession, user2: AuthUser) -> UserQ
         await db.commit()
     return questionnaire
 
+@pytest.fixture(scope="module")
+async def questionary_user3(get_async_session: AsyncSession, user3: AuthUser) -> UserQuestionnaire:
+    """User questionary."""
+    user3_questionary_data["user_id"] = user3.id
+    async with get_async_session as db:
+        questionary_user3 = UserQuestionnaire(**user3_questionary_data)
+        _hobbies: list = hobbies_dict["hobbies"]
+        for hobby in _hobbies:
+            hobby_obj = UserQuestionnaireHobby(hobby_name=hobby["hobby_name"])
+            questionary_user3.hobbies.append(hobby_obj)
+        db.add(questionary_user3)
+        await db.commit()
+    return questionary_user3
 
 @pytest.fixture(scope="module")
 async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser) -> Match:
@@ -165,6 +192,17 @@ async def like2(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
         like = UserLike(
             user_id=user2.id,
             liked_user_id=user.id,
+        )
+        db.add(like)
+        await db.commit()
+    return like
+
+@pytest.fixture(scope="module")
+async def like3(get_async_session: AsyncSession, user3: AuthUser, user2: AuthUser) -> UserLike:
+    async with get_async_session as db:
+        like = UserLike(
+            user_id=user2.id,
+            liked_user_id=user3.id,
         )
         db.add(like)
         await db.commit()
