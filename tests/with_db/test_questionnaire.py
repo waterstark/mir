@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.models import AuthUser
 from src.questionnaire.crud import get_questionnaire
 from src.questionnaire.models import UserQuestionnaire
+from src.likes.models import UserLike
 
 
 async def test_create_questionnaire(
@@ -106,6 +107,22 @@ async def test_get_quest_authenticated_user(
         "user_id": IsUUID,
         "id": IsUUID
     }
+
+async def test_logic_for_reusing_questionnaires(
+    async_client: TestClient,
+    user2: AuthUser,
+    authorised_cookie_user2: dict,
+    like3: UserLike,
+    questionary: UserQuestionnaire,
+    questionary_user3: UserQuestionnaire,
+):
+    response = await async_client.get(
+        f"/api/v1/questionnaire/10",
+        cookies=authorised_cookie_user2,
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == []
+
 
 async def test_update_quest(
     async_client: TestClient,
