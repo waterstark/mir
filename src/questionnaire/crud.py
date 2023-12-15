@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.likes.models import UserLike
 from src.auth.models import AuthUser
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 from src.questionnaire.schemas import (
@@ -19,6 +20,10 @@ async def get_list_questionnaire(
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
     is_visible = True
+    liked_user_ids = (
+        select(UserLike.liked_user_id)
+        .where(UserLike.user_id == user.id)
+    )
     query = (
         select(UserQuestionnaire)
         .where(
@@ -26,6 +31,7 @@ async def get_list_questionnaire(
             UserQuestionnaire.city == user_questionnaire.city,
             UserQuestionnaire.gender != user_questionnaire.gender,
             UserQuestionnaire.is_visible == is_visible,
+            UserQuestionnaire.user_id.notin_(liked_user_ids)
         )
         .limit(5).offset(page_number)
     )
