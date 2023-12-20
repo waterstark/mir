@@ -1,4 +1,5 @@
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.routing import Mount
 from starlette.staticfiles import StaticFiles
 
@@ -8,7 +9,6 @@ from src.chat.routers import ws_router
 from src.likes.routers import likes_router
 from src.matches.routers import router as matches_router
 from src.questionnaire.routers import router as questionnaire_router
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="social networking application",
@@ -26,7 +26,7 @@ app = FastAPI(
 origins = [
     "http://localhost",
     "http://localhost:3000",
-    "http://localhost:8080"
+    "http://localhost:8080",
 ]
 
 app.add_middleware(

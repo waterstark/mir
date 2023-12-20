@@ -124,6 +124,7 @@ async def questionary(get_async_session: AsyncSession, user2: AuthUser) -> UserQ
         await db.commit()
     return questionnaire
 
+
 @pytest.fixture(scope="module")
 async def questionary_user3(get_async_session: AsyncSession, user3: AuthUser) -> UserQuestionnaire:
     """User questionary."""
@@ -137,6 +138,7 @@ async def questionary_user3(get_async_session: AsyncSession, user3: AuthUser) ->
         db.add(questionary_user3)
         await db.commit()
     return questionary_user3
+
 
 @pytest.fixture(scope="module")
 async def match(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser) -> Match:
@@ -196,6 +198,7 @@ async def like2(get_async_session: AsyncSession, user: AuthUser, user2: AuthUser
         db.add(like)
         await db.commit()
     return like
+
 
 @pytest.fixture(scope="module")
 async def like3(get_async_session: AsyncSession, user3: AuthUser, user2: AuthUser) -> UserLike:
