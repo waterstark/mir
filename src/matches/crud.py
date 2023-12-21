@@ -135,11 +135,6 @@ async def remove_match(
         liked_user_id=liked_user_id,
     )
 
-    if not like:
-        raise NotFoundException(
-            f"Like from user {user.id} to user {liked_user_id} not found",
-        )
-
     await delete_match(session, match)
     await delete_like(session, like)
 
