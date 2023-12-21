@@ -1,26 +1,16 @@
-from typing import TYPE_CHECKING
-
-import pytest
 import orjson
 from async_asgi_testclient import TestClient
-from dirty_equals import IsUUID, IsStr, IsStr
+from dirty_equals import IsStr, IsUUID
 from fastapi import status
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
-from src.auth.crud import get_user_profile
-from src.auth.models import AuthUser
 from src.main import app
-from tests.fixtures import user_data
-from src.auth.models import AuthUser
-from src.questionnaire.crud import get_questionnaire
-from src.questionnaire.models import UserQuestionnaire
 
 
 class TestAcceptance:
     """Тесты на поведение пользователя."""
 
-    async def test_acceptance(self, async_client: TestClient,):
-
+    async def test_acceptance(self, async_client: TestClient):
         """1. Регистрация двух пользователей."""
         """2. Создание анкет двух пользователей."""
         """3. Логины двух пользователей."""
@@ -124,7 +114,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
-             "id": IsUUID,
+            "id": IsUUID,
             "firstname": questionnaire_2_data["firstname"],
             "lastname": questionnaire_2_data["lastname"],
             "gender": questionnaire_2_data["gender"],
@@ -153,7 +143,7 @@ class TestAcceptance:
         """Проверка анкет первым пользователем."""
 
         response = await async_client.get(
-            f"/api/v1/questionnaire/10",
+            "/api/v1/questionnaire/list/0",
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -177,19 +167,19 @@ class TestAcceptance:
 
         like_1 = {
             "liked_user_id": created_user_2_id,
-            "is_liked": True
+            "is_liked": True,
         }
 
         response = await async_client.post(
-            f"/api/v1/likes",
-            json = like_1,
+            "/api/v1/likes",
+            json=like_1,
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
             "created_at": IsStr,
             "id": IsUUID,
             "liked_user_id": created_user_2_id,
-            "is_liked": True
+            "is_liked": True,
         }
 
         """Логин пользователя 2."""
@@ -205,11 +195,11 @@ class TestAcceptance:
         """Проверка анкет вторым пользователем."""
 
         response = await async_client.get(
-            f"/api/v1/questionnaire/10",
+            "/api/v1/questionnaire/list/0",
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
-             "id": IsUUID,
+            "id": IsUUID,
             "firstname": questionnaire_1_data["firstname"],
             "lastname": questionnaire_1_data["lastname"],
             "gender": questionnaire_1_data["gender"],
@@ -228,12 +218,12 @@ class TestAcceptance:
         """Второй пользователь лайкает первого."""
 
         like_2 = {
-             "liked_user_id": created_user_1_id,
-             "is_liked": True
+            "liked_user_id": created_user_1_id,
+            "is_liked": True,
         }
 
         response = await async_client.post(
-            f"/api/v1/likes",
+            "/api/v1/likes",
             json=like_2,
         )
         assert response.status_code == status.HTTP_201_CREATED
@@ -241,13 +231,13 @@ class TestAcceptance:
             "created_at": IsStr,
             "id": IsUUID,
             "liked_user_id": created_user_1_id,
-            "is_liked": True
+            "is_liked": True,
         }
 
         """Проверка матча вторым пользователем."""
 
         response = await async_client.get(
-            f"/api/v1/matches",
+            "/api/v1/matches",
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -265,7 +255,7 @@ class TestAcceptance:
             "body_type": questionnaire_1_data["body_type"],
             "age": questionnaire_1_data["age"],
             "user_id": created_user_1_id,
-            "is_match": True
+            "is_match": True,
         }]
 
     async def test_acceptance_with_chat(self, async_client: TestClient):
@@ -284,19 +274,19 @@ class TestAcceptance:
             ],
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        user1_cookie = {'mir': async_client.cookie_jar['mir'].value}
+        user1_cookie = {"mir": async_client.cookie_jar["mir"].value}
 
         """Получаем id матча."""
 
         response = await async_client.get(
-            f"/api/v1/matches",
+            "/api/v1/matches",
         )
         created_match_id = response.json()[0]["id"]
 
         """Получаем id первого пользователя."""
 
         response = await async_client.get(
-            f"/api/v1/users/me",
+            "/api/v1/users/me",
         )
         created_user_1_id = response.json()["user_id"]
 
@@ -309,17 +299,17 @@ class TestAcceptance:
             ],
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        user2_cookie = {'mir': async_client.cookie_jar['mir'].value}
+        user2_cookie = {"mir": async_client.cookie_jar["mir"].value}
         """Получаем id Второго пользователя."""
 
         response = await async_client.get(
-            f"/api/v1/users/me",
+            "/api/v1/users/me",
         )
         created_user_2_id = response.json()["user_id"]
 
         """Создание сообщений первым пользователем."""
 
-        msg = {"match_id": created_match_id, "text": "Пр, го встр?",
+        msg = {"match_id": created_match_id, "text": "Hi, lets meet up?",
                "from_id": created_user_1_id, "to_id": created_user_2_id}
 
         async with async_client.websocket_connect("/chat/ws", cookies=user1_cookie) as ws:
@@ -335,14 +325,14 @@ class TestAcceptance:
             "match_id": created_match_id,
             "from_id": created_user_1_id,
             "to_id": created_user_2_id,
-            "text": "Пр, го встр?",
+            "text": "Hi, lets meet up?",
             "status": str(MessageStatus.SENT),
             "updated_at": IsStr(),
         }
 
         """Создание сообщений первым пользователем."""
 
-        msg = {"match_id": created_match_id, "text": "Го)))",
+        msg = {"match_id": created_match_id, "text": "Ok)))",
                "from_id": created_user_2_id, "to_id": created_user_1_id}
 
         async with async_client.websocket_connect("/chat/ws", cookies=user2_cookie) as ws:
@@ -358,7 +348,7 @@ class TestAcceptance:
             "match_id": created_match_id,
             "from_id": created_user_2_id,
             "to_id": created_user_1_id,
-            "text": "Го)))",
+            "text": "Ok)))",
             "status": str(MessageStatus.SENT),
             "updated_at": IsStr(),
         }

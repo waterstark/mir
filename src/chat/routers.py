@@ -22,7 +22,6 @@ from src.chat.utils import get_user_from_ws_cookie, ws_manager
 from src.database import get_async_session, mongo
 from src.matches.crud import get_match_by_user_ids
 
-
 ws_router = APIRouter(
     prefix="/chat",
     tags=["WebSocket chat"],
