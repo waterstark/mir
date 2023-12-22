@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from src.config import settings
 from src.mongodb.mongodb import Mongo
+from src.redis.redis import redis as redis_client
 
 if settings.TEST_DB_NAME:
     settings.DB_NAME = settings.TEST_DB_NAME
@@ -35,6 +36,7 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+    await redis_client.flush_db()
 
 
 @pytest.fixture(scope="session")
