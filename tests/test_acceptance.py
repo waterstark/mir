@@ -10,7 +10,7 @@ from src.main import app
 class TestAcceptance:
     """Тесты на поведение пользователя."""
 
-    async def test_acceptance(self, async_client: TestClient):
+    async def test_acceptance(self, async_client: TestClient, authorised_cookie: dict):
         """1. Регистрация двух пользователей."""
         """2. Создание анкет двух пользователей."""
         """3. Логины двух пользователей."""
@@ -75,6 +75,7 @@ class TestAcceptance:
         response = await async_client.post(
             "/api/v1/questionnaire",
             json=questionnaire_1_data,
+            cookies=authorised_cookie,
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -111,6 +112,7 @@ class TestAcceptance:
         response = await async_client.post(
             "/api/v1/questionnaire",
             json=questionnaire_2_data,
+            cookies=authorised_cookie,
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {

@@ -23,6 +23,7 @@ router = APIRouter(
     "",
     response_model=ResponseUserQuestionnaireSchema,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(current_user)],
 )
 async def create_questionnaire(
     user_profile: CreateUserQuestionnaireSchema,
@@ -60,6 +61,7 @@ async def get_questionnaire(
     "/{quest_id}",
     response_model=ResponseUserQuestionnaireSchema,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(current_user)],
 )
 async def update_quest(
     quest_id: UUID,

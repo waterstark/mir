@@ -12,6 +12,7 @@ from src.questionnaire.models import UserQuestionnaire
 async def test_create_questionnaire(
     async_client: TestClient,
     user: AuthUser,
+    authorised_cookie: dict,
 ):
     questionnaire_data = {
         "firstname": "string",
@@ -31,6 +32,7 @@ async def test_create_questionnaire(
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
+        cookies=authorised_cookie,
     )
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
@@ -55,6 +57,7 @@ async def test_create_questionnaire(
 async def test_create_questionnaire_bad_credentials(
     async_client: TestClient,
     questionary: UserQuestionnaire,
+    authorised_cookie: dict,
 ):
     questionnaire_data = {
         "firstname": "s123123tring",
@@ -74,6 +77,7 @@ async def test_create_questionnaire_bad_credentials(
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
+        cookies=authorised_cookie,
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert (
@@ -130,6 +134,7 @@ async def test_update_quest(
     async_client: TestClient,
     questionary: UserQuestionnaire,
     user2: AuthUser,
+    authorised_cookie: dict,
 ):
     updated_data = {
         "firstname": "string",
@@ -157,6 +162,7 @@ async def test_update_quest(
     response = await async_client.patch(
         f"/api/v1/questionnaire/{questionary.id}",
         json=updated_data,
+        cookies=authorised_cookie,
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
@@ -202,3 +208,95 @@ async def test_delete_quest(
         session=get_async_session,
     )
     assert response_check is None
+
+
+async def test_create_questionnaire_without_token(
+    async_client: TestClient,
+    user: AuthUser,
+):
+    questionnaire_data = {
+        "firstname": "string",
+        "lastname": "string",
+        "gender": "Male",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 0,
+        "goals": "Дружба",
+        "body_type": "Худое",
+        "age": 20,
+        "user_id": user.id,
+    }
+
+    """Without cookies."""
+
+    response = await async_client.post(
+        "/api/v1/questionnaire",
+        json=questionnaire_data,
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    """Incorrect cookies."""
+
+    response = await async_client.post(
+        "/api/v1/questionnaire",
+        json=questionnaire_data,
+        cookies={"mir": "some.kind.of.incorrect.cookies"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+async def test_get_questionnaires_without_token(
+    async_client: TestClient,
+):
+    response = await async_client.get(
+        "/api/v1/questionnaire/get_my_quest",
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response = await async_client.get(
+        "/api/v1/questionnaire/list/0",
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+async def test_update_or_delete_quest_without_token(
+    async_client: TestClient,
+    questionary: UserQuestionnaire,
+    user2: AuthUser,
+):
+    updated_data = {
+        "firstname": "string",
+        "lastname": "string",
+        "gender": "Female",
+        "photo": "string",
+        "country": "string",
+        "city": "string",
+        "about": "string",
+        "hobbies": [
+            {
+                "hobby_name": "qwewasd",
+            },
+            {
+                "hobby_name": "asidpas",
+            },
+        ],
+        "height": 0,
+        "goals": "Флирт",
+        "body_type": "Полное",
+        "age": 20,
+        "user_id": user2.id,
+    }
+
+    response = await async_client.patch(
+        f"/api/v1/questionnaire/{questionary.id}",
+        json=updated_data,
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response = await async_client.delete(
+        f"/api/v1/questionnaire/{questionary.id}",
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
