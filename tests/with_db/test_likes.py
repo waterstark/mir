@@ -82,3 +82,22 @@ async def test_match_creation_after_double_like(
     match = await get_match_by_user_ids(get_async_session, user1_id=user3.id, user2_id=user2.id)
 
     assert match is not None
+
+
+async def test_like_user_without_token(
+    async_client: AsyncClient,
+    user2: AuthUser,
+):
+    """Проверка выставления лайка без токена или c неправильным токеном.
+    """
+    data = {"liked_user_id": str(user2.id), "is_liked": True}
+
+    response: Response = await async_client.post("/api/v1/likes", json=data)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    response: Response = await async_client.post(
+        "/api/v1/likes",
+        json=data,
+        cookies={"mir": "some.kind.of.incorrect.cookies"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
