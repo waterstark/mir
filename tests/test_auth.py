@@ -106,6 +106,10 @@ class TestUser:
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    async def test_logout_without_token(
+        self,
+        async_client: TestClient,
+    ):
         """Тест - logout неавторизованного пользователя."""
         response = await async_client.post(
             app.url_path_for("auth:jwt.logout"),
@@ -144,6 +148,10 @@ class TestUserProfile:
             "search_age_max": profile.search_age_max,
         }
 
+    async def test_get_user_profile_without_token(
+        self,
+        async_client: TestClient,
+    ):
         """Тест - получение профиля пользователя без токена."""
         response = await async_client.get(
             app.url_path_for("get_profile"),
@@ -192,7 +200,17 @@ class TestUserProfile:
             "search_age_max": data.get("search_age_max"),
         }
 
+    async def test_update_user_profile_without_token(
+        self,
+        async_client: TestClient,
+    ):
         """Тест - обновление профиля пользователя без токена."""
+        data = {
+            "search_range_min": 0,
+            "search_range_max": 100,
+            "search_age_min": 18,
+            "search_age_max": 80,
+        }
         response = await async_client.patch(
             app.url_path_for("get_profile"),
             json=data,
