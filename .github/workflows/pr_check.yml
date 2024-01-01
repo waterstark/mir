@@ -34,6 +34,15 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
     steps:
       - name: Checkout a Git repo
         uses: actions/checkout@v3
@@ -64,7 +73,7 @@ jobs:
           MONGO_HOST: localhost
           MONGO_PORT: '27017'
           MONGO_DATABASE: mongodb
-          REDIS_HOST: redis
+          REDIS_HOST: localhost
           REDIS_PORT: '6379'
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
       - name: Upload coverage reports to Codecov
