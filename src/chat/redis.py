@@ -36,10 +36,10 @@ async def get_match(
         if match is None:
             return match
         dict_match = {
-            "match_id": str(match.id),
-            "user1_id": str(match.user1_id),
-            "user2_id": str(match.user2_id),
-            "created_at": str(match.created_at),
+         "match_id": str(match.id),
+         "user1_id": str(match.user1_id),
+         "user2_id": str(match.user2_id),
+         "created_at": str(match.created_at),
         }
         await redis_client.set(f"match_{ws_msg.message.match_id}", json.dumps(dict_match))
 

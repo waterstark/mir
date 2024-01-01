@@ -105,6 +105,7 @@ async def test_ws_message_delete(
     authorised_cookie: dict,
     user2: AuthUser,
     mongo: Mongo,
+    match: Match,
 ):
     msg = {
         "match_id": uuid.uuid4(),
@@ -133,6 +134,7 @@ async def test_ws_unknown_message_delete(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
+    match: Match,
 ):
     msg = {
         "id": uuid.uuid4(),
@@ -158,6 +160,7 @@ async def test_ws_message_update(
     authorised_cookie: dict,
     user2: AuthUser,
     mongo: Mongo,
+    match: Match,
 ):
     msg = {
         "match_id": uuid.uuid4(),
@@ -195,6 +198,7 @@ async def test_ws_unknown_message_update(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
+    match: Match,
 ):
     msg = {
         "id": uuid.uuid4(),
