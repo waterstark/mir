@@ -3,6 +3,8 @@ from async_asgi_testclient import TestClient
 from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
+from src.auth.base_config import get_jwt_strategy
+from src.auth.models import AuthUser
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
 from src.main import app
 
@@ -10,7 +12,7 @@ from src.main import app
 class TestAcceptance:
     """Тесты на поведение пользователя."""
 
-    async def test_acceptance(self, async_client: TestClient, authorised_cookie: dict):
+    async def test_acceptance(self, async_client: TestClient):
         """1. Регистрация двух пользователей."""
         """2. Создание анкет двух пользователей."""
         """3. Логины двух пользователей."""
@@ -29,6 +31,8 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_201_CREATED
         created_user_1_id = response.json()["id"]
+        # TODO вынести created_user_1_jwt в fixture?
+        created_user_1_jwt = await get_jwt_strategy().write_token(AuthUser(**response.json()))
         assert response.json() == {
             "id": created_user_1_id,
             "email": user_1_data.get("email"),
@@ -46,6 +50,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_201_CREATED
         created_user_2_id = response.json()["id"]
+        created_user_2_jwt = await get_jwt_strategy().write_token(AuthUser(**response.json()))
         assert response.json() == {
             "id": created_user_2_id,
             "email": user_2_data.get("email"),
@@ -69,13 +74,12 @@ class TestAcceptance:
             "goals": "Дружба",
             "body_type": "Худое",
             "age": 20,
-            "user_id": created_user_1_id,
         }
 
         response = await async_client.post(
             "/api/v1/questionnaire",
             json=questionnaire_1_data,
-            cookies=authorised_cookie,
+            cookies={"mir": created_user_1_jwt},
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -107,12 +111,11 @@ class TestAcceptance:
             "goals": "Дружба",
             "body_type": "Худое",
             "age": 21,
-            "user_id": created_user_2_id,
         }
         response = await async_client.post(
             "/api/v1/questionnaire",
             json=questionnaire_2_data,
-            cookies=authorised_cookie,
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
