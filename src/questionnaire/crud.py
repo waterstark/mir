@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import delete, select, update
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
@@ -42,9 +42,10 @@ async def get_list_questionnaire(
 async def create_questionnaire(
     user_profile: CreateUserQuestionnaireSchema,
     session: AsyncSession,
+    user: AuthUser,
 ):
     select_user_questionnaire = await get_questionnaire(
-        user_id=user_profile.user_id,
+        user_id=user.id,
         session=session,
     )
     if select_user_questionnaire:
@@ -55,7 +56,7 @@ async def create_questionnaire(
             ),
         )
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
-    questionnaire = UserQuestionnaire(**user_profile_dict)
+    questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
     hobbies = user_profile.hobbies
     for hobby in hobbies:
         hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
@@ -69,9 +70,13 @@ async def update_questionnaire(
     quest_id: UUID,
     update_value: CreateUserQuestionnaireSchema,
     session: AsyncSession,
+    user: AuthUser,
 ):
     update_value_dict = update_value.dict(exclude={"hobbies", "user_id"})
-    stmt = select(UserQuestionnaire).where(UserQuestionnaire.id == quest_id)
+    stmt = select(UserQuestionnaire).where(
+        and_(UserQuestionnaire.id == quest_id,
+             UserQuestionnaire.user_id == user.id),
+    )
     result = await session.execute(stmt)
     questionnaire = result.scalar_one_or_none()
     stmt = (

@@ -27,8 +27,9 @@ router = APIRouter(
 async def create_questionnaire(
     user_profile: CreateUserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
+    user: Annotated[AuthUser, Depends(current_user)],
 ):
-    return await crud.create_questionnaire(user_profile, session)
+    return await crud.create_questionnaire(user_profile, session, user)
 
 
 @router.get(
@@ -65,8 +66,9 @@ async def update_quest(
     quest_id: UUID,
     update_value: CreateUserQuestionnaireSchema,
     session: Annotated[AsyncSession, Depends(get_async_session)],
+    user: Annotated[AuthUser, Depends(current_user)],
 ):
-    return await crud.update_questionnaire(quest_id, update_value, session)
+    return await crud.update_questionnaire(quest_id, update_value, session, user)
 
 
 @router.delete(
