@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import current_user
@@ -32,15 +32,17 @@ async def create_questionnaire(
 
 
 @router.get(
-    "/10",
+    "/list/{page_number}",
     response_model=list[ResponseUserQuestionnaireSchema],
     status_code=status.HTTP_200_OK,
 )
 async def get_list_questionnaire(
     user: Annotated[AuthUser, Depends(current_user)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
+    page_number: Annotated[int, Path(ge=0)],
 ):
-    return await crud.get_list_questionnaire_first_10(user, session)
+    return await crud.get_list_questionnaire(user, session, page_number)
+
 
 @router.get(
     "/get_my_quest",

@@ -4,9 +4,9 @@ from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
+from src.likes.models import UserLike
 from src.questionnaire.crud import get_questionnaire
 from src.questionnaire.models import UserQuestionnaire
-from src.likes.models import UserLike
 
 
 async def test_create_questionnaire(
@@ -81,6 +81,7 @@ async def test_create_questionnaire_bad_credentials(
         == f"Объект уже существует в базе данных!!!{questionary.firstname}"
     )
 
+
 async def test_get_quest_authenticated_user(
         async_client: TestClient,
         authorised_cookie: dict,
@@ -105,8 +106,9 @@ async def test_get_quest_authenticated_user(
         "body_type": "Худое",
         "age": 20,
         "user_id": IsUUID,
-        "id": IsUUID
+        "id": IsUUID,
     }
+
 
 async def test_logic_for_reusing_questionnaires(
     async_client: TestClient,
@@ -117,7 +119,7 @@ async def test_logic_for_reusing_questionnaires(
     questionary_user3: UserQuestionnaire,
 ):
     response = await async_client.get(
-        f"/api/v1/questionnaire/10",
+        "/api/v1/questionnaire/list/0",
         cookies=authorised_cookie_user2,
     )
     assert response.status_code == status.HTTP_200_OK
