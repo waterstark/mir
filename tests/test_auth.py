@@ -106,6 +106,17 @@ class TestUser:
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
+    async def test_logout_without_token(
+        self,
+        async_client: TestClient,
+    ):
+        """Тест - logout неавторизованного пользователя."""
+        response = await async_client.post(
+            app.url_path_for("auth:jwt.logout"),
+            cookies={"mir": "some.kind.of.incorrect.cookies"},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
 
 class TestUserProfile:
     """Тесты профиля пользователя."""
@@ -136,6 +147,24 @@ class TestUserProfile:
             "search_age_min": profile.search_age_min,
             "search_age_max": profile.search_age_max,
         }
+
+    async def test_get_user_profile_without_token(
+        self,
+        async_client: TestClient,
+    ):
+        """Тест - получение профиля пользователя без токена."""
+        response = await async_client.get(
+            app.url_path_for("get_profile"),
+            cookies={},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+        """Тест - получение профиля пользователя c неправильным токеном."""
+        response = await async_client.get(
+            app.url_path_for("get_profile"),
+            cookies={"mir": "some.kind.of.incorrect.cookies"},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     async def test_update_user_profile(
         self,
@@ -170,6 +199,32 @@ class TestUserProfile:
             "search_age_min": data.get("search_age_min"),
             "search_age_max": data.get("search_age_max"),
         }
+
+    async def test_update_user_profile_without_token(
+        self,
+        async_client: TestClient,
+    ):
+        """Тест - обновление профиля пользователя без токена."""
+        data = {
+            "search_range_min": 0,
+            "search_range_max": 100,
+            "search_age_min": 18,
+            "search_age_max": 80,
+        }
+        response = await async_client.patch(
+            app.url_path_for("get_profile"),
+            json=data,
+            cookies={},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+        """Тест - обновление профиля пользователя c неправильным токеном."""
+        response = await async_client.patch(
+            app.url_path_for("get_profile"),
+            json=data,
+            cookies={"mir": "some.kind.of.incorrect.cookies"},
+        )
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.parametrize(
         ("age_min", "age_max", "range_min", "range_max"),
