@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import orjson
@@ -9,6 +10,7 @@ from src.auth.models import AuthUser
 from src.chat.schemas import MessageCreateRequest, MessageStatus, WSAction, WSStatus
 from src.matches.models import Match
 from src.mongodb.mongodb import Mongo
+from src.redis.redis import redis
 
 
 async def test_ws_msg_create(
@@ -38,6 +40,10 @@ async def test_ws_msg_create(
         "status": str(MessageStatus.SENT),
         "updated_at": IsStr(),
     }
+
+    cache_match = await redis.get(f'match_{resp["message"]["match_id"]}')
+
+    assert json.loads(cache_match)["match_id"] == resp["message"]["match_id"]
 
 
 async def test_ws_connect_without_token(async_client: TestClient):
@@ -98,8 +104,8 @@ async def test_ws_message_delete(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
-    match: Match,
     mongo: Mongo,
+    match: Match,
 ):
     msg = {
         "match_id": uuid.uuid4(),
@@ -127,8 +133,8 @@ async def test_ws_unknown_message_delete(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
-    match: Match,
     user2: AuthUser,
+    match: Match,
 ):
     msg = {
         "id": uuid.uuid4(),
@@ -153,8 +159,8 @@ async def test_ws_message_update(
     user: AuthUser,
     authorised_cookie: dict,
     user2: AuthUser,
-    match: Match,
     mongo: Mongo,
+    match: Match,
 ):
     msg = {
         "match_id": uuid.uuid4(),
@@ -191,8 +197,8 @@ async def test_ws_unknown_message_update(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
-    match: Match,
     user2: AuthUser,
+    match: Match,
 ):
     msg = {
         "id": uuid.uuid4(),

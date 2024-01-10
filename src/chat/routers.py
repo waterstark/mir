@@ -9,6 +9,7 @@ from starlette.websockets import WebSocketDisconnect
 
 from src.auth.models import AuthUser
 from src.chat.exceptions import NoMatchError
+from src.chat.redis import get_match
 from src.chat.schemas import (
     MessageCreateRequest,
     MessageDeleteRequest,
@@ -20,7 +21,6 @@ from src.chat.schemas import (
 )
 from src.chat.utils import get_user_from_ws_cookie, ws_manager
 from src.database import get_async_session, mongo
-from src.matches.crud import get_match_by_user_ids
 
 ws_router = APIRouter(
     prefix="/chat",
@@ -83,7 +83,7 @@ async def create_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
     # TODO: get user's matches from redis and check if he can send message to 'to_id'
     session_gen = get_async_session()
     session = await session_gen.asend(None)
-    match = await get_match_by_user_ids(session, user.id, ws_msg.message.to_id)
+    match = await get_match(session, user, ws_msg)
     if match is None:
         raise NoMatchError(user.id, ws_msg.message.to_id)
 
@@ -105,7 +105,7 @@ async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
     # TODO: get user's matches from redis and check if he can delete message to 'to_id'
     session_gen = get_async_session()
     session = await session_gen.asend(None)
-    match = await get_match_by_user_ids(session, user.id, ws_msg.message.to_id)
+    match = await get_match(session, user, ws_msg)
     if match is None:
         raise NoMatchError(user.id, ws_msg.message.to_id)
 
@@ -129,7 +129,7 @@ async def update_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
     # TODO: get user's matches from redis and check if he can send message to 'to_id'
     session_gen = get_async_session()
     session = await session_gen.asend(None)
-    match = await get_match_by_user_ids(session, user.id, ws_msg.message.to_id)
+    match = await get_match(session, user, ws_msg)
     if match is None:
         raise NoMatchError(user.id, ws_msg.message.to_id)
 

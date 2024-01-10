@@ -20,6 +20,10 @@ class Settings(BaseSettings):
 
     MONGO_DATABASE: str
 
+    REDIS_HOST: str
+
+    REDIS_PORT: int
+
     SECRET_KEY: str
 
     class Config:
@@ -56,6 +60,11 @@ class Settings(BaseSettings):
     def db_url_mongo(self) -> str:
         """Product db url."""
         return f"mongodb://{self.MONGO_HOST}:{self.MONGO_PORT}"
+
+    @property
+    def db_url_redis(self) -> str:
+        """Product db url."""
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
 
 
 settings = Settings()
