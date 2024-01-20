@@ -23,4 +23,8 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
 
+async def get_async_session_as_session() -> AsyncSession:
+    async with async_session_maker() as session:
+        return session
+
 mongo = Mongo()
