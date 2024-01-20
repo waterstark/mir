@@ -14,9 +14,10 @@
 cat .env-example > .env
 ```
 Поднять контейнеры
-```shell
-docker-compose up
+```sh
+docker compose up app
 ```
+После этого бэкенд будет доступен по адресу http://localhost:8000 
 
 ## Локальная установка
 Активация виртуального окружения
