@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.database import async_session_maker
 from src.auth.models import AuthUser
 from src.likes.models import UserLike
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
@@ -19,24 +20,30 @@ async def get_list_questionnaire(
     page_number: int,
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
-    is_visible = True
-    liked_user_ids = (
-        select(UserLike.liked_user_id)
-        .where(UserLike.user_id == user.id)
-    )
-    query = (
-        select(UserQuestionnaire)
-        .where(
-            UserQuestionnaire.user_id != user.id,
-            UserQuestionnaire.city == user_questionnaire.city,
-            UserQuestionnaire.gender != user_questionnaire.gender,
-            UserQuestionnaire.is_visible == is_visible,
-            UserQuestionnaire.user_id.notin_(liked_user_ids),
+    if user_questionnaire.quest_lists_per_day < 3:
+        user_questionnaire.quest_lists_per_day += 1
+        await session.commit()
+
+        is_visible = True
+        liked_user_ids = (
+            select(UserLike.liked_user_id)
+            .where(UserLike.user_id == user.id)
         )
-        .limit(5).offset(page_number)
-    )
-    result = await session.execute(query)
-    return result.scalars().fetchall()
+        query = (
+            select(UserQuestionnaire)
+            .where(
+                UserQuestionnaire.user_id != user.id,
+                UserQuestionnaire.city == user_questionnaire.city,
+                UserQuestionnaire.gender != user_questionnaire.gender,
+                UserQuestionnaire.is_visible == is_visible,
+                UserQuestionnaire.user_id.notin_(liked_user_ids),
+            )
+            .limit(5).offset(page_number)
+        )
+        result = await session.execute(query)
+        return result.scalars().fetchall()
+    else:
+        return []
 
 
 async def create_questionnaire(
@@ -120,3 +127,12 @@ async def get_questionnaire(user_id: UUID, session: AsyncSession):
     if response:
         return response
     return None
+
+async def reset_quest_lists_per_day():
+    async with async_session_maker() as session:
+        stmt = (
+            update(UserQuestionnaire)
+            .values(quest_lists_per_day=0)
+        )
+        await session.execute(stmt)
+        await session.commit()

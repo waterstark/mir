@@ -71,6 +71,8 @@ class UserQuestionnaire(Base):
     created_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow,
     )
+    is_prem: Mapped[bool] = mapped_column(default=False, nullable=False)
+    quest_lists_per_day: Mapped[int] = mapped_column(default=0, nullable=False)
     firstname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     lastname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     gender: Mapped[str] = mapped_column(ChoiceType(Gender), nullable=True)
