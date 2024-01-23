@@ -1,7 +1,7 @@
 # mir
 
 ## Dependencies
-* python 3.10+
+* python 3.10/3.11/3.12
 * python-poetry
 * postgresql
 * mongodb
@@ -32,7 +32,7 @@ poetry install
 ```sh
 cat .env-example > .env
 ```
-Развернуть контейнеры для подключения к базам данных 
+Запустить сервисы (postgresql, mongodb и redis) или поднять их в контейнере с помощью:
 ```sh
 docker compose up -d --build --remove-orphans
 ```

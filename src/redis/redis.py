@@ -1,6 +1,6 @@
 from typing import Any
 
-import aioredis
+from redis.asyncio import Redis as AsyncRedis
 
 from src.config import settings
 
@@ -9,7 +9,7 @@ class Redis:
     path_to_conf_file = "/etc/redis/redis.conf"
 
     def __init__(self):
-        self.redis_client = aioredis.from_url(
+        self.redis_client = AsyncRedis.from_url(
             url=settings.db_url_redis,
             db=0,
             decode_responses=True,
