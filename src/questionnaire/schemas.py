@@ -25,11 +25,11 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     goals: str
     body_type: str
     age: conint(ge=18, le=99)
-    user_id: uuid.UUID
 
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
     id: uuid.UUID | None = None
+    user_id: uuid.UUID | None = None
 
 
 class ResponseQuestionnaireSchemaWithMatch(ResponseUserQuestionnaireSchema):

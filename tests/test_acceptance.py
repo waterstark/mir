@@ -4,6 +4,7 @@ from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
+from src.chat.utils import orjson_dumps
 from src.main import app
 
 
@@ -12,8 +13,8 @@ class TestAcceptance:
 
     async def test_acceptance(self, async_client: TestClient):
         """1. Регистрация двух пользователей."""
-        """2. Создание анкет двух пользователей."""
-        """3. Логины двух пользователей."""
+        """2. Логины двух пользователей."""
+        """3. Создание анкет двух пользователей."""
         """4. Взаимные лайки двух пользователей."""
         """5. Проверка матча."""
 
@@ -54,6 +55,30 @@ class TestAcceptance:
             "is_verified": False,
         }
 
+        """Логин пользователя 1."""
+        response = await async_client.post(
+            app.url_path_for("auth:jwt.login"),
+            form=[
+                ("username", "user1@mail.ru"),
+                ("password", "password"),
+            ],
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        created_user_1_jwt = async_client.cookie_jar["mir"].value
+
+        """Логин пользователя 2."""
+        response = await async_client.post(
+            app.url_path_for("auth:jwt.login"),
+            form=[
+                ("username", "user2@mail.ru"),
+                ("password", "password"),
+            ],
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        created_user_2_jwt = async_client.cookie_jar["mir"].value
+
         """Создание двух анкет."""
 
         questionnaire_1_data = {
@@ -69,12 +94,12 @@ class TestAcceptance:
             "goals": "Дружба",
             "body_type": "Худое",
             "age": 20,
-            "user_id": created_user_1_id,
         }
 
         response = await async_client.post(
             "/api/v1/questionnaire",
             json=questionnaire_1_data,
+            cookies={"mir": created_user_1_jwt},
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -106,11 +131,11 @@ class TestAcceptance:
             "goals": "Дружба",
             "body_type": "Худое",
             "age": 21,
-            "user_id": created_user_2_id,
         }
         response = await async_client.post(
             "/api/v1/questionnaire",
             json=questionnaire_2_data,
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -130,20 +155,11 @@ class TestAcceptance:
             "user_id": created_user_2_id,
         }
 
-        """Логин пользователя 1."""
-        response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user1@mail.ru"),
-                ("password", "password"),
-            ],
-        )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-
         """Проверка анкет первым пользователем."""
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_1_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -173,6 +189,7 @@ class TestAcceptance:
         response = await async_client.post(
             "/api/v1/likes",
             json=like_1,
+            cookies={"mir": created_user_1_jwt},
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -182,20 +199,11 @@ class TestAcceptance:
             "is_liked": True,
         }
 
-        """Логин пользователя 2."""
-        response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user2@mail.ru"),
-                ("password", "password"),
-            ],
-        )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-
         """Проверка анкет вторым пользователем."""
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -225,6 +233,7 @@ class TestAcceptance:
         response = await async_client.post(
             "/api/v1/likes",
             json=like_2,
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json() == {
@@ -238,6 +247,7 @@ class TestAcceptance:
 
         response = await async_client.get(
             "/api/v1/matches",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -313,11 +323,11 @@ class TestAcceptance:
                "from_id": created_user_1_id, "to_id": created_user_2_id}
 
         async with async_client.websocket_connect("/chat/ws", cookies=user1_cookie) as ws:
-            await ws.send_bytes(orjson.dumps({
+            await ws.send_text(orjson_dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
             }))
-            resp = orjson.loads(await ws.receive_bytes())
+            resp = orjson.loads(await ws.receive_text())
 
         assert resp["status"] == WSStatus.OK
         assert resp["message"] == {
@@ -336,11 +346,11 @@ class TestAcceptance:
                "from_id": created_user_2_id, "to_id": created_user_1_id}
 
         async with async_client.websocket_connect("/chat/ws", cookies=user2_cookie) as ws:
-            await ws.send_bytes(orjson.dumps({
+            await ws.send_text(orjson_dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
             }))
-            resp = orjson.loads(await ws.receive_bytes())
+            resp = orjson.loads(await ws.receive_text())
 
         assert resp["status"] == WSStatus.OK
         assert resp["message"] == {

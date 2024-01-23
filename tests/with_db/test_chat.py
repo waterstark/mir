@@ -8,6 +8,7 @@ from dirty_equals import IsStr, IsUUID
 
 from src.auth.models import AuthUser
 from src.chat.schemas import MessageCreateRequest, MessageStatus, WSAction, WSStatus
+from src.chat.utils import orjson_dumps
 from src.matches.models import Match
 from src.mongodb.mongodb import Mongo
 from src.redis.redis import redis
@@ -24,11 +25,11 @@ async def test_ws_msg_create(
            "from_id": user.id, "to_id": user2.id}
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": WSAction.CREATE,
             "message": msg,
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.OK
     assert resp["message"] == {
@@ -65,11 +66,11 @@ async def test_ws_msg_create_without_match(
            "from_id": user.id, "to_id": user3.id}
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": WSAction.CREATE,
             "message": msg,
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.ERROR
     assert resp["detail"] == f"No match for users {user.id} and {user3.id}"
@@ -86,17 +87,17 @@ async def test_ws_unknown_action(
            "from_id": user.id, "to_id": user2.id}
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "user_id": user.id,
         }))
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": "DO SOME SHIT",
             "message": msg,
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.ERROR
-    assert resp["detail"] == "unknown action or message format"
+    assert resp["detail"] == "unknown action or bad message format"
 
 
 async def test_ws_message_delete(
@@ -120,11 +121,11 @@ async def test_ws_message_delete(
     msg.pop("text")
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": WSAction.DELETE,
             "message": msg,
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.OK
 
@@ -144,11 +145,11 @@ async def test_ws_unknown_message_delete(
     }
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": WSAction.DELETE,
             "message": msg,
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.ERROR
     assert resp["detail"] == f"unknown message id {msg['id']}"
@@ -175,11 +176,11 @@ async def test_ws_message_update(
     msg.status = MessageStatus.READ
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": WSAction.UPDATE,
             "message": msg.dict(exclude={"updated_at"}),
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.OK
     assert resp["message"] == {
@@ -210,11 +211,11 @@ async def test_ws_unknown_message_update(
     }
 
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "action": WSAction.UPDATE,
             "message": msg,
         }))
-        resp = orjson.loads(await ws.receive_bytes())
+        resp = orjson.loads(await ws.receive_text())
 
     assert resp["status"] == WSStatus.ERROR
     assert resp["detail"] == f"unknown message id {msg['id']}"
