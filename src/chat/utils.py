@@ -1,13 +1,18 @@
 import uuid
 from collections.abc import AsyncGenerator
-from typing import Annotated
+from typing import Annotated, Any
 
+import orjson
 from fastapi import Depends, WebSocketException
 from starlette.websockets import WebSocket
 
 from src.auth.base_config import auth_backend
 from src.auth.manager import UserManager, get_user_manager
 from src.auth.models import AuthUser
+
+
+def orjson_dumps(data: Any, **kwargs: Any):
+    return orjson.dumps(data, **kwargs).decode("utf-8")
 
 
 async def get_user_from_ws_cookie(

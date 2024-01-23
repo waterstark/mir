@@ -4,6 +4,7 @@ from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
+from src.chat.utils import orjson_dumps
 from src.main import app
 
 
@@ -322,11 +323,11 @@ class TestAcceptance:
                "from_id": created_user_1_id, "to_id": created_user_2_id}
 
         async with async_client.websocket_connect("/chat/ws", cookies=user1_cookie) as ws:
-            await ws.send_bytes(orjson.dumps({
+            await ws.send_text(orjson_dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
             }))
-            resp = orjson.loads(await ws.receive_bytes())
+            resp = orjson.loads(await ws.receive_text())
 
         assert resp["status"] == WSStatus.OK
         assert resp["message"] == {
@@ -345,11 +346,11 @@ class TestAcceptance:
                "from_id": created_user_2_id, "to_id": created_user_1_id}
 
         async with async_client.websocket_connect("/chat/ws", cookies=user2_cookie) as ws:
-            await ws.send_bytes(orjson.dumps({
+            await ws.send_text(orjson_dumps({
                 "action": WSAction.CREATE,
                 "message": msg,
             }))
-            resp = orjson.loads(await ws.receive_bytes())
+            resp = orjson.loads(await ws.receive_text())
 
         assert resp["status"] == WSStatus.OK
         assert resp["message"] == {

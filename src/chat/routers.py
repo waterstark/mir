@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from fastapi.websockets import WebSocket
-from orjson import orjson
+from orjson import JSONEncodeError, orjson
 from pydantic import ValidationError
 from starlette.websockets import WebSocketDisconnect
 
@@ -19,7 +19,7 @@ from src.chat.schemas import (
     WSMessageRequest,
     WSStatus,
 )
-from src.chat.utils import get_user_from_ws_cookie, ws_manager
+from src.chat.utils import get_user_from_ws_cookie, orjson_dumps, ws_manager
 from src.database import get_async_session, mongo
 
 ws_router = APIRouter(
@@ -48,8 +48,8 @@ async def websocket_chat(
 
     while True:
         try:
-            b_data = await ws.receive_bytes()
-            data = orjson.loads(b_data)
+            text_data = await ws.receive_text()
+            data = orjson.loads(text_data)
             ws_msg = WSMessageRequest.parse_obj(data)
             match ws_msg.action:
                 case WSAction.CREATE:
@@ -61,13 +61,13 @@ async def websocket_chat(
         except (RuntimeError, WebSocketDisconnect):  # ws connection error
             await ws_manager.disconnect(ws, user.id)
             break
-        except ValidationError:  # pydantic schema parse error + unknown action
-            await ws.send_bytes(orjson.dumps({
+        except (ValidationError, JSONEncodeError):  # pydantic schema parse error, unknown action, decode msg error
+            await ws.send_text(orjson_dumps({
                 "status": WSStatus.ERROR,
-                "detail": "unknown action or message format",
+                "detail": "unknown action or bad message format",
             }))
         except NoMatchError as e:
-            await ws.send_bytes(orjson.dumps({
+            await ws.send_text(orjson_dumps({
                 "status": WSStatus.ERROR,
                 "detail": str(e),
             }))
@@ -89,8 +89,7 @@ async def create_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
 
     msg = await mongo.create_message(ws_msg.message)
 
-    # TODO: may be create orjson message serializer
-    await ws.send_bytes(orjson.dumps({
+    await ws.send_text(orjson_dumps({
         "status": WSStatus.OK,
         "message": msg.dict(),
     }))
@@ -112,12 +111,12 @@ async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
     result = await mongo.delete_message(ws_msg.message.id)
 
     if not result.deleted_count:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "status": WSStatus.ERROR,
             "detail": f"unknown message id {ws_msg.message.id}",
         }))
 
-    await ws.send_bytes(orjson.dumps({
+    await ws.send_text(orjson_dumps({
         "status": WSStatus.OK,
     }))
 
@@ -135,7 +134,7 @@ async def update_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
 
     result = await mongo.get_message(ws_msg.message.id)
     if result is None:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "status": WSStatus.ERROR,
             "detail": f"unknown message id {ws_msg.message.id}",
         }))
@@ -148,12 +147,12 @@ async def update_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
 
     result = await mongo.update_message(msg)
     if not result.modified_count:
-        await ws.send_bytes(orjson.dumps({
+        await ws.send_text(orjson_dumps({
             "status": WSStatus.OK,
             "detail": f"error updating message id {msg.id}",
         }))
 
-    await ws.send_bytes(orjson.dumps({
+    await ws.send_text(orjson_dumps({
         "status": WSStatus.OK,
         "message": msg.dict(),
     }))
