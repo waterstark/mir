@@ -1,16 +1,15 @@
 import uuid
 from datetime import datetime
 
-from fastapi_users import schemas
-from fastapi_users.schemas import CreateUpdateDictModel
 from pydantic import BaseModel, EmailStr, Field, ValidationError, root_validator
 
 from src.auth.models import AGE_MAX, AGE_MIN, RANGE_MAX, RANGE_MIN
 
 
-class UserCreateOutput(schemas.BaseUser[uuid.UUID]):
+class UserSchema(BaseModel):
     id: uuid.UUID
     email: str
+    hashed_password: bytes | str
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
@@ -19,9 +18,14 @@ class UserCreateOutput(schemas.BaseUser[uuid.UUID]):
         orm_mode = True
 
 
-class UserCreateInput(CreateUpdateDictModel):
+class UserCreateInput(BaseModel):
     email: EmailStr
     password: str
+
+
+class ResponseSchema(BaseModel):
+    status_code: int
+    detail: str
 
 
 class BaseUserProfile(BaseModel):

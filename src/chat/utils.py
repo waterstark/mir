@@ -6,9 +6,9 @@ import orjson
 from fastapi import Depends, WebSocketException
 from starlette.websockets import WebSocket
 
-from src.auth.base_config import auth_backend
-from src.auth.manager import UserManager, get_user_manager
+from src.auth.base_config import current_user
 from src.auth.models import AuthUser
+from src.auth.schemas import UserSchema
 
 
 def orjson_dumps(data: Any, **kwargs: Any):
@@ -17,10 +17,10 @@ def orjson_dumps(data: Any, **kwargs: Any):
 
 async def get_user_from_ws_cookie(
         ws: WebSocket,
-        user_manager: Annotated[UserManager, Depends(get_user_manager)],
+        user: Annotated[UserSchema, Depends(current_user)],
 ) -> AsyncGenerator[AuthUser, None]:
-    cookie = ws.cookies.get("mir")
-    user = await auth_backend.get_strategy().read_token(cookie, user_manager)
+    ws.cookies.get("mir")
+    # TODO user = await auth_backend.get_strategy().read_token(cookie, user_manager)
     if not user or not user.is_active:
         raise WebSocketException(404, "Invalid user")
     yield user

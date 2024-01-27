@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from pydantic import BaseSettings
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 class Settings(BaseSettings):
@@ -25,6 +29,16 @@ class Settings(BaseSettings):
     REDIS_PORT: int
 
     SECRET_KEY: str
+
+    PRIVATE_KEY_PATH: Path = BASE_DIR / "jwt-private.pem"
+    PUBLIC_KEY_PATH: Path = BASE_DIR / "jwt-public.pem"
+    ALGORITHM: str
+
+    COOKIE_ACCESS_TOKEN_KEY: str
+    COOKIE_REFRESH_TOKEN_KEY: str
+
+    ACCESS_TOKEN_EXPIRES_IN: int
+    REFRESH_TOKEN_EXPIRES_IN: int
 
     class Config:
         env_file = ".env"
