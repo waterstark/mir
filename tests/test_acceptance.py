@@ -132,6 +132,8 @@ class TestAcceptance:
             "user_id": created_user_2_id,
         }
 
+        """Проверка анкет первым пользователем."""
+
         """Проверка анкет вторым пользователем, проверка превышения количества проверок анкет"""
 
         response = await async_client.get(
@@ -208,8 +210,6 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
-
-        """Проверка анкет первым пользователем."""
 
         """Первый пользователь лайкает второго."""
 
