@@ -1,9 +1,12 @@
 import orjson
 from async_asgi_testclient import TestClient
+from sqlalchemy import delete, select, update
 from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
+from src.questionnaire.models import UserQuestionnaire
+from src.database import async_session_maker
 from src.main import app
 
 
@@ -140,7 +143,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-        """Проверка анкет первым пользователем."""
+        """Проверка анкет первым пользователем, проверка превышения количества проверок анкет"""
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
@@ -162,6 +165,60 @@ class TestAcceptance:
             "age": questionnaire_2_data["age"],
             "user_id": created_user_2_id,
         }]
+
+        response = await async_client.get(
+            "/api/v1/questionnaire/list/0",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [{
+            "id": IsUUID,
+            "firstname": questionnaire_2_data["firstname"],
+            "lastname": questionnaire_2_data["lastname"],
+            "gender": questionnaire_2_data["gender"],
+            "photo": questionnaire_2_data["photo"],
+            "country": questionnaire_2_data["country"],
+            "city": questionnaire_2_data["city"],
+            "about": questionnaire_2_data["about"],
+            "hobbies": questionnaire_2_data["hobbies"],
+            "height": questionnaire_2_data["height"],
+            "goals": questionnaire_2_data["goals"],
+            "body_type": questionnaire_2_data["body_type"],
+            "age": questionnaire_2_data["age"],
+            "user_id": created_user_2_id,
+        }]
+
+        response = await async_client.get(
+            "/api/v1/questionnaire/list/0",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == [{
+            "id": IsUUID,
+            "firstname": questionnaire_2_data["firstname"],
+            "lastname": questionnaire_2_data["lastname"],
+            "gender": questionnaire_2_data["gender"],
+            "photo": questionnaire_2_data["photo"],
+            "country": questionnaire_2_data["country"],
+            "city": questionnaire_2_data["city"],
+            "about": questionnaire_2_data["about"],
+            "hobbies": questionnaire_2_data["hobbies"],
+            "height": questionnaire_2_data["height"],
+            "goals": questionnaire_2_data["goals"],
+            "body_type": questionnaire_2_data["body_type"],
+            "age": questionnaire_2_data["age"],
+            "user_id": created_user_2_id,
+        }]
+
+        response = await async_client.get(
+            "/api/v1/questionnaire/list/0",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == []
+
+        response = await async_client.get(
+            "/api/v1/questionnaire/list/0",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == []
 
         """Первый пользователь лайкает второго."""
 
@@ -257,6 +314,17 @@ class TestAcceptance:
             "user_id": created_user_1_id,
             "is_match": True,
         }]
+
+        """Проверка анкет вторым пользователем после матча."""
+
+        response = await async_client.get(
+            "/api/v1/questionnaire/list/0",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == []
+
+
+
 
     async def test_acceptance_with_chat(self, async_client: TestClient):
         """Тесты на чат между пользователями (пользователи взяты из предыдущего теста)."""
