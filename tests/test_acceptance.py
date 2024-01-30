@@ -209,6 +209,8 @@ class TestAcceptance:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
+        """Проверка анкет первым пользователем."""
+
         """Первый пользователь лайкает второго."""
 
         like_1 = {
