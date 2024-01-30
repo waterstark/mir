@@ -132,6 +132,17 @@ class TestAcceptance:
             "user_id": created_user_2_id,
         }
 
+        """Логин пользователя 1."""
+        response = await async_client.post(
+            app.url_path_for("auth:jwt.login"),
+            form=[
+                ("username", "user1@mail.ru"),
+                ("password", "password"),
+            ],
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
         """Проверка анкет первым пользователем."""
 
         """Проверка анкет вторым пользователем, проверка превышения количества проверок анкет"""
