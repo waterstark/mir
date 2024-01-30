@@ -5,8 +5,7 @@ from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
-from src.questionnaire.models import UserQuestionnaire
-from src.database import async_session_maker
+from src.chat.utils import orjson_dumps
 from src.main import app
 
 
@@ -133,17 +132,7 @@ class TestAcceptance:
             "user_id": created_user_2_id,
         }
 
-        """Логин пользователя 1."""
-        response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user1@mail.ru"),
-                ("password", "password"),
-            ],
-        )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-
-        """Проверка анкет первым пользователем, проверка превышения количества проверок анкет"""
+        """Проверка анкет вторым пользователем, проверка превышения количества проверок анкет"""
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
@@ -151,19 +140,19 @@ class TestAcceptance:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
             "id": IsUUID,
-            "firstname": questionnaire_2_data["firstname"],
-            "lastname": questionnaire_2_data["lastname"],
-            "gender": questionnaire_2_data["gender"],
-            "photo": questionnaire_2_data["photo"],
-            "country": questionnaire_2_data["country"],
-            "city": questionnaire_2_data["city"],
-            "about": questionnaire_2_data["about"],
-            "hobbies": questionnaire_2_data["hobbies"],
-            "height": questionnaire_2_data["height"],
-            "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
-            "age": questionnaire_2_data["age"],
-            "user_id": created_user_2_id,
+            "firstname": questionnaire_1_data["firstname"],
+            "lastname": questionnaire_1_data["lastname"],
+            "gender": questionnaire_1_data["gender"],
+            "photo": questionnaire_1_data["photo"],
+            "country": questionnaire_1_data["country"],
+            "city": questionnaire_1_data["city"],
+            "about": questionnaire_1_data["about"],
+            "hobbies": questionnaire_1_data["hobbies"],
+            "height": questionnaire_1_data["height"],
+            "goals": questionnaire_1_data["goals"],
+            "body_type": questionnaire_1_data["body_type"],
+            "age": questionnaire_1_data["age"],
+            "user_id": created_user_1_id,
         }]
 
         response = await async_client.get(
@@ -172,19 +161,19 @@ class TestAcceptance:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
             "id": IsUUID,
-            "firstname": questionnaire_2_data["firstname"],
-            "lastname": questionnaire_2_data["lastname"],
-            "gender": questionnaire_2_data["gender"],
-            "photo": questionnaire_2_data["photo"],
-            "country": questionnaire_2_data["country"],
-            "city": questionnaire_2_data["city"],
-            "about": questionnaire_2_data["about"],
-            "hobbies": questionnaire_2_data["hobbies"],
-            "height": questionnaire_2_data["height"],
-            "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
-            "age": questionnaire_2_data["age"],
-            "user_id": created_user_2_id,
+            "firstname": questionnaire_1_data["firstname"],
+            "lastname": questionnaire_1_data["lastname"],
+            "gender": questionnaire_1_data["gender"],
+            "photo": questionnaire_1_data["photo"],
+            "country": questionnaire_1_data["country"],
+            "city": questionnaire_1_data["city"],
+            "about": questionnaire_1_data["about"],
+            "hobbies": questionnaire_1_data["hobbies"],
+            "height": questionnaire_1_data["height"],
+            "goals": questionnaire_1_data["goals"],
+            "body_type": questionnaire_1_data["body_type"],
+            "age": questionnaire_1_data["age"],
+            "user_id": created_user_1_id,
         }]
 
         response = await async_client.get(
@@ -193,19 +182,19 @@ class TestAcceptance:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
             "id": IsUUID,
-            "firstname": questionnaire_2_data["firstname"],
-            "lastname": questionnaire_2_data["lastname"],
-            "gender": questionnaire_2_data["gender"],
-            "photo": questionnaire_2_data["photo"],
-            "country": questionnaire_2_data["country"],
-            "city": questionnaire_2_data["city"],
-            "about": questionnaire_2_data["about"],
-            "hobbies": questionnaire_2_data["hobbies"],
-            "height": questionnaire_2_data["height"],
-            "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
-            "age": questionnaire_2_data["age"],
-            "user_id": created_user_2_id,
+            "firstname": questionnaire_1_data["firstname"],
+            "lastname": questionnaire_1_data["lastname"],
+            "gender": questionnaire_1_data["gender"],
+            "photo": questionnaire_1_data["photo"],
+            "country": questionnaire_1_data["country"],
+            "city": questionnaire_1_data["city"],
+            "about": questionnaire_1_data["about"],
+            "hobbies": questionnaire_1_data["hobbies"],
+            "height": questionnaire_1_data["height"],
+            "goals": questionnaire_1_data["goals"],
+            "body_type": questionnaire_1_data["body_type"],
+            "age": questionnaire_1_data["age"],
+            "user_id": created_user_1_id,
         }]
 
         response = await async_client.get(
