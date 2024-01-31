@@ -2,7 +2,6 @@ import pytest
 from async_asgi_testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.base_config import get_jwt_strategy
 from src.auth.models import AuthUser
 from src.likes.models import UserLike
 from src.matches.models import Match
@@ -63,38 +62,17 @@ hobbies_dict = {
 async def user(async_client: TestClient) -> AuthUser:
     """Test user."""
     response = await async_client.post(
-        async_client.application.url_path_for("register:register"),
+        "/api/v1/auth/register",
         json=user_data,
     )
     return AuthUser(**response.json())
 
 
 @pytest.fixture(scope="module")
-async def authorised_cookie(user: AuthUser) -> dict:
-    """Cookie of authorized user."""
-    jwt = await get_jwt_strategy().write_token(user)
-    return {"mir": jwt}
-
-
-@pytest.fixture(scope="module")
-async def authorised_cookie_user2(user2: AuthUser) -> dict:
-    """Cookie of authorized user."""
-    jwt = await get_jwt_strategy().write_token(user2)
-    return {"mir": jwt}
-
-
-@pytest.fixture(scope="module")
-async def authorised_cookie_user3(user3: AuthUser) -> dict:
-    """Cookie of authorized user."""
-    jwt = await get_jwt_strategy().write_token(user3)
-    return {"mir": jwt}
-
-
-@pytest.fixture(scope="module")
 async def user2(async_client: TestClient) -> AuthUser:
     """Test user."""
     response = await async_client.post(
-        async_client.application.url_path_for("register:register"),
+        "/api/v1/auth/register",
         json=user2_data,
     )
     return AuthUser(**response.json())
@@ -104,10 +82,43 @@ async def user2(async_client: TestClient) -> AuthUser:
 async def user3(async_client: TestClient) -> AuthUser:
     """Test user."""
     response = await async_client.post(
-        async_client.application.url_path_for("register:register"),
+        "/api/v1/auth/register",
         json=user3_data,
     )
     return AuthUser(**response.json())
+
+
+@pytest.fixture(scope="module")
+async def authorised_cookie(user: AuthUser, async_client: TestClient) -> dict:
+    """Cookie of authorized user."""
+    _ = await async_client.post(
+        "/api/v1/auth/login",
+        json=user_data,
+    )
+    jwt = async_client.cookie_jar.get("mir")
+    return {"mir": jwt}
+
+
+@pytest.fixture(scope="module")
+async def authorised_cookie_user2(user2: AuthUser, async_client: TestClient) -> dict:
+    """Cookie of authorized user."""
+    _ = await async_client.post(
+        "/api/v1/auth/login",
+        json=user2_data,
+    )
+    jwt = async_client.cookie_jar.get("mir")
+    return {"mir": jwt}
+
+
+@pytest.fixture(scope="module")
+async def authorised_cookie_user3(user3: AuthUser, async_client: TestClient) -> dict:
+    """Cookie of authorized user."""
+    _ = await async_client.post(
+        "/api/v1/auth/login",
+        json=user3_data,
+    )
+    jwt = async_client.cookie_jar.get("mir")
+    return {"mir": jwt}
 
 
 @pytest.fixture(scope="module")

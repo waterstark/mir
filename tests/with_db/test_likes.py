@@ -92,9 +92,9 @@ async def test_like_user_without_token(
     """
     data = {"liked_user_id": str(user2.id), "is_liked": True}
 
-    response: Response = await async_client.post("/api/v1/likes", json=data)
+    response: Response = await async_client.post("/api/v1/likes", json=data, cookies={})
 
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
     response: Response = await async_client.post(
         "/api/v1/likes",

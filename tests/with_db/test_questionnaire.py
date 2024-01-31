@@ -3,7 +3,6 @@ from dirty_equals import IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.base_config import get_jwt_strategy
 from src.auth.models import AuthUser
 from src.likes.models import UserLike
 from src.questionnaire.crud import get_questionnaire
@@ -28,11 +27,10 @@ async def test_create_questionnaire(
         "body_type": "Худое",
         "age": 20,
     }
-    user_jwt = await get_jwt_strategy().write_token(user)
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
-        cookies={"mir": user_jwt},
+        cookies={"mir": async_client.cookie_jar.get("mir")},
     )
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
@@ -72,7 +70,7 @@ async def test_create_questionnaire_bad_credentials(
         "body_type": "Худое",
         "age": 20,
     }
-    user_jwt = await get_jwt_strategy().write_token(user)
+    user_jwt = async_client.cookie_jar.get("mir")
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
@@ -94,10 +92,9 @@ async def test_get_quest_authenticated_user(
     async_client: TestClient,
     user: AuthUser,
 ):
-    user_jwt = await get_jwt_strategy().write_token(user)
     response = await async_client.get(
         "/api/v1/questionnaire/get_my_quest",
-        cookies={"mir": user_jwt},
+        cookies={"mir": async_client.cookie_jar.get("mir")},
     )
 
     assert response.status_code == status.HTTP_200_OK
@@ -127,10 +124,9 @@ async def test_logic_for_reusing_questionnaires(
     questionary: UserQuestionnaire,
     questionary_user3: UserQuestionnaire,
 ):
-    user_jwt = await get_jwt_strategy().write_token(user2)
     response = await async_client.get(
         "/api/v1/questionnaire/list/0",
-        cookies={"mir": user_jwt},
+        cookies=authorised_cookie_user2,
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == []
@@ -140,6 +136,7 @@ async def test_update_quest(
     async_client: TestClient,
     questionary: UserQuestionnaire,
     user2: AuthUser,
+    authorised_cookie_user2: dict,
 ):
     updated_data = {
         "firstname": "string",
@@ -163,11 +160,10 @@ async def test_update_quest(
         "age": 20,
     }
 
-    user_jwt = await get_jwt_strategy().write_token(user2)
     response = await async_client.patch(
         f"/api/v1/questionnaire/{questionary.id}",
         json=updated_data,
-        cookies={"mir": user_jwt},
+        cookies=authorised_cookie_user2,
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
@@ -200,12 +196,12 @@ async def test_delete_quest(
     async_client: TestClient,
     questionary: UserQuestionnaire,
     user2: AuthUser,
+    authorised_cookie_user2: dict,
     get_async_session: AsyncSession,
 ):
-    user_jwt = await get_jwt_strategy().write_token(user2)
     response = await async_client.delete(
         f"/api/v1/questionnaire/{questionary.id}",
-        cookies={"mir": user_jwt},
+        cookies=authorised_cookie_user2,
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT
     response_check = await get_questionnaire(
@@ -239,8 +235,9 @@ async def test_create_questionnaire_without_token(
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
+        cookies={},
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
     """Incorrect cookies."""
 
@@ -257,13 +254,15 @@ async def test_get_questionnaires_without_token(
 ):
     response = await async_client.get(
         "/api/v1/questionnaire/get_my_quest",
+        cookies={},
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
     response = await async_client.get(
         "/api/v1/questionnaire/list/0",
+        cookies={},
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 async def test_update_or_delete_quest_without_token(
@@ -296,10 +295,12 @@ async def test_update_or_delete_quest_without_token(
     response = await async_client.patch(
         f"/api/v1/questionnaire/{questionary.id}",
         json=updated_data,
+        cookies={},
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN
 
     response = await async_client.delete(
         f"/api/v1/questionnaire/{questionary.id}",
+        cookies={},
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_403_FORBIDDEN

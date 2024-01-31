@@ -23,11 +23,6 @@ class UserCreateInput(BaseModel):
     password: str
 
 
-class ResponseSchema(BaseModel):
-    status_code: int
-    detail: str
-
-
 class BaseUserProfile(BaseModel):
     """Base profile model."""
 

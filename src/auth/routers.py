@@ -3,11 +3,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth import base_config as auth_handler
 from src.auth import crud, schemas
-from src.auth.base_config import AuthHandler, current_user
+from src.auth.base_config import current_user
 from src.auth.crud import create_user
 from src.auth.models import AuthUser
-from src.auth.schemas import ResponseSchema, UserCreateInput, UserSchema
+from src.auth.schemas import UserCreateInput, UserSchema
 from src.database import get_async_session
 
 auth_router = APIRouter(
@@ -32,27 +33,23 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="invalid user data",
         )
-    AuthHandler.create_access_token(response, user)
-    AuthHandler.create_refresh_token(response, user)
+    auth_handler.create_access_token(response, user)
+    auth_handler.create_refresh_token(response, user)
     return UserSchema(**user.dict())
 
 
 @auth_router.post(
     "/login",
-    response_model=ResponseSchema,
     status_code=status.HTTP_200_OK,
 )
 async def login(
     response: Response,
-    user: Annotated[UserCreateInput, Depends(AuthHandler.validate_auth_user)],
-) -> ResponseSchema:
+    user: Annotated[UserCreateInput, Depends(auth_handler.validate_auth_user)],
+) -> dict:
     """Проверка и вход пользователя c выдачей ему access и refresh token."""
-    AuthHandler.create_access_token(response, user)
-    AuthHandler.create_refresh_token(response, user)
-    return ResponseSchema(
-        status_code=status.HTTP_200_OK,
-        detail=user.email,
-    )
+    auth_handler.create_access_token(response, user)
+    auth_handler.create_refresh_token(response, user)
+    return {"status_code": status.HTTP_200_OK}
 
 
 @auth_router.get(
@@ -61,25 +58,24 @@ async def login(
 )
 async def refresh_token(
     response: Response,
-    user: Annotated[UserSchema, Depends(AuthHandler.check_user_refresh_token)],
+    user: Annotated[UserSchema, Depends(auth_handler.check_user_refresh_token)],
 ) -> dict:
     """Обновление access_token при наличии действующего refresh_token."""
-    AuthHandler.create_access_token(response, user)
-    AuthHandler.create_refresh_token(response, user)
+    auth_handler.create_access_token(response, user)
+    auth_handler.create_refresh_token(response, user)
     return {"status_code": status.HTTP_200_OK}
 
 
 @auth_router.get(
     "/logout",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def logout(
     response: Response,
     _: Annotated[UserSchema, Depends(current_user)],
-) -> dict:
+) -> None:
     """Выход пользователя c удалением файлов куки из браузера."""
-    AuthHandler.delete_all_tokens(response)
-    return {"status_code": status.HTTP_204_NO_CONTENT}
+    return auth_handler.delete_all_tokens(response)
 
 
 user_router = APIRouter(

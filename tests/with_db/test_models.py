@@ -5,6 +5,7 @@ from pathlib import Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
+from src.auth.utils import hash_password
 from src.database import Base
 
 
@@ -12,7 +13,7 @@ async def test_uuid(get_async_session: AsyncSession):
     new_user = {
         "email": "mail@server.com",
         "created_at": datetime.datetime.utcnow(),
-        "hashed_password": "pass",
+        "hashed_password": hash_password("pass"),
         "is_active": False,
         "is_superuser": False,
         "is_verified": False,

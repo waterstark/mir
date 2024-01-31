@@ -9,3 +9,6 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --without dev
 
 COPY . .
+
+RUN openssl genrsa -out jwt-private.pem 2048
+RUN openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
