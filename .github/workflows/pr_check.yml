@@ -61,6 +61,10 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Installing Deps
         run: poetry install
+      - name: Creating Private RSA Tokens
+        run: openssl genrsa -out jwt-private.pem 2048
+      - name: Creating Public RSA Tokens
+        run: openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
       - name: Tests
         run: poetry run pytest --cov=. --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests
         env:
@@ -76,6 +80,11 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: '6379'
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ACCESS_TOKEN_EXPIRES_IN: 15
+          REFRESH_TOKEN_EXPIRES_IN: 5000
+          ALGORITHM: RS256
+          COOKIE_ACCESS_TOKEN_KEY: mir
+          COOKIE_REFRESH_TOKEN_KEY: rsmir
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
