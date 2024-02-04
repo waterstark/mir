@@ -39,7 +39,12 @@ async def test_ws_msg_create(
         "to_id": user2.id,
         "text": "lol",
         "status": str(MessageStatus.SENT),
+        "created_at": IsStr(),
         "updated_at": IsStr(),
+        "reply_to": None,
+        "group_id": None,
+        "media": None,
+
     }
 
     cache_match = await redis.get(f'match_{resp["message"]["match_id"]}')
@@ -178,7 +183,7 @@ async def test_ws_message_update(
     async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
         await ws.send_text(orjson_dumps({
             "action": WSAction.UPDATE,
-            "message": msg.dict(exclude={"updated_at"}),
+            "message": msg.dict(exclude={"updated_at", "created_at"}),
         }))
         resp = orjson.loads(await ws.receive_text())
 
@@ -190,7 +195,11 @@ async def test_ws_message_update(
         "to_id": user2.id,
         "text": "lol",
         "status": str(MessageStatus.READ),
+        "created_at": IsStr(),
         "updated_at": IsStr(),
+        "reply_to": None,
+        "group_id": None,
+        "media": None,
     }
 
 
