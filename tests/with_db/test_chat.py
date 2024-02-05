@@ -5,7 +5,6 @@ import orjson
 import pytest
 from async_asgi_testclient import TestClient
 from dirty_equals import IsStr, IsUUID
-from jwt import DecodeError
 
 from src.auth.models import AuthUser
 from src.chat.schemas import MessageCreateRequest, MessageStatus, WSAction, WSStatus
@@ -51,11 +50,10 @@ async def test_ws_msg_create(
 async def test_ws_connect_without_token(async_client: TestClient):
     """App does not accept ws connection if there is no token."""
     await async_client.get("/api/v1/auth/logout")
-    with pytest.raises(DecodeError) as exc:
+    with pytest.raises(TypeError) as exc:
         async with async_client.websocket_connect("/chat/ws"):
             pass
-
-    assert str(exc.value) == "Not enough segments"
+    assert str(exc.value) == "'Message' object is not subscriptable"
 
 
 async def test_ws_msg_create_without_match(

@@ -12,6 +12,7 @@ from src.questionnaire.models import UserQuestionnaire
 async def test_create_questionnaire(
     async_client: TestClient,
     user: AuthUser,
+    authorised_cookie: dict,
 ):
     questionnaire_data = {
         "firstname": "string",
@@ -30,7 +31,7 @@ async def test_create_questionnaire(
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
-        cookies={"mir": async_client.cookie_jar.get("mir")},
+        cookies=authorised_cookie,
     )
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
@@ -55,6 +56,7 @@ async def test_create_questionnaire(
 async def test_create_questionnaire_bad_credentials(
     async_client: TestClient,
     user: AuthUser,
+    authorised_cookie: dict,
 ):
     questionnaire_data = {
         "firstname": "s123123tring",
@@ -70,17 +72,16 @@ async def test_create_questionnaire_bad_credentials(
         "body_type": "Худое",
         "age": 20,
     }
-    user_jwt = async_client.cookie_jar.get("mir")
     response = await async_client.post(
         "/api/v1/questionnaire",
         json=questionnaire_data,
-        cookies={"mir": user_jwt},
+        cookies=authorised_cookie,
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     questionary = await async_client.get(
         "/api/v1/questionnaire/get_my_quest",
-        cookies={"mir": user_jwt},
+        cookies=authorised_cookie,
     )
     assert (
         response.json()["detail"]
@@ -91,10 +92,11 @@ async def test_create_questionnaire_bad_credentials(
 async def test_get_quest_authenticated_user(
     async_client: TestClient,
     user: AuthUser,
+    authorised_cookie: dict,
 ):
     response = await async_client.get(
         "/api/v1/questionnaire/get_my_quest",
-        cookies={"mir": async_client.cookie_jar.get("mir")},
+        cookies=authorised_cookie,
     )
 
     assert response.status_code == status.HTTP_200_OK

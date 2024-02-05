@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth import utils as auth_utils
 from src.auth.crud import get_user
-from src.auth.schemas import UserCreateInput, UserSchema
+from src.auth.models import AuthUser
+from src.auth.schemas import UserCreateInput
 from src.config import settings
 from src.database import get_async_session
 
@@ -18,7 +19,7 @@ cookies_refresh_scheme = APIKeyCookie(name=settings.COOKIE_REFRESH_TOKEN_KEY)
 async def validate_auth_user(
     user_login: UserCreateInput,
     session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> UserSchema:
+) -> AuthUser:
     """Идентификация данных пользователя."""
     unauthenticated_exception = HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -34,7 +35,7 @@ async def validate_auth_user(
 
 
 def _verify_user(
-    user: UserSchema,
+    user: AuthUser,
     user_password: str | bytes,
     custom_exception: HTTPException,
 ) -> None:
@@ -55,7 +56,7 @@ def _verify_user(
 async def get_auth_user(
     access_token: Annotated[str, Depends(cookies_access_scheme)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> UserSchema:
+) -> AuthUser:
     """
     Получение данных аутентифицированного пользователя.
     Функция проверяет подлинность пользователя и дает
@@ -77,7 +78,7 @@ async def get_auth_user(
 async def check_user_refresh_token(
     refresh_token: Annotated[str, Depends(cookies_refresh_scheme)],
     session: Annotated[AsyncSession, Depends(get_async_session)],
-) -> UserSchema:
+) -> AuthUser:
     """Проверка refresh token на подлинность."""
     try:
         payload = auth_utils.decode_jwt(
@@ -95,7 +96,7 @@ async def check_user_refresh_token(
 async def _check_token_data(
     payload: dict,
     session: AsyncSession,
-) -> UserSchema:
+) -> AuthUser:
     """Функция проверки данных токена."""
     if not payload.get("sub"):
         raise HTTPException(
@@ -103,7 +104,8 @@ async def _check_token_data(
             detail="could not refresh access token",
         )
     email: str = payload.get("email")
-    if not (user := await get_user(email, session)):
+    user = await get_user(email, session)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="the user no longer exists",
@@ -117,11 +119,10 @@ async def _check_token_data(
 
 
 def _create_token(
-    response: Response,
     type_token: str,
     expires_time: int,
-    data: UserSchema,
-) -> str:
+    data: AuthUser,
+) -> dict:
     """Функция создания токена по заданным параметрам."""
     jwt_payload = {
         "sub": str(data.id),
@@ -129,17 +130,14 @@ def _create_token(
         "type": type_token,
     }
     token = auth_utils.encode_jwt(jwt_payload, expire_minutes=expires_time)
-    response.set_cookie(type_token, token)
-    return token
+    return {"type_token": type_token, "token": token}
 
 
 def create_access_token(
-    response: Response,
-    user_data: Annotated[UserSchema, Depends(validate_auth_user)],
-) -> str:
+    user_data: Annotated[AuthUser, Depends(validate_auth_user)],
+) -> dict:
     """Создание access_token."""
     return _create_token(
-        response=response,
         type_token=settings.COOKIE_ACCESS_TOKEN_KEY,
         expires_time=settings.ACCESS_TOKEN_EXPIRES_IN,
         data=user_data,
@@ -147,12 +145,10 @@ def create_access_token(
 
 
 def create_refresh_token(
-    response: Response,
-    user_data: Annotated[UserSchema, Depends(validate_auth_user)],
+    user_data: Annotated[AuthUser, Depends(validate_auth_user)],
 ) -> dict:
     """Создание refresh_token."""
     return _create_token(
-        response=response,
         type_token=settings.COOKIE_REFRESH_TOKEN_KEY,
         expires_time=settings.REFRESH_TOKEN_EXPIRES_IN,
         data=user_data,

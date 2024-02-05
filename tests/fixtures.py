@@ -91,7 +91,7 @@ async def user3(async_client: TestClient) -> AuthUser:
 @pytest.fixture(scope="module")
 async def authorised_cookie(user: AuthUser, async_client: TestClient) -> dict:
     """Cookie of authorized user."""
-    _ = await async_client.post(
+    await async_client.post(
         "/api/v1/auth/login",
         json=user_data,
     )
@@ -102,7 +102,7 @@ async def authorised_cookie(user: AuthUser, async_client: TestClient) -> dict:
 @pytest.fixture(scope="module")
 async def authorised_cookie_user2(user2: AuthUser, async_client: TestClient) -> dict:
     """Cookie of authorized user."""
-    _ = await async_client.post(
+    await async_client.post(
         "/api/v1/auth/login",
         json=user2_data,
     )
@@ -113,7 +113,7 @@ async def authorised_cookie_user2(user2: AuthUser, async_client: TestClient) -> 
 @pytest.fixture(scope="module")
 async def authorised_cookie_user3(user3: AuthUser, async_client: TestClient) -> dict:
     """Cookie of authorized user."""
-    _ = await async_client.post(
+    await async_client.post(
         "/api/v1/auth/login",
         json=user3_data,
     )

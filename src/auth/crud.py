@@ -1,5 +1,3 @@
-import uuid
-
 from fastapi import HTTPException, status
 from sqlalchemy import select, update
 from sqlalchemy.dialects.postgresql import insert
@@ -14,7 +12,7 @@ from src.auth.schemas import UserCreateInput, UserSchema
 async def get_user(
     email: str,
     session: AsyncSession,
-) -> UserSchema:
+) -> AuthUser:
     """Получение данных o пользователе из БД по email."""
     query = select(AuthUser).where(AuthUser.email == email)
     result = await session.execute(query)
@@ -31,16 +29,22 @@ async def create_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="register user already exists",
         )
-    valid_user_data = UserSchema(
-        id=uuid.uuid4(),
-        email=user_data.email,
-        hashed_password=auth_utils.hash_password(user_data.password),
+    stmt = insert(AuthUser).values(
+        {
+            "email": user_data.email,
+            "hashed_password": auth_utils.hash_password(user_data.password),
+         },
     )
-    stmt = insert(AuthUser).values(**valid_user_data.dict())
     await session.execute(stmt)
-    await session.commit()
-    await create_user_profile(user=valid_user_data, session=session)
-    return valid_user_data
+    user = await get_user(user_data.email, session)
+    await create_user_profile(user=user, session=session)
+    return UserSchema(
+        id=user.id,
+        email=user.email,
+        is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        is_verified=user.is_verified,
+    )
 
 
 async def add_user(user: UserCreateInput, session: AsyncSession):

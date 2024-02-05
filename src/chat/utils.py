@@ -7,8 +7,7 @@ from fastapi import Depends, WebSocketException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.websockets import WebSocket
 
-from src.auth import utils as auth_utils
-from src.auth.crud import get_user
+from src.auth.base_config import get_auth_user
 from src.auth.models import AuthUser
 from src.database import get_async_session
 
@@ -21,9 +20,7 @@ async def get_user_from_ws_cookie(
         ws: WebSocket,
         session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> AsyncGenerator[AuthUser, None]:
-    cookies = ws.cookies.get("mir")
-    cookies_data = auth_utils.decode_jwt(cookies)
-    user = await get_user(cookies_data.get("email"), session)
+    user = await get_auth_user(ws.cookies.get("mir"), session)
     if not user or not user.is_active:
         raise WebSocketException(404, "Invalid user")
     yield user

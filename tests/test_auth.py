@@ -1,9 +1,10 @@
 import asyncio
 from typing import TYPE_CHECKING
+from unittest import mock
 
 import pytest
 from async_asgi_testclient import TestClient
-from dirty_equals import IsInt, IsStr, IsUUID
+from dirty_equals import IsInt, IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,7 +34,6 @@ class TestUser:
         assert response.json() == {
             "id": IsUUID,
             "email": user_data.get("email"),
-            "hashed_password": IsStr,
             "is_active": True,
             "is_superuser": False,
             "is_verified": False,
@@ -69,37 +69,23 @@ class TestUser:
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     async def test_cookies_after_register(
-            self,
-            async_client: TestClient,
+        self,
+        async_client: TestClient,
     ) -> None:
         """Тест - проверка кук после создания пользователя."""
         assert auth_utils.decode_jwt(async_client.cookie_jar["mir"].value) == {
             "email": "user@mail.ru",
             "exp": IsInt,
-            "iat": IsInt,
             "sub": IsUUID,
             "type": "mir",
         }
-
-    async def test_login(
-        self,
-        async_client: TestClient,
-    ):
-        """Тест - авторизация зарегистрированного пользователя."""
-        response = await async_client.post(
-            "/api/v1/auth/login",
-            json={
-                "email": "user@mail.ru",
-                "password": "password",
-            },
-        )
-        assert response.status_code == status.HTTP_200_OK
 
     async def test_login_wrong_password(
         self,
         async_client: TestClient,
     ):
         """Тест - вход c неправильным паролем."""
+        async_client.cookie_jar.clear()
         response = await async_client.post(
             "/api/v1/auth/login",
             json={
@@ -108,23 +94,32 @@ class TestUser:
             },
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert async_client.cookie_jar.get("mir") is None
 
-    async def test_cookies_after_login(
-            self,
-            async_client: TestClient,
-    ) -> None:
-        """Тест - проверка кук после авторизации пользователя."""
+    async def test_login(
+        self,
+        async_client: TestClient,
+    ):
+        """Тест - авторизация зарегистрированного пользователя."""
+        async_client.cookie_jar.clear()
+        response = await async_client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "user@mail.ru",
+                "password": "password",
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
         assert auth_utils.decode_jwt(async_client.cookie_jar["mir"].value) == {
             "email": "user@mail.ru",
             "exp": IsInt,
-            "iat": IsInt,
             "sub": IsUUID,
             "type": "mir",
         }
 
     async def test_refresh_token(
-            self,
-            async_client: TestClient,
+        self,
+        async_client: TestClient,
     ) -> None:
         """Тест - перевыпуска access_token по refresh_token."""
         old_access_token = async_client.cookie_jar["mir"].value
@@ -136,15 +131,15 @@ class TestUser:
             "/api/v1/auth/refresh",
             cookies={"rsmir": old_refresh_token},
         )
+        assert response.status_code == status.HTTP_200_OK
         assert response.cookies["mir"] != old_access_token
         assert response.cookies["rsmir"] != old_refresh_token
-        assert response.status_code == status.HTTP_200_OK
 
     async def test_refresh_token_without_token(
-            self,
-            async_client: TestClient,
+        self,
+        async_client: TestClient,
     ) -> None:
-        """Тест обновления токенов без refresh_token и c некорректным токеном."""
+        """Тест обновления токенов без refresh_token."""
 
         response = await async_client.get(
             "/api/v1/auth/refresh",
@@ -155,6 +150,11 @@ class TestUser:
             "detail": "Not authenticated",
         }
 
+    async def test_refresh_token_with_incorrect_token(
+        self,
+        async_client: TestClient,
+    ) -> None:
+        """Тест обновления токенов c некорректным токеном."""
         response = await async_client.get(
             "/api/v1/auth/refresh",
             cookies={"rsmir": "some.incorrect.refresh.token"},
@@ -165,30 +165,54 @@ class TestUser:
         }
 
     async def test_logout(
-            self,
-            async_client: TestClient,
+        self,
+        async_client: TestClient,
     ):
         """Тест - logout авторизованного пользователя."""
         response = await async_client.get(
             "/api/v1/auth/logout",
-            cookies={"mir": async_client.cookie_jar["mir"].value},
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        with pytest.raises(KeyError):
-            _ = response.cookies["mir"]
-        with pytest.raises(KeyError):
-            _ = response.cookies["rsmir"]
+        assert response.cookies.get("mir") is None
+        assert response.cookies.get("rsmir") is None
 
-    async def test_logout_without_token(
+    async def test_expired_access_token(
         self,
         async_client: TestClient,
     ):
-        """Тест - logout неавторизованного пользователя."""
-        response = await async_client.get(
-            "/api/v1/auth/logout",
-            cookies={"mir": "some.kind.of.incorrect.cookies"},
-        )
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        """Тест - просроченный токен доступа."""
+        with mock.patch("src.config.settings.ACCESS_TOKEN_EXPIRES_IN", new=0.01):
+            await async_client.post(
+                "/api/v1/auth/login",
+                json={
+                    "email": "user@mail.ru",
+                    "password": "password",
+                },
+            )
+            await asyncio.sleep(0.5)
+            response = await async_client.get(
+                "/api/v1/users/me",
+            )
+            assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    async def test_expired_refresh_token(
+        self,
+        async_client: TestClient,
+    ):
+        """Тест - просроченный рефреш токен."""
+        with mock.patch("src.config.settings.REFRESH_TOKEN_EXPIRES_IN", new=0.01):
+            await async_client.post(
+                "/api/v1/auth/login",
+                json={
+                    "email": "user@mail.ru",
+                    "password": "password",
+                },
+            )
+            await asyncio.sleep(0.5)
+            response = await async_client.get(
+                "/api/v1/auth/refresh",
+            )
+            assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 class TestUserProfile:

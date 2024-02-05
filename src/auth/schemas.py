@@ -9,7 +9,6 @@ from src.auth.models import AGE_MAX, AGE_MIN, RANGE_MAX, RANGE_MIN
 class UserSchema(BaseModel):
     id: uuid.UUID
     email: str
-    hashed_password: bytes | str
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False

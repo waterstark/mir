@@ -32,7 +32,6 @@ class TestAcceptance:
         assert response.json() == {
             "id": created_user_1_id,
             "email": user_1_data.get("email"),
-            "hashed_password": IsStr,
             "is_active": True,
             "is_superuser": False,
             "is_verified": False,
@@ -50,7 +49,6 @@ class TestAcceptance:
         assert response.json() == {
             "id": created_user_2_id,
             "email": user_2_data.get("email"),
-            "hashed_password": IsStr,
             "is_active": True,
             "is_superuser": False,
             "is_verified": False,

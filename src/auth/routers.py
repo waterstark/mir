@@ -26,16 +26,19 @@ async def register(
     response: Response,
     user_data: UserCreateInput,
     session: Annotated[AsyncSession, Depends(get_async_session)],
-):
+) -> UserSchema:
     """Регистрация нового пользователя c выдачей ему access и refresh token."""
-    if not (user := await create_user(user_data, session)):
+    user = await create_user(user_data, session)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="invalid user data",
         )
-    auth_handler.create_access_token(response, user)
-    auth_handler.create_refresh_token(response, user)
-    return UserSchema(**user.dict())
+    token_access = auth_handler.create_access_token(user)
+    token_refresh = auth_handler.create_refresh_token(user)
+    response.set_cookie(token_access["type_token"], token_access["token"])
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"])
+    return user
 
 
 @auth_router.post(
@@ -47,8 +50,10 @@ async def login(
     user: Annotated[UserCreateInput, Depends(auth_handler.validate_auth_user)],
 ) -> dict:
     """Проверка и вход пользователя c выдачей ему access и refresh token."""
-    auth_handler.create_access_token(response, user)
-    auth_handler.create_refresh_token(response, user)
+    token_access = auth_handler.create_access_token(user)
+    token_refresh = auth_handler.create_refresh_token(user)
+    response.set_cookie(token_access["type_token"], token_access["token"])
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"])
     return {"status_code": status.HTTP_200_OK}
 
 
@@ -58,11 +63,13 @@ async def login(
 )
 async def refresh_token(
     response: Response,
-    user: Annotated[UserSchema, Depends(auth_handler.check_user_refresh_token)],
+    user: Annotated[AuthUser, Depends(auth_handler.check_user_refresh_token)],
 ) -> dict:
     """Обновление access_token при наличии действующего refresh_token."""
-    auth_handler.create_access_token(response, user)
-    auth_handler.create_refresh_token(response, user)
+    token_access = auth_handler.create_access_token(user)
+    token_refresh = auth_handler.create_refresh_token(user)
+    response.set_cookie(token_access["type_token"], token_access["token"])
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"])
     return {"status_code": status.HTTP_200_OK}
 
 
@@ -72,7 +79,6 @@ async def refresh_token(
 )
 async def logout(
     response: Response,
-    _: Annotated[UserSchema, Depends(current_user)],
 ) -> None:
     """Выход пользователя c удалением файлов куки из браузера."""
     return auth_handler.delete_all_tokens(response)
