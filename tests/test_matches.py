@@ -20,7 +20,6 @@ class TestMatch:
 
     async def test_access_not_authenticated_matches_list(
         self,
-        user2: AuthUser,
         async_client: TestClient,
     ):
         """Проверка существования эндпоинта matches/ и наличия
@@ -116,9 +115,9 @@ class TestMatch:
         assert (
             response.status_code != status.HTTP_404_NOT_FOUND
         ), f"Эндпоинт `{match_delete_url}` не найден."
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED, (
+        assert response.status_code == status.HTTP_403_FORBIDDEN, (
             "Проверьте, что GET-запрос неавторизованного пользователя к "
-            f"`{match_delete_url}` возвращает код 401"
+            f"`{match_delete_url}` возвращает код 403"
         )
 
     async def test_valid_match_delete(

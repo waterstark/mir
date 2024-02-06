@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,7 +12,7 @@ RANGE_MIN = 0
 RANGE_MAX = 999
 
 
-class AuthUser(SQLAlchemyBaseUserTableUUID, Base):
+class AuthUser(Base):
     __tablename__ = "auth_user"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -24,7 +23,7 @@ class AuthUser(SQLAlchemyBaseUserTableUUID, Base):
         nullable=False,
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-    hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=False)
+    hashed_password: Mapped[bytes] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
     is_verified: Mapped[bool] = mapped_column(default=False)

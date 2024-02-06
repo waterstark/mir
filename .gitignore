@@ -128,6 +128,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+jwt-private.pem
+jwt-public.pem
 
 # Spyder project settings
 .spyderproject

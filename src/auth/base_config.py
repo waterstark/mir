@@ -1,32 +1,177 @@
-import uuid
+from typing import Annotated
 
-from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import (
-    AuthenticationBackend,
-    CookieTransport,
-    JWTStrategy,
-)
+from fastapi import Depends, HTTPException, Response, status
+from fastapi.security import APIKeyCookie
+from jwt import InvalidTokenError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.manager import get_user_manager
+from src.auth import utils as auth_utils
+from src.auth.crud import get_user
 from src.auth.models import AuthUser
+from src.auth.schemas import UserCreateInput, UserSchema
 from src.config import settings
+from src.database import get_async_session
 
-cookie_transport = CookieTransport(cookie_name="mir", cookie_max_age=3600)
-
-
-def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.SECRET_KEY, lifetime_seconds=3600)
+cookies_access_scheme = APIKeyCookie(name=settings.COOKIE_ACCESS_TOKEN_KEY)
+cookies_refresh_scheme = APIKeyCookie(name=settings.COOKIE_REFRESH_TOKEN_KEY)
 
 
-auth_backend = AuthenticationBackend(
-    name="jwt",
-    transport=cookie_transport,
-    get_strategy=get_jwt_strategy,
-)
+async def validate_auth_user(
+    user_login: UserCreateInput,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+) -> AuthUser:
+    """Идентификация данных пользователя."""
+    unauthenticated_exception = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="invalid username or password",
+    )
+    user = await get_user(user_login.email, session)
+    _verify_user(
+        user=user,
+        user_password=user_login.password,
+        custom_exception=unauthenticated_exception,
+    )
+    return user
 
-fastapi_users_auth = FastAPIUsers[AuthUser, uuid.UUID](
-    get_user_manager,
-    [auth_backend],
-)
 
-current_user = fastapi_users_auth.current_user()
+def _verify_user(
+    user: AuthUser,
+    user_password: str | bytes,
+    custom_exception: HTTPException,
+) -> None:
+    if not user:
+        raise custom_exception
+    if not auth_utils.validate_password(
+        password=user_password,
+        hashed_password=user.hashed_password,
+    ):
+        raise custom_exception
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="user inactive",
+        ) from None
+
+
+async def get_auth_user(
+    access_token: Annotated[str, Depends(cookies_access_scheme)],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+) -> AuthUser:
+    """
+    Получение данных аутентифицированного пользователя.
+    Функция проверяет подлинность пользователя и дает
+    доступ к использованию закрытых эндпоинтов.
+    """
+    try:
+        payload = auth_utils.decode_jwt(
+            token=access_token,
+        )
+        user = await _check_token_data(payload, session)
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="invalid token error",
+        ) from None
+    return user
+
+
+async def check_user_refresh_token(
+    refresh_token: Annotated[str, Depends(cookies_refresh_scheme)],
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+) -> AuthUser:
+    """Проверка refresh token на подлинность."""
+    try:
+        payload = auth_utils.decode_jwt(
+            token=refresh_token,
+        )
+        user = await _check_token_data(payload, session)
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="could not refresh access token",
+        ) from None
+    return user
+
+
+async def _check_token_data(
+    payload: dict,
+    session: AsyncSession,
+) -> AuthUser:
+    """Функция проверки данных токена."""
+    if not payload.get("sub"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="could not refresh access token",
+        )
+    email: str = payload.get("email")
+    user = await get_user(email, session)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="the user no longer exists",
+        )
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="user inactive",
+        )
+    return user
+
+
+def _create_token(
+    type_token: str,
+    expires_time: int,
+    data: AuthUser,
+) -> dict:
+    """Функция создания токена по заданным параметрам."""
+    jwt_payload = {
+        "sub": str(data.id),
+        "email": data.email,
+        "type": type_token,
+    }
+    token = auth_utils.encode_jwt(jwt_payload, expire_minutes=expires_time)
+    return {"type_token": type_token, "token": token}
+
+
+def create_access_token(
+    user_data: Annotated[AuthUser, Depends(validate_auth_user)],
+) -> dict:
+    """Создание access_token."""
+    return _create_token(
+        type_token=settings.COOKIE_ACCESS_TOKEN_KEY,
+        expires_time=settings.ACCESS_TOKEN_EXPIRES_IN,
+        data=user_data,
+    )
+
+
+def create_refresh_token(
+    user_data: Annotated[AuthUser, Depends(validate_auth_user)],
+) -> dict:
+    """Создание refresh_token."""
+    return _create_token(
+        type_token=settings.COOKIE_REFRESH_TOKEN_KEY,
+        expires_time=settings.REFRESH_TOKEN_EXPIRES_IN,
+        data=user_data,
+    )
+
+
+def create_tokens(
+    user: AuthUser | UserSchema,
+    response: Response,
+) -> None:
+    """Создание для пользователя всех токенов."""
+    token_access = create_access_token(user)
+    token_refresh = create_refresh_token(user)
+    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
+
+
+def delete_all_tokens(
+    response: Response,
+) -> None:
+    """Удаление всех токенов из браузера пользователя."""
+    response.delete_cookie(settings.COOKIE_ACCESS_TOKEN_KEY)
+    response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
+
+
+current_user = get_auth_user

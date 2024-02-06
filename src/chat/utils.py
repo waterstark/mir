@@ -4,11 +4,12 @@ from typing import Annotated, Any
 
 import orjson
 from fastapi import Depends, WebSocketException
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.websockets import WebSocket
 
-from src.auth.base_config import auth_backend
-from src.auth.manager import UserManager, get_user_manager
+from src.auth.base_config import get_auth_user
 from src.auth.models import AuthUser
+from src.database import get_async_session
 
 
 def orjson_dumps(data: Any, **kwargs: Any):
@@ -17,10 +18,9 @@ def orjson_dumps(data: Any, **kwargs: Any):
 
 async def get_user_from_ws_cookie(
         ws: WebSocket,
-        user_manager: Annotated[UserManager, Depends(get_user_manager)],
+        session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> AsyncGenerator[AuthUser, None]:
-    cookie = ws.cookies.get("mir")
-    user = await auth_backend.get_strategy().read_token(cookie, user_manager)
+    user = await get_auth_user(ws.cookies.get("mir"), session)
     if not user or not user.is_active:
         raise WebSocketException(404, "Invalid user")
     yield user

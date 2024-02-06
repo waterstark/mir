@@ -5,7 +5,6 @@ from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
 from src.chat.utils import orjson_dumps
-from src.main import app
 
 
 class TestAcceptance:
@@ -25,7 +24,7 @@ class TestAcceptance:
             "password": "password",
         }
         response = await async_client.post(
-            app.url_path_for("register:register"),
+            "/api/v1/auth/register",
             json=user_1_data,
         )
         assert response.status_code == status.HTTP_201_CREATED
@@ -42,7 +41,7 @@ class TestAcceptance:
             "password": "password",
         }
         response = await async_client.post(
-            app.url_path_for("register:register"),
+            "/api/v1/auth/register",
             json=user_2_data,
         )
         assert response.status_code == status.HTTP_201_CREATED
@@ -57,25 +56,19 @@ class TestAcceptance:
 
         """Логин пользователя 1."""
         response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user1@mail.ru"),
-                ("password", "password"),
-            ],
+            "/api/v1/auth/login",
+            json=user_1_data,
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_200_OK
 
         created_user_1_jwt = async_client.cookie_jar["mir"].value
 
         """Логин пользователя 2."""
         response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user2@mail.ru"),
-                ("password", "password"),
-            ],
+            "/api/v1/auth/login",
+            json=user_2_data,
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_200_OK
 
         created_user_2_jwt = async_client.cookie_jar["mir"].value
 
@@ -277,13 +270,13 @@ class TestAcceptance:
 
         """Логин пользователя 1."""
         response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user1@mail.ru"),
-                ("password", "password"),
-            ],
+            "/api/v1/auth/login",
+            json={
+                "email": "user1@mail.ru",
+                "password": "password",
+            },
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_200_OK
         user1_cookie = {"mir": async_client.cookie_jar["mir"].value}
 
         """Получаем id матча."""
@@ -302,13 +295,13 @@ class TestAcceptance:
 
         """Логин пользователя 2."""
         response = await async_client.post(
-            app.url_path_for("auth:jwt.login"),
-            form=[
-                ("username", "user2@mail.ru"),
-                ("password", "password"),
-            ],
+            "/api/v1/auth/login",
+            json={
+                "email": "user2@mail.ru",
+                "password": "password",
+            },
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_200_OK
         user2_cookie = {"mir": async_client.cookie_jar["mir"].value}
         """Получаем id Второго пользователя."""
 
