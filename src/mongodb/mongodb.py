@@ -20,11 +20,12 @@ class Mongo:
 
     async def create_message(self, message: MessageCreateRequest) -> MessageResponse:
         # TODO: find out if we can force _id=uuid for all documents
-        dt = datetime.datetime.utcnow()
+        now = datetime.datetime.utcnow()
         result = await self.collection.insert_one({
             **message.dict(),
             "_id": uuid.uuid4(),
-            "updated_at": dt,
+            "created_at": now,
+            "updated_at": now,
             "status": MessageStatus.SENT,
         })
 
@@ -32,7 +33,8 @@ class Mongo:
             **dict(message),
             id=result.inserted_id,
             status=MessageStatus.SENT,
-            updated_at=dt,
+            created_at=now,
+            updated_at=now,
         )
 
     async def get_message(self, message_id: uuid.UUID) -> dict | None:

@@ -37,12 +37,14 @@ class BaseMessage(BaseModel):
 
 class MessageCreateRequest(BaseMessage):
     text: str
+    reply_to: uuid.UUID | None
+    group_id: uuid.UUID | None
+    media: str | None
 
 
-class MessageUpdateRequest(BaseMessage):
+class MessageUpdateRequest(MessageCreateRequest):
     id: uuid.UUID
     status: MessageStatus
-    text: str
 
 
 class MessageDeleteRequest(BaseMessage):
@@ -52,8 +54,12 @@ class MessageDeleteRequest(BaseMessage):
 class MessageResponse(BaseMessage):
     id: uuid.UUID
     text: str
+    created_at: datetime.datetime
     updated_at: datetime.datetime
     status: MessageStatus
+    reply_to: uuid.UUID | None
+    group_id: uuid.UUID | None
+    media: str | None
 
 
 class WSMessageRequest(BaseModel):

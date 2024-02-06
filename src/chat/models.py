@@ -2,7 +2,6 @@ import datetime
 import uuid
 
 from sqlalchemy import DateTime, ForeignKey, String
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_utils import ChoiceType
 
@@ -31,6 +30,10 @@ class Message(Base):
         nullable=False,
     )
     text: Mapped[str] = mapped_column(String(length=4096), nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+    )
     updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime,
         default=datetime.datetime.utcnow,
@@ -41,7 +44,13 @@ class Message(Base):
         default=MessageStatus.SENT,
         nullable=False,
     )
-    captions: Mapped[list[str]] = mapped_column(
-        ARRAY(String),
+    reply_to: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("message.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    group_id: Mapped[uuid.UUID] = mapped_column(
+        nullable=True,
+    )
+    media: Mapped[str] = mapped_column(
         nullable=True,
     )

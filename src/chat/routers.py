@@ -20,12 +20,7 @@ from src.chat.schemas import (
     WSStatus,
 )
 from src.chat.utils import get_user_from_ws_cookie, orjson_dumps, ws_manager
-from src.database import get_async_session, mongo
-
-ws_router = APIRouter(
-    prefix="/chat",
-    tags=["WebSocket chat"],
-)
+from src.database import async_session_maker, mongo
 
 ws_router = APIRouter(
     prefix="/chat",
@@ -74,6 +69,7 @@ async def websocket_chat(
         except Exception:  # noqa: BLE001
             # TODO: log this shit
             await ws_manager.disconnect(ws, user.id)
+            break
 
 
 async def create_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser):
@@ -81,9 +77,9 @@ async def create_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
         raise ValidationError
 
     # TODO: get user's matches from redis and check if he can send message to 'to_id'
-    session_gen = get_async_session()
-    session = await session_gen.asend(None)
-    match = await get_match(session, user, ws_msg)
+    async with async_session_maker() as session:
+        match = await get_match(session, user, ws_msg)
+
     if match is None:
         raise NoMatchError(user.id, ws_msg.message.to_id)
 
@@ -102,9 +98,9 @@ async def delete_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
         raise ValidationError
 
     # TODO: get user's matches from redis and check if he can delete message to 'to_id'
-    session_gen = get_async_session()
-    session = await session_gen.asend(None)
-    match = await get_match(session, user, ws_msg)
+    async with async_session_maker() as session:
+        match = await get_match(session, user, ws_msg)
+
     if match is None:
         raise NoMatchError(user.id, ws_msg.message.to_id)
 
@@ -126,9 +122,9 @@ async def update_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
         raise ValidationError
 
     # TODO: get user's matches from redis and check if he can send message to 'to_id'
-    session_gen = get_async_session()
-    session = await session_gen.asend(None)
-    match = await get_match(session, user, ws_msg)
+    async with async_session_maker() as session:
+        match = await get_match(session, user, ws_msg)
+
     if match is None:
         raise NoMatchError(user.id, ws_msg.message.to_id)
 
@@ -142,6 +138,7 @@ async def update_message(ws_msg: WSMessageRequest, ws: WebSocket, user: AuthUser
 
     msg = MessageResponse(
         **ws_msg.message.dict(),
+        created_at=result["created_at"],
         updated_at=datetime.datetime.utcnow(),
     )
 

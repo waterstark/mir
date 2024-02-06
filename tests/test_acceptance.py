@@ -330,7 +330,11 @@ class TestAcceptance:
             "to_id": created_user_2_id,
             "text": "Hi, lets meet up?",
             "status": str(MessageStatus.SENT),
+            "created_at": IsStr(),
             "updated_at": IsStr(),
+            "reply_to": None,
+            "group_id": None,
+            "media": None,
         }
 
         """Создание сообщений первым пользователем."""
@@ -353,5 +357,9 @@ class TestAcceptance:
             "to_id": created_user_1_id,
             "text": "Ok)))",
             "status": str(MessageStatus.SENT),
+            "created_at": IsStr(),
             "updated_at": IsStr(),
+            "reply_to": None,
+            "group_id": None,
+            "media": None,
         }
