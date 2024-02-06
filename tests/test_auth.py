@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from unittest import mock
 
@@ -73,12 +74,15 @@ class TestUser:
         async_client: TestClient,
     ) -> None:
         """Тест - проверка кук после создания пользователя."""
-        assert auth_utils.decode_jwt(async_client.cookie_jar["mir"].value) == {
+        cookies_data = auth_utils.decode_jwt(async_client.cookie_jar["mir"].value)
+        assert cookies_data == {
             "email": "user@mail.ru",
             "exp": IsInt,
             "sub": IsUUID,
             "type": "mir",
         }
+        expires = (datetime.utcnow() + timedelta(minutes=14)).timestamp()
+        assert int(cookies_data["exp"]) > int(expires)
 
     async def test_login_wrong_password(
         self,

@@ -36,8 +36,8 @@ async def register(
         )
     token_access = auth_handler.create_access_token(user)
     token_refresh = auth_handler.create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"])
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"])
+    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
     return user
 
 
@@ -52,8 +52,8 @@ async def login(
     """Проверка и вход пользователя c выдачей ему access и refresh token."""
     token_access = auth_handler.create_access_token(user)
     token_refresh = auth_handler.create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"])
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"])
+    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
     return {"status_code": status.HTTP_200_OK}
 
 
@@ -68,8 +68,8 @@ async def refresh_token(
     """Обновление access_token при наличии действующего refresh_token."""
     token_access = auth_handler.create_access_token(user)
     token_refresh = auth_handler.create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"])
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"])
+    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
     return {"status_code": status.HTTP_200_OK}
 
 

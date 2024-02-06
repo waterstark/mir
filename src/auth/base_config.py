@@ -159,8 +159,8 @@ def delete_all_tokens(
     response: Response,
 ) -> None:
     """Удаление всех токенов из браузера пользователя."""
-    response.delete_cookie(settings.COOKIE_ACCESS_TOKEN_KEY)
-    response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
+    response.delete_cookie(settings.COOKIE_ACCESS_TOKEN_KEY, httponly=True, secure=True)
+    response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY, httponly=True, secure=True)
 
 
 current_user = get_auth_user
