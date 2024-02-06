@@ -54,7 +54,7 @@ def validate_password(
     password: str,
     hashed_password: bytes,
 ) -> bool:
-    """Проверка на совпадение хэшированного и не хэшированного пароля."""
+    """Проверка на совпадение хэшированного и нехэшированного пароля."""
     return bcrypt.checkpw(
         password=password.encode(),
         hashed_password=hashed_password,

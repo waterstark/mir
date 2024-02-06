@@ -34,10 +34,7 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="invalid user data",
         )
-    token_access = auth_handler.create_access_token(user)
-    token_refresh = auth_handler.create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
+    auth_handler.create_tokens(user, response)
     return user
 
 
@@ -50,10 +47,7 @@ async def login(
     user: Annotated[UserCreateInput, Depends(auth_handler.validate_auth_user)],
 ) -> dict:
     """Проверка и вход пользователя c выдачей ему access и refresh token."""
-    token_access = auth_handler.create_access_token(user)
-    token_refresh = auth_handler.create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
+    auth_handler.create_tokens(user, response)
     return {"status_code": status.HTTP_200_OK}
 
 
@@ -66,10 +60,7 @@ async def refresh_token(
     user: Annotated[AuthUser, Depends(auth_handler.check_user_refresh_token)],
 ) -> dict:
     """Обновление access_token при наличии действующего refresh_token."""
-    token_access = auth_handler.create_access_token(user)
-    token_refresh = auth_handler.create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
+    auth_handler.create_tokens(user, response)
     return {"status_code": status.HTTP_200_OK}
 
 

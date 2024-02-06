@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth import utils as auth_utils
 from src.auth.crud import get_user
 from src.auth.models import AuthUser
-from src.auth.schemas import UserCreateInput
+from src.auth.schemas import UserCreateInput, UserSchema
 from src.config import settings
 from src.database import get_async_session
 
@@ -155,12 +155,23 @@ def create_refresh_token(
     )
 
 
+def create_tokens(
+    user: AuthUser | UserSchema,
+    response: Response,
+) -> None:
+    """Создание для пользователя всех токенов."""
+    token_access = create_access_token(user)
+    token_refresh = create_refresh_token(user)
+    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=True)
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=True)
+
+
 def delete_all_tokens(
     response: Response,
 ) -> None:
     """Удаление всех токенов из браузера пользователя."""
-    response.delete_cookie(settings.COOKIE_ACCESS_TOKEN_KEY, httponly=True, secure=True)
-    response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY, httponly=True, secure=True)
+    response.delete_cookie(settings.COOKIE_ACCESS_TOKEN_KEY)
+    response.delete_cookie(settings.COOKIE_REFRESH_TOKEN_KEY)
 
 
 current_user = get_auth_user
