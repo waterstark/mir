@@ -142,10 +142,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-
-        """Проверка анкет первым пользователем."""
-
-        """Проверка анкет вторым пользователем, проверка превышения количества проверок анкет"""
+        """Проверка анкет первым пользователем, проверка превышения количества проверок анкет"""
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
