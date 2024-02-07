@@ -5,7 +5,7 @@ from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
-from src.chat.utils import orjson_dumps
+
 from src.main import app
 
 
@@ -146,6 +146,7 @@ class TestAcceptance:
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -167,6 +168,7 @@ class TestAcceptance:
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -188,6 +190,7 @@ class TestAcceptance:
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
@@ -209,12 +212,14 @@ class TestAcceptance:
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
 
         response = await async_client.get(
             "/api/v1/questionnaire/list/0",
+            cookies={"mir": created_user_2_jwt},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == []
