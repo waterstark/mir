@@ -5,6 +5,7 @@ from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
+from src.database import async_session_maker
 from src.likes.models import UserLike
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 from src.questionnaire.schemas import (
@@ -19,6 +20,12 @@ async def get_list_questionnaire(
     page_number: int,
 ):
     user_questionnaire = await get_questionnaire(user_id=user.id, session=session)
+    if user_questionnaire.quest_lists_per_day >= 3:
+        return []
+
+    user_questionnaire.quest_lists_per_day += 1
+    await session.commit()
+
     is_visible = True
     liked_user_ids = (
         select(UserLike.liked_user_id)
@@ -125,3 +132,12 @@ async def get_questionnaire(user_id: UUID, session: AsyncSession):
     if response:
         return response
     return None
+
+async def reset_quest_lists_per_day():
+    async with async_session_maker() as session:
+        stmt = (
+            update(UserQuestionnaire)
+            .values(quest_lists_per_day=0)
+        )
+        await session.execute(stmt)
+        await session.commit()

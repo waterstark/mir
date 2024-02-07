@@ -30,6 +30,8 @@ motor = "^3.3.1"
 orjson = "^3.9.7"
 async-asgi-testclient = "^1.4.11"
 pydantic = "^1.9.1"
+apscheduler = "^3.10.4"
+schedule = "^1.2.1"
 
 
 [tool.poetry.group.dev.dependencies]

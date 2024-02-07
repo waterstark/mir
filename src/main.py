@@ -1,3 +1,6 @@
+from contextlib import asynccontextmanager
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.routing import Mount
@@ -8,11 +11,25 @@ from src.auth.routers import auth_router, user_router
 from src.chat.routers import ws_router
 from src.likes.routers import likes_router
 from src.matches.routers import router as matches_router
+from src.questionnaire.crud import reset_quest_lists_per_day
 from src.questionnaire.routers import router as questionnaire_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(
+        reset_quest_lists_per_day,
+        "interval",
+        seconds=5,
+    )
+    scheduler.start()
+    yield
 
 app = FastAPI(
     title="social networking application",
     docs_url="/",
+    lifespan=lifespan,
     routes=[
         Mount(
             "/static",
