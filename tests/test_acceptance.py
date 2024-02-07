@@ -6,7 +6,6 @@ from fastapi import status
 
 from src.chat.schemas import MessageStatus, WSAction, WSStatus
 from src.chat.utils import orjson_dumps
-from src.main import app
 
 
 class TestAcceptance:
