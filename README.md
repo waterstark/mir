@@ -33,11 +33,13 @@ poetry install
 cat .env-example > .env
 ```
 Создать файлы с ключами RSA для выпуска токенов
-```shell
-# Создание приватного RSA ключа, размер 2048
-openssl genrsa -out jwt-private.pem 2048
 
-# Создание публичного ключа при помощи приватного ключа
+Создание приватного RSA ключа, размер 2048
+```shell
+openssl genrsa -out jwt-private.pem 2048
+```
+Создание публичного ключа при помощи приватного ключа
+```shell
 openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
 ```
 Запустить сервисы (postgresql, mongodb и redis) или поднять их в контейнере с помощью:
