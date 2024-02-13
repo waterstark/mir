@@ -318,6 +318,7 @@ class TestAcceptance:
             "age": questionnaire_1_data["age"],
             "user_id": created_user_1_id,
             "is_match": True,
+            "match_id": IsUUID
         }]
 
         """Проверка анкет вторым пользователем после матча."""

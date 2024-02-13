@@ -35,7 +35,7 @@ async def get_questionnaires_by_user_matched(
 ) -> list[UserQuestionnaire]:
     """Getting all the questionnaires for which the Match occurred."""
     query = (
-        select(AuthUser, UserQuestionnaire)
+        select(AuthUser, UserQuestionnaire, Match)
         .join(
             Match,
             or_(
@@ -45,18 +45,19 @@ async def get_questionnaires_by_user_matched(
         )
         .join(UserQuestionnaire, UserQuestionnaire.user_id == AuthUser.id)
     )
+
     result = (await session.execute(query)).fetchall()
 
     await change_questionnaire_match_info(result)
 
-    return [questionnaire for _, questionnaire in result]
+    return [questionnaire for _, questionnaire, match in result]
 
 
-async def change_questionnaire_match_info(query_result: Sequence[tuple[AuthUser, UserQuestionnaire]]) -> None:
-    # TODO: Придумать что-то логичное вместо этого костыля, возможно перенести логику в likes
+async def change_questionnaire_match_info(query_result: Sequence[tuple[AuthUser, UserQuestionnaire,  int]]) -> None:
     """The function changes the value of is_match in the Questionnaire model to True."""
-    for _, questionnaire in query_result:
+    for _, questionnaire, match in query_result:
         questionnaire.is_match = True
+        questionnaire.match_id = match.id
 
 
 async def get_match_by_match_id(
