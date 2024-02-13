@@ -1,6 +1,5 @@
 import orjson
 from async_asgi_testclient import TestClient
-from sqlalchemy import delete, select, update
 from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
@@ -318,7 +317,7 @@ class TestAcceptance:
             "age": questionnaire_1_data["age"],
             "user_id": created_user_1_id,
             "is_match": True,
-            "match_id": IsUUID
+            "match_id": IsUUID,
         }]
 
         """Проверка анкет вторым пользователем после матча."""

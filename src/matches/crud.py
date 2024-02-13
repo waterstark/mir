@@ -35,27 +35,26 @@ async def get_questionnaires_by_user_matched(
 ) -> list[UserQuestionnaire]:
     """Getting all the questionnaires for which the Match occurred."""
     query = (
-        select(AuthUser, UserQuestionnaire, Match)
+        select(Match, UserQuestionnaire)
         .join(
             Match,
             or_(
-                and_(Match.user1_id == user.id, Match.user2_id == AuthUser.id),
-                and_(Match.user2_id == user.id, Match.user1_id == AuthUser.id),
+                and_(Match.user1_id == user.id, Match.user2_id == UserQuestionnaire.user_id),
+                and_(Match.user2_id == user.id, Match.user1_id == UserQuestionnaire.user_id),
             ),
         )
-        .join(UserQuestionnaire, UserQuestionnaire.user_id == AuthUser.id)
     )
-
     result = (await session.execute(query)).fetchall()
 
     await change_questionnaire_match_info(result)
 
-    return [questionnaire for _, questionnaire, match in result]
+    return [questionnaire for _, questionnaire in result]
 
 
-async def change_questionnaire_match_info(query_result: Sequence[tuple[AuthUser, UserQuestionnaire,  int]]) -> None:
+async def change_questionnaire_match_info(query_result: Sequence[tuple[Match, UserQuestionnaire]]) -> None:
+    # TODO: Придумать что-то логичное вместо этого костыля, возможно перенести логику в likes
     """The function changes the value of is_match in the Questionnaire model to True."""
-    for _, questionnaire, match in query_result:
+    for match, questionnaire in query_result:
         questionnaire.is_match = True
         questionnaire.match_id = match.id
 
