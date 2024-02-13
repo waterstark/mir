@@ -162,8 +162,11 @@ def create_tokens(
     """Создание для пользователя всех токенов."""
     token_access = create_access_token(user)
     token_refresh = create_refresh_token(user)
-    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=False)
-    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=False)
+
+    secure = not settings.DEBUG
+
+    response.set_cookie(token_access["type_token"], token_access["token"], httponly=True, secure=secure)
+    response.set_cookie(token_refresh["type_token"], token_refresh["token"], httponly=True, secure=secure)
 
 
 def delete_all_tokens(
