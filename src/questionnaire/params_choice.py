@@ -30,14 +30,14 @@ class SmokingType(str, Enum):
 class AlcoholType(str, Enum):
     often = "Пью часто"
     sometimes = "Иногда выпиваю"
-    negative = "Не пью"
+    negative = "He пью"
     hate = "Негативно"
 
 class SportType(str, Enum):
     often = "Часто занимаюсь"
     sometimes = "Иногда занимаюсь"
-    negative = "Не занимаюсь"
-    hate = "Не люблю спорт"
+    negative = "He занимаюсь"
+    hate = "He люблю спорт"
 
 class BodyType(str, Enum):
     skinny = "Худое"

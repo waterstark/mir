@@ -1,6 +1,5 @@
 import orjson
 from async_asgi_testclient import TestClient
-from sqlalchemy import delete, select, update
 from dirty_equals import IsStr, IsUUID
 from fastapi import status
 
@@ -85,11 +84,11 @@ class TestAcceptance:
             "about": "Мужичок",
             "hobbies": [{"hobby_name": "string"}],
             "height": 190,
-            "sport": "Не занимаюсь",
-            "alcohol": "Не пью",
+            "sport": "He занимаюсь",
+            "alcohol": "He пью",
             "smoking": "Курю",
             "goals": "Дружба",
-            "age": "2004-02-14"
+            "age": "2004-02-14",
         }
 
         response = await async_client.post(
@@ -126,11 +125,11 @@ class TestAcceptance:
             "about": "Мужичок",
             "hobbies": [{"hobby_name": "string"}],
             "height": 190,
-            "sport": "Не занимаюсь",
-            "alcohol": "Не пью",
+            "sport": "He занимаюсь",
+            "alcohol": "He пью",
             "smoking": "Курю",
             "goals": "Дружба",
-            "age": "2004-02-14"
+            "age": "2004-02-14",
         }
         response = await async_client.post(
             "/api/v1/questionnaire",

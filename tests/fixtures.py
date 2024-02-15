@@ -1,7 +1,8 @@
+from datetime import datetime
+
 import pytest
 from async_asgi_testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
 
 from src.auth.models import AuthUser
 from src.likes.models import UserLike
@@ -9,8 +10,8 @@ from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
 
 """Without that tests will die, sa cant work with date and pytest same time normaly(kostil)"""
-date_string = '2004-02-14'
-datetime_object = datetime.strptime(date_string, '%Y-%m-%d')
+date_string = "2004-02-14"
+datetime_object = datetime.strptime(date_string, "%Y-%m-%d")
 date_object = datetime_object.date()
 
 user_data = {
@@ -38,8 +39,8 @@ user_questionary_data = {
     "about": "False",
     "goals": "Дружба",
     "height": 150,
-    "sport": "Не занимаюсь",
-    "alcohol": "Не пью",
+    "sport": "He занимаюсь",
+    "alcohol": "He пью",
     "smoking": "Курю",
     "age": date_object,
 }
@@ -54,8 +55,8 @@ user3_questionary_data = {
     "about": "False",
     "goals": "Дружба",
     "height": 150,
-    "sport": "Не занимаюсь",
-    "alcohol": "Не пью",
+    "sport": "He занимаюсь",
+    "alcohol": "He пью",
     "smoking": "Курю",
     "age": date_object,
 }

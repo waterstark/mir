@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, date
+from datetime import date, datetime
 
 from sqlalchemy import (
     CheckConstraint,
@@ -15,7 +15,7 @@ from sqlalchemy_utils import ChoiceType
 
 from src.auth.models import AuthUser
 from src.database import Base
-from src.questionnaire.params_choice import *
+from src.questionnaire.params_choice import AlcoholType, Gender, Goal, SmokingType, SportType
 
 
 class BlackListUser(Base):

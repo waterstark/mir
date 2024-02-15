@@ -1,8 +1,7 @@
-from datetime import datetime
 
 import pytest
 from async_asgi_testclient import TestClient
-from dirty_equals import IsTrueLike, IsUUID
+from dirty_equals import IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -48,12 +47,6 @@ class TestMatch:
         match2: Match,
         questionary: UserQuestionnaire,
     ):
-        print({
-            "firstname": questionary.firstname,
-            "lastname": questionary.lastname,
-            "gender": questionary.gender,
-            "goals": questionary.goals
-        })
         """Проверка корректности работы эндпоинта matches/ при
         GET-запросе авторизованного пользователя
         """

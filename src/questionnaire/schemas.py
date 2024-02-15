@@ -1,7 +1,7 @@
 import uuid
-
-from pydantic import BaseModel, conint
 from datetime import date
+
+from pydantic import BaseModel
 
 
 class UserBaseSchema(BaseModel):
