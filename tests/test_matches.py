@@ -95,6 +95,7 @@ class TestMatch:
             "user_id": IsUUID,
             "id": IsUUID,
             "is_match": IsTrueLike,
+            "match_id": IsUUID,
         }, (
             "Проверьте, что GET-запрос авторизованного пользователя "
             f"к `{self.matches_url}` возвращает анкету c корректными данными"
