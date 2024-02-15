@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from async_asgi_testclient import TestClient
 from dirty_equals import IsTrueLike, IsUUID
@@ -46,6 +48,12 @@ class TestMatch:
         match2: Match,
         questionary: UserQuestionnaire,
     ):
+        print({
+            "firstname": questionary.firstname,
+            "lastname": questionary.lastname,
+            "gender": questionary.gender,
+            "goals": questionary.goals
+        })
         """Проверка корректности работы эндпоинта matches/ при
         GET-запросе авторизованного пользователя
         """
@@ -80,7 +88,7 @@ class TestMatch:
             "country": questionary.country,
             "city": questionary.city,
             "about": questionary.about,
-            "age": questionary.age,
+            "age": "2004-02-14",
             "hobbies": [
                 {
                     "hobby_name": questionary.hobbies[0].hobby_name,
@@ -91,10 +99,13 @@ class TestMatch:
             ],
             "height": questionary.height,
             "goals": questionary.goals,
-            "body_type": questionary.body_type,
+            "sport": questionary.sport,
+            "alcohol": questionary.alcohol,
+            "smoking": questionary.smoking,
             "user_id": IsUUID,
             "id": IsUUID,
-            "is_match": IsTrueLike,
+            "is_match": True,
+            "match_id": IsUUID,
         }, (
             "Проверьте, что GET-запрос авторизованного пользователя "
             f"к `{self.matches_url}` возвращает анкету c корректными данными"

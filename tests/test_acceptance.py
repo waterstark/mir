@@ -85,9 +85,11 @@ class TestAcceptance:
             "about": "Мужичок",
             "hobbies": [{"hobby_name": "string"}],
             "height": 190,
+            "sport": "Не занимаюсь",
+            "alcohol": "Не пью",
+            "smoking": "Курю",
             "goals": "Дружба",
-            "body_type": "Худое",
-            "age": 20,
+            "age": "2004-02-14"
         }
 
         response = await async_client.post(
@@ -108,23 +110,27 @@ class TestAcceptance:
             "hobbies": questionnaire_1_data["hobbies"],
             "height": questionnaire_1_data["height"],
             "goals": questionnaire_1_data["goals"],
-            "body_type": questionnaire_1_data["body_type"],
+            "sport": questionnaire_1_data["sport"],
+            "alcohol": questionnaire_1_data["alcohol"],
+            "smoking": questionnaire_1_data["smoking"],
             "age": questionnaire_1_data["age"],
             "user_id": created_user_1_id,
         }
         questionnaire_2_data = {
-            "firstname": "Аня",
-            "lastname": "Каренина",
+            "firstname": "Антон",
+            "lastname": "Суворов",
             "gender": "Female",
-            "photo": "Селфак",
+            "photo": "Фото",
             "country": "Россия",
             "city": "Питер",
-            "about": "Баба",
+            "about": "Мужичок",
             "hobbies": [{"hobby_name": "string"}],
-            "height": 120,
+            "height": 190,
+            "sport": "Не занимаюсь",
+            "alcohol": "Не пью",
+            "smoking": "Курю",
             "goals": "Дружба",
-            "body_type": "Худое",
-            "age": 21,
+            "age": "2004-02-14"
         }
         response = await async_client.post(
             "/api/v1/questionnaire",
@@ -144,7 +150,9 @@ class TestAcceptance:
             "hobbies": questionnaire_2_data["hobbies"],
             "height": questionnaire_2_data["height"],
             "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
+            "sport": questionnaire_2_data["sport"],
+            "alcohol": questionnaire_2_data["alcohol"],
+            "smoking": questionnaire_2_data["smoking"],
             "age": questionnaire_2_data["age"],
             "user_id": created_user_2_id,
         }
@@ -168,7 +176,9 @@ class TestAcceptance:
             "hobbies": questionnaire_2_data["hobbies"],
             "height": questionnaire_2_data["height"],
             "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
+            "sport": questionnaire_2_data["sport"],
+            "alcohol": questionnaire_2_data["alcohol"],
+            "smoking": questionnaire_2_data["smoking"],
             "age": questionnaire_2_data["age"],
             "user_id": created_user_2_id,
         }]
@@ -190,7 +200,9 @@ class TestAcceptance:
             "hobbies": questionnaire_2_data["hobbies"],
             "height": questionnaire_2_data["height"],
             "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
+            "sport": questionnaire_2_data["sport"],
+            "alcohol": questionnaire_2_data["alcohol"],
+            "smoking": questionnaire_2_data["smoking"],
             "age": questionnaire_2_data["age"],
             "user_id": created_user_2_id,
         }]
@@ -212,7 +224,9 @@ class TestAcceptance:
             "hobbies": questionnaire_2_data["hobbies"],
             "height": questionnaire_2_data["height"],
             "goals": questionnaire_2_data["goals"],
-            "body_type": questionnaire_2_data["body_type"],
+            "sport": questionnaire_2_data["sport"],
+            "alcohol": questionnaire_2_data["alcohol"],
+            "smoking": questionnaire_2_data["smoking"],
             "age": questionnaire_2_data["age"],
             "user_id": created_user_2_id,
         }]
@@ -259,7 +273,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
-            "id": IsUUID,
+             "id": IsUUID,
             "firstname": questionnaire_1_data["firstname"],
             "lastname": questionnaire_1_data["lastname"],
             "gender": questionnaire_1_data["gender"],
@@ -270,7 +284,9 @@ class TestAcceptance:
             "hobbies": questionnaire_1_data["hobbies"],
             "height": questionnaire_1_data["height"],
             "goals": questionnaire_1_data["goals"],
-            "body_type": questionnaire_1_data["body_type"],
+            "sport": questionnaire_1_data["sport"],
+            "alcohol": questionnaire_1_data["alcohol"],
+            "smoking": questionnaire_1_data["smoking"],
             "age": questionnaire_1_data["age"],
             "user_id": created_user_1_id,
         }]
@@ -303,7 +319,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
-            "id": IsUUID,
+             "id": IsUUID,
             "firstname": questionnaire_1_data["firstname"],
             "lastname": questionnaire_1_data["lastname"],
             "gender": questionnaire_1_data["gender"],
@@ -314,10 +330,13 @@ class TestAcceptance:
             "hobbies": questionnaire_1_data["hobbies"],
             "height": questionnaire_1_data["height"],
             "goals": questionnaire_1_data["goals"],
-            "body_type": questionnaire_1_data["body_type"],
+            "sport": questionnaire_1_data["sport"],
+            "alcohol": questionnaire_1_data["alcohol"],
+            "smoking": questionnaire_1_data["smoking"],
             "age": questionnaire_1_data["age"],
             "user_id": created_user_1_id,
             "is_match": True,
+            "match_id": IsUUID,
         }]
 
         """Проверка анкет вторым пользователем после матча."""

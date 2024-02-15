@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, date
 
 from src.auth.models import AuthUser
 from src.database import async_session_maker
@@ -64,6 +65,15 @@ async def create_questionnaire(
         )
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
+    today = date.today()
+    years = today.year - questionnaire.age.year
+    if today.month >= questionnaire.age.month and today.day >= questionnaire.age.day:
+        years += 1
+    if years < 18:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Возрастное ограничение строго с 18 лет!"
+        )
     hobbies = user_profile.hobbies
     for hobby in hobbies:
         hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)

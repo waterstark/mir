@@ -1,6 +1,7 @@
 import uuid
 
 from pydantic import BaseModel, conint
+from datetime import date
 
 
 class UserBaseSchema(BaseModel):
@@ -21,10 +22,12 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     city: str
     about: str
     hobbies: list[UserHobby]
+    sport: str
+    alcohol: str
+    smoking: str
     height: int
     goals: str
-    body_type: str
-    age: conint(ge=18, le=99)
+    age: date
 
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
@@ -34,3 +37,4 @@ class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
 
 class ResponseQuestionnaireSchemaWithMatch(ResponseUserQuestionnaireSchema):
     is_match: bool = False
+    match_id: uuid.UUID | None = None
