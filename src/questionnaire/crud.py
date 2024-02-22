@@ -66,8 +66,8 @@ async def create_questionnaire(
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
     today = date.today()
-    years = today.year - questionnaire.age.year
-    if today.month >= questionnaire.age.month and today.day >= questionnaire.age.day:
+    years = today.year - questionnaire.birthday.year
+    if today.month >= questionnaire.birthday.month and today.day >= questionnaire.birthday.day:
         years += 1
     if years < 18:
         raise HTTPException(

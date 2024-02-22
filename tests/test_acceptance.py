@@ -88,7 +88,7 @@ class TestAcceptance:
             "alcohol": "He пью",
             "smoking": "Курю",
             "goals": "Дружба",
-            "age": "2004-02-14",
+            "birthday": "2004-02-14",
         }
 
         response = await async_client.post(
@@ -112,7 +112,7 @@ class TestAcceptance:
             "sport": questionnaire_1_data["sport"],
             "alcohol": questionnaire_1_data["alcohol"],
             "smoking": questionnaire_1_data["smoking"],
-            "age": questionnaire_1_data["age"],
+            "birthday": questionnaire_1_data["birthday"],
             "user_id": created_user_1_id,
         }
         questionnaire_2_data = {
@@ -129,7 +129,7 @@ class TestAcceptance:
             "alcohol": "He пью",
             "smoking": "Курю",
             "goals": "Дружба",
-            "age": "2004-02-14",
+            "birthday": "2004-02-14",
         }
         response = await async_client.post(
             "/api/v1/questionnaire",
@@ -152,7 +152,7 @@ class TestAcceptance:
             "sport": questionnaire_2_data["sport"],
             "alcohol": questionnaire_2_data["alcohol"],
             "smoking": questionnaire_2_data["smoking"],
-            "age": questionnaire_2_data["age"],
+            "birthday": questionnaire_2_data["birthday"],
             "user_id": created_user_2_id,
         }
 
@@ -178,7 +178,7 @@ class TestAcceptance:
             "sport": questionnaire_2_data["sport"],
             "alcohol": questionnaire_2_data["alcohol"],
             "smoking": questionnaire_2_data["smoking"],
-            "age": questionnaire_2_data["age"],
+            "birthday": questionnaire_2_data["birthday"],
             "user_id": created_user_2_id,
         }]
 
@@ -202,7 +202,7 @@ class TestAcceptance:
             "sport": questionnaire_2_data["sport"],
             "alcohol": questionnaire_2_data["alcohol"],
             "smoking": questionnaire_2_data["smoking"],
-            "age": questionnaire_2_data["age"],
+            "birthday": questionnaire_2_data["birthday"],
             "user_id": created_user_2_id,
         }]
 
@@ -226,7 +226,7 @@ class TestAcceptance:
             "sport": questionnaire_2_data["sport"],
             "alcohol": questionnaire_2_data["alcohol"],
             "smoking": questionnaire_2_data["smoking"],
-            "age": questionnaire_2_data["age"],
+            "birthday": questionnaire_2_data["birthday"],
             "user_id": created_user_2_id,
         }]
 
@@ -286,7 +286,7 @@ class TestAcceptance:
             "sport": questionnaire_1_data["sport"],
             "alcohol": questionnaire_1_data["alcohol"],
             "smoking": questionnaire_1_data["smoking"],
-            "age": questionnaire_1_data["age"],
+            "birthday": questionnaire_1_data["birthday"],
             "user_id": created_user_1_id,
         }]
 
@@ -332,7 +332,7 @@ class TestAcceptance:
             "sport": questionnaire_1_data["sport"],
             "alcohol": questionnaire_1_data["alcohol"],
             "smoking": questionnaire_1_data["smoking"],
-            "age": questionnaire_1_data["age"],
+            "birthday": questionnaire_1_data["birthday"],
             "user_id": created_user_1_id,
             "is_match": True,
             "match_id": IsUUID,

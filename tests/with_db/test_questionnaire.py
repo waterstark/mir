@@ -28,7 +28,7 @@ async def test_create_questionnaire(
         "alcohol": "He пью",
         "smoking": "Курю",
         "goals": "Дружба",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
     }
     response = await async_client.post(
         "/api/v1/questionnaire",
@@ -51,7 +51,7 @@ async def test_create_questionnaire(
         "alcohol": "He пью",
         "smoking": "Курю",
         "goals": "Дружба",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
         "user_id": IsUUID,
     }
     assert response.json()["user_id"] == str(user.id)
@@ -76,7 +76,7 @@ async def test_create_questionnaire_bad_credentials(
         "alcohol": "He пью",
         "smoking": "Курю",
         "goals": "Дружба",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
     }
     response = await async_client.post(
         "/api/v1/questionnaire",
@@ -120,7 +120,7 @@ async def test_get_quest_authenticated_user(
         "alcohol": "He пью",
         "smoking": "Курю",
         "goals": "Дружба",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
         "user_id": IsUUID,
         "id": IsUUID,
     }
@@ -162,7 +162,7 @@ async def test_update_quest(
         "alcohol": "He пью",
         "smoking": "Курю",
         "goals": "Дружба",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
     }
 
     response = await async_client.patch(
@@ -186,7 +186,7 @@ async def test_update_quest(
         "alcohol": "He пью",
         "smoking": "Курю",
         "goals": "Дружба",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
         "user_id": IsUUID,
     }
     assert response.json()["user_id"] == str(user2.id)
@@ -235,7 +235,7 @@ async def test_create_questionnaire_without_token(
         "sport": "He занимаюсь",
         "alcohol": "He пью",
         "smoking": "Курю",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
     }
 
     """Without cookies."""
@@ -298,7 +298,7 @@ async def test_update_or_delete_quest_without_token(
         "sport": "He занимаюсь",
         "alcohol": "He пью",
         "smoking": "Курю",
-        "age": "2004-02-14",
+        "birthday": "2004-02-14",
     }
 
     response = await async_client.patch(

@@ -42,7 +42,7 @@ user_questionary_data = {
     "sport": "He занимаюсь",
     "alcohol": "He пью",
     "smoking": "Курю",
-    "age": date_object,
+    "birthday": date_object,
 }
 
 user3_questionary_data = {
@@ -58,7 +58,7 @@ user3_questionary_data = {
     "sport": "He занимаюсь",
     "alcohol": "He пью",
     "smoking": "Курю",
-    "age": date_object,
+    "birthday": date_object,
 }
 
 hobbies_dict = {

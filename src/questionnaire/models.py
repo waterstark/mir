@@ -88,7 +88,7 @@ class UserQuestionnaire(Base):
     smoking: Mapped[str] = mapped_column(ChoiceType(SmokingType), nullable=True)
     alcohol: Mapped[str] = mapped_column(ChoiceType(AlcoholType), nullable=True)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
-    age: Mapped[date] = mapped_column(nullable=False)
+    birthday: Mapped[date] = mapped_column(nullable=False)
     hobbies: Mapped[list["UserQuestionnaireHobby"]] = relationship(
         secondary=user_hobby,
         lazy="selectin",

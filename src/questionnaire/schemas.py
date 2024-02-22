@@ -27,7 +27,7 @@ class CreateUserQuestionnaireSchema(UserBaseSchema):
     smoking: str
     height: int
     goals: str
-    age: date
+    birthday: date
 
 
 class ResponseUserQuestionnaireSchema(CreateUserQuestionnaireSchema):
