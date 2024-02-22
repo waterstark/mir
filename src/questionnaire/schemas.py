@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 
 from pydantic import BaseModel
-
+from .params_choice import Gender, SportType, SmokingType, AlcoholType, Goal
 
 class UserBaseSchema(BaseModel):
     class Config:
@@ -16,17 +16,17 @@ class UserHobby(UserBaseSchema):
 class CreateUserQuestionnaireSchema(UserBaseSchema):
     firstname: str
     lastname: str
-    gender: str
+    gender: Gender
     photo: str
     country: str
     city: str
     about: str
     hobbies: list[UserHobby]
-    sport: str
-    alcohol: str
-    smoking: str
+    sport: SportType
+    alcohol: AlcoholType
+    smoking: SmokingType
     height: int
-    goals: str
+    goals: Goal
     birthday: date
 
 
