@@ -1,4 +1,3 @@
-
 import pytest
 from async_asgi_testclient import TestClient
 from dirty_equals import IsUUID

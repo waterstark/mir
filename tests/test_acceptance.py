@@ -272,7 +272,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
-             "id": IsUUID,
+            "id": IsUUID,
             "firstname": questionnaire_1_data["firstname"],
             "lastname": questionnaire_1_data["lastname"],
             "gender": questionnaire_1_data["gender"],
@@ -318,7 +318,7 @@ class TestAcceptance:
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == [{
-             "id": IsUUID,
+            "id": IsUUID,
             "firstname": questionnaire_1_data["firstname"],
             "lastname": questionnaire_1_data["lastname"],
             "gender": questionnaire_1_data["gender"],

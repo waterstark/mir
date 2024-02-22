@@ -67,7 +67,6 @@ async def create_questionnaire(
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
     today = date.today()
     today.replace(year=today.year - 18)
-    print(today)
     if questionnaire.birthday > today:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
