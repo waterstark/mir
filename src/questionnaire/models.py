@@ -84,9 +84,9 @@ class UserQuestionnaire(Base):
     about: Mapped[str] = mapped_column(String, nullable=True)
     height: Mapped[int] = mapped_column(nullable=True)
     goals: Mapped[str] = mapped_column(ChoiceType(Goal), nullable=True)
-    sport: Mapped[str] = mapped_column(ChoiceType(SportType), nullable=True)
-    smoking: Mapped[str] = mapped_column(ChoiceType(SmokingType), nullable=True)
-    alcohol: Mapped[str] = mapped_column(ChoiceType(AlcoholType), nullable=True)
+    sport: Mapped[str] = mapped_column(ChoiceType(SportType), nullable=False)
+    smoking: Mapped[str] = mapped_column(ChoiceType(SmokingType), nullable=False)
+    alcohol: Mapped[str] = mapped_column(ChoiceType(AlcoholType), nullable=False)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
     birthday: Mapped[date] = mapped_column(nullable=False)
     hobbies: Mapped[list["UserQuestionnaireHobby"]] = relationship(
