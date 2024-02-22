@@ -2,7 +2,9 @@ import uuid
 from datetime import date
 
 from pydantic import BaseModel
-from .params_choice import Gender, SportType, SmokingType, AlcoholType, Goal
+
+from .params_choice import AlcoholType, Gender, Goal, SmokingType, SportType
+
 
 class UserBaseSchema(BaseModel):
     class Config:
