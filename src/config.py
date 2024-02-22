@@ -6,6 +6,8 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class Settings(BaseSettings):
+    DEBUG: bool
+
     DB_HOST: str
 
     DB_PORT: str

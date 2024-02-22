@@ -68,6 +68,7 @@ jobs:
       - name: Tests
         run: poetry run pytest --cov=. --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests
         env:
+          DEBUG: True
           DB_HOST: localhost
           DB_PORT: 5432
           DB_NAME: ${{matrix.POSTGRES_DB}}
@@ -116,4 +117,4 @@ jobs:
         with: 
           poetry-version: ${{ matrix.poetry-version }}
       - name: Linter
-        run: poetry run ruff check . --fix
+        run: poetry run ruff check .

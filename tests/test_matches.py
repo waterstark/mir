@@ -98,6 +98,7 @@ class TestMatch:
             "user_id": IsUUID,
             "id": IsUUID,
             "is_match": True,
+
             "match_id": IsUUID,
         }, (
             "Проверьте, что GET-запрос авторизованного пользователя "
