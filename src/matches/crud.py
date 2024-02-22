@@ -58,6 +58,7 @@ async def change_questionnaire_match_info(query_result: Sequence[tuple[Match, Us
         questionnaire.is_match = True
         questionnaire.match_id = match.id
 
+
 async def get_match_by_match_id(
     session: AsyncSession,
     match_id: UUID,
