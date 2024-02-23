@@ -359,7 +359,7 @@ async def test_age_validation(
     }
     response = await async_client.post(
         "/api/v1/questionnaire",
-        json=questionnaire_data,
+        json=questionnaire_data1,
         cookies=authorised_cookie,
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
