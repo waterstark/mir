@@ -66,8 +66,7 @@ async def create_questionnaire(
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
     today = date.today()
-    today.replace(year=today.year - 18)
-    if questionnaire.birthday > today:
+    if questionnaire.birthday > today.replace(year=today.year - 18) and questionnaire.birthday < today.replace(year=today.year - 82):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Возрастное ограничение строго c 18 лет!",

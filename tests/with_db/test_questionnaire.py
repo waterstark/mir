@@ -313,3 +313,53 @@ async def test_update_or_delete_quest_without_token(
         cookies={},
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+async def test_age_validation(
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+):
+    questionnaire_data = {
+        "firstname": "Антон",
+        "lastname": "Суворов",
+        "gender": "Male",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "goals": "Дружба",
+        "birthday": "2020-02-14",
+    }
+    response = await async_client.post(
+        "/api/v1/questionnaire",
+        json=questionnaire_data,
+        cookies=authorised_cookie,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    questionnaire_data1 = {
+        "firstname": "Антон",
+        "lastname": "Суворов",
+        "gender": "Male",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "goals": "Дружба",
+        "birthday": "1900-02-14",
+    }
+    response = await async_client.post(
+        "/api/v1/questionnaire",
+        json=questionnaire_data,
+        cookies=authorised_cookie,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
