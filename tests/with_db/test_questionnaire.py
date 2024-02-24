@@ -15,18 +15,20 @@ async def test_create_questionnaire(
     authorised_cookie: dict,
 ):
     questionnaire_data = {
-        "firstname": "string",
-        "lastname": "string",
+        "firstname": "Антон",
+        "lastname": "Суворов",
         "gender": "Male",
-        "photo": "string",
-        "country": "string",
-        "city": "string",
-        "about": "string",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
         "hobbies": [{"hobby_name": "string"}],
-        "height": 0,
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
         "goals": "Дружба",
-        "body_type": "Худое",
-        "age": 20,
+        "birthday": "2004-02-14",
     }
     response = await async_client.post(
         "/api/v1/questionnaire",
@@ -36,18 +38,20 @@ async def test_create_questionnaire(
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == {
         "id": IsUUID,
-        "firstname": "string",
-        "lastname": "string",
+        "firstname": "Антон",
+        "lastname": "Суворов",
         "gender": "Male",
-        "photo": "string",
-        "country": "string",
-        "city": "string",
-        "about": "string",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
         "hobbies": [{"hobby_name": "string"}],
-        "height": 0,
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
         "goals": "Дружба",
-        "body_type": "Худое",
-        "age": 20,
+        "birthday": "2004-02-14",
         "user_id": IsUUID,
     }
     assert response.json()["user_id"] == str(user.id)
@@ -59,18 +63,20 @@ async def test_create_questionnaire_bad_credentials(
     authorised_cookie: dict,
 ):
     questionnaire_data = {
-        "firstname": "s123123tring",
-        "lastname": "string",
+        "firstname": "Антон",
+        "lastname": "Суворов",
         "gender": "Male",
-        "photo": "string",
-        "country": "string",
-        "city": "string",
-        "about": "string",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
         "hobbies": [{"hobby_name": "string"}],
-        "height": 0,
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
         "goals": "Дружба",
-        "body_type": "Худое",
-        "age": 20,
+        "birthday": "2004-02-14",
     }
     response = await async_client.post(
         "/api/v1/questionnaire",
@@ -101,18 +107,20 @@ async def test_get_quest_authenticated_user(
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
-        "firstname": "string",
-        "lastname": "string",
+        "firstname": "Антон",
+        "lastname": "Суворов",
         "gender": "Male",
-        "photo": "string",
-        "country": "string",
-        "city": "string",
-        "about": "string",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
         "hobbies": [{"hobby_name": "string"}],
-        "height": 0,
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
         "goals": "Дружба",
-        "body_type": "Худое",
-        "age": 20,
+        "birthday": "2004-02-14",
         "user_id": IsUUID,
         "id": IsUUID,
     }
@@ -141,25 +149,20 @@ async def test_update_quest(
     authorised_cookie_user2: dict,
 ):
     updated_data = {
-        "firstname": "string",
-        "lastname": "string",
-        "gender": "Female",
-        "photo": "string",
-        "country": "string",
-        "city": "string",
-        "about": "string",
-        "hobbies": [
-            {
-                "hobby_name": "qwewasd",
-            },
-            {
-                "hobby_name": "asidpas",
-            },
-        ],
-        "height": 0,
-        "goals": "Флирт",
-        "body_type": "Полное",
-        "age": 20,
+        "firstname": "Антон",
+        "lastname": "Суворов",
+        "gender": "Male",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "goals": "Дружба",
+        "birthday": "2004-02-14",
     }
 
     response = await async_client.patch(
@@ -170,25 +173,20 @@ async def test_update_quest(
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {
         "id": IsUUID,
-        "firstname": "string",
-        "lastname": "string",
-        "gender": "Female",
-        "photo": "string",
-        "country": "string",
-        "city": "string",
-        "about": "string",
-        "hobbies": [
-            {
-                "hobby_name": "qwewasd",
-            },
-            {
-                "hobby_name": "asidpas",
-            },
-        ],
-        "height": 0,
-        "goals": "Флирт",
-        "body_type": "Полное",
-        "age": 20,
+        "firstname": "Антон",
+        "lastname": "Суворов",
+        "gender": "Male",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "goals": "Дружба",
+        "birthday": "2004-02-14",
         "user_id": IsUUID,
     }
     assert response.json()["user_id"] == str(user2.id)
@@ -220,16 +218,24 @@ async def test_create_questionnaire_without_token(
     questionnaire_data = {
         "firstname": "string",
         "lastname": "string",
-        "gender": "Male",
+        "gender": "Female",
         "photo": "string",
         "country": "string",
         "city": "string",
         "about": "string",
-        "hobbies": [{"hobby_name": "string"}],
+        "hobbies": [
+            {
+                "hobby_name": "qwewasd",
+            },
+            {
+                "hobby_name": "asidpas",
+            },
+        ],
         "height": 0,
-        "goals": "Дружба",
-        "body_type": "Худое",
-        "age": 20,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "birthday": "2004-02-14",
     }
 
     """Without cookies."""
@@ -289,9 +295,10 @@ async def test_update_or_delete_quest_without_token(
             },
         ],
         "height": 0,
-        "goals": "Флирт",
-        "body_type": "Полное",
-        "age": 20,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "birthday": "2004-02-14",
     }
 
     response = await async_client.patch(
@@ -306,3 +313,53 @@ async def test_update_or_delete_quest_without_token(
         cookies={},
     )
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+async def test_age_validation(
+    async_client: TestClient,
+    user: AuthUser,
+    authorised_cookie: dict,
+):
+    questionnaire_data = {
+        "firstname": "Антон",
+        "lastname": "Суворов",
+        "gender": "Male",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "goals": "Дружба",
+        "birthday": "2020-02-14",
+    }
+    response = await async_client.post(
+        "/api/v1/questionnaire",
+        json=questionnaire_data,
+        cookies=authorised_cookie,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    questionnaire_data1 = {
+        "firstname": "Антон",
+        "lastname": "Суворов",
+        "gender": "Male",
+        "photo": "Фото",
+        "country": "Россия",
+        "city": "Питер",
+        "about": "Мужичок",
+        "hobbies": [{"hobby_name": "string"}],
+        "height": 190,
+        "sport": "He занимаюсь",
+        "alcohol": "He пью",
+        "smoking": "Курю",
+        "goals": "Дружба",
+        "birthday": "1900-02-14",
+    }
+    response = await async_client.post(
+        "/api/v1/questionnaire",
+        json=questionnaire_data1,
+        cookies=authorised_cookie,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
