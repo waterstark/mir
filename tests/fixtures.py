@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from datetime import datetime
 
 import pytest
 from async_asgi_testclient import TestClient
@@ -8,6 +9,11 @@ from src.auth.models import AuthUser
 from src.likes.models import UserLike
 from src.matches.models import Match
 from src.questionnaire.models import UserQuestionnaire, UserQuestionnaireHobby
+
+"""Without that tests will die, sa cant work with date and pytest same time normaly(kostil)"""
+date_string = "2004-02-14"
+datetime_object = datetime.strptime(date_string, "%Y-%m-%d")
+date_object = datetime_object.date()
 
 user_data = {
     "email": "test_user@server.com",
@@ -32,10 +38,12 @@ user_questionary_data = {
     "country": "False",
     "city": "False",
     "about": "False",
+    "goals": "Дружба",
     "height": 150,
-    "goals": "Флирт",
-    "body_type": "Худое",
-    "age": 20,
+    "sport": "He занимаюсь",
+    "alcohol": "He пью",
+    "smoking": "Курю",
+    "birthday": date_object,
 }
 
 user3_questionary_data = {
@@ -46,10 +54,12 @@ user3_questionary_data = {
     "country": "False",
     "city": "False",
     "about": "False",
+    "goals": "Дружба",
     "height": 150,
-    "goals": "Флирт",
-    "body_type": "Худое",
-    "age": 20,
+    "sport": "He занимаюсь",
+    "alcohol": "He пью",
+    "smoking": "Курю",
+    "birthday": date_object,
 }
 
 hobbies_dict = {

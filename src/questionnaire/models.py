@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
     CheckConstraint,
@@ -15,7 +15,7 @@ from sqlalchemy_utils import ChoiceType
 
 from src.auth.models import AuthUser
 from src.database import Base
-from src.questionnaire.params_choice import BodyType, Gender, Goal
+from src.questionnaire.params_choice import AlcoholType, Gender, Goal, SmokingType, SportType
 
 
 class BlackListUser(Base):
@@ -84,9 +84,11 @@ class UserQuestionnaire(Base):
     about: Mapped[str] = mapped_column(String, nullable=True)
     height: Mapped[int] = mapped_column(nullable=True)
     goals: Mapped[str] = mapped_column(ChoiceType(Goal), nullable=True)
-    body_type: Mapped[str] = mapped_column(ChoiceType(BodyType), nullable=True)
+    sport: Mapped[str] = mapped_column(ChoiceType(SportType), nullable=False)
+    smoking: Mapped[str] = mapped_column(ChoiceType(SmokingType), nullable=False)
+    alcohol: Mapped[str] = mapped_column(ChoiceType(AlcoholType), nullable=False)
     is_visible: Mapped[bool] = mapped_column(default=True, nullable=False)
-    age: Mapped[int] = mapped_column(nullable=False)
+    birthday: Mapped[date] = mapped_column(nullable=False)
     hobbies: Mapped[list["UserQuestionnaireHobby"]] = relationship(
         secondary=user_hobby,
         lazy="selectin",

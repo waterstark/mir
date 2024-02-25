@@ -1,6 +1,6 @@
 import pytest
 from async_asgi_testclient import TestClient
-from dirty_equals import IsTrueLike, IsUUID
+from dirty_equals import IsUUID
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -80,7 +80,7 @@ class TestMatch:
             "country": questionary.country,
             "city": questionary.city,
             "about": questionary.about,
-            "age": questionary.age,
+            "birthday": "2004-02-14",
             "hobbies": [
                 {
                     "hobby_name": questionary.hobbies[0].hobby_name,
@@ -91,10 +91,13 @@ class TestMatch:
             ],
             "height": questionary.height,
             "goals": questionary.goals,
-            "body_type": questionary.body_type,
+            "sport": questionary.sport,
+            "alcohol": questionary.alcohol,
+            "smoking": questionary.smoking,
             "user_id": IsUUID,
             "id": IsUUID,
-            "is_match": IsTrueLike,
+            "is_match": True,
+
             "match_id": IsUUID,
         }, (
             "Проверьте, что GET-запрос авторизованного пользователя "

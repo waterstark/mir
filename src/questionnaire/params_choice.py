@@ -17,6 +17,30 @@ class Goal(str, Enum):
     flirts = "Флирт"
     friendship = "Дружба"
     for_one_day = "Ha одну ночь"
+    open_relationship = "Открытые отношения"
+    new_experience = "Новый опыт"
+    nothing_serious = "Ничего серьезного"
+    communication = "Общение"
+
+
+class SmokingType(str, Enum):
+    positive = "Курю"
+    normal = "Нормально"
+    negative = "Негативно"
+
+
+class AlcoholType(str, Enum):
+    often = "Пью часто"
+    sometimes = "Иногда выпиваю"
+    negative = "He пью"
+    hate = "Негативно"
+
+
+class SportType(str, Enum):
+    often = "Часто занимаюсь"
+    sometimes = "Иногда занимаюсь"
+    negative = "He занимаюсь"
+    hate = "He люблю спорт"
 
 
 class BodyType(str, Enum):

@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -65,6 +66,14 @@ async def create_questionnaire(
         )
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
+    today = date.today()
+    min_age = today.replace(year=today.year - 18)
+    max_age = today.replace(year=today.year - 82)
+    if questionnaire.birthday > min_age and questionnaire.birthday < max_age:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Возрастное ограничение строго c 18 лет!",
+        )
     hobbies = user_profile.hobbies
     for hobby in hobbies:
         hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
