@@ -62,6 +62,10 @@ class MessageResponse(BaseMessage):
     media: str | None
 
 
+class MessageDeleteResponse(BaseMessage):
+    id: uuid.UUID
+
+
 class WSMessageRequest(BaseModel):
     action: WSAction
     message: MessageUpdateRequest | MessageCreateRequest | MessageDeleteRequest
@@ -71,9 +75,10 @@ class WSMessageRequest(BaseModel):
 
 
 class WSMessageResponse(BaseModel):
+    action: WSAction
     status: WSStatus
     detail: str | None
-    message: MessageResponse | None
+    message: MessageResponse | MessageDeleteResponse | None
 
     class Config:
         orm_mode = True

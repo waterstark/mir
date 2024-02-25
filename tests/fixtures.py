@@ -1,3 +1,5 @@
+from collections.abc import AsyncGenerator
+
 import pytest
 from async_asgi_testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -221,3 +223,19 @@ async def like3(get_async_session: AsyncSession, user3: AuthUser, user2: AuthUse
         db.add(like)
         await db.commit()
     return like
+
+
+@pytest.fixture()
+async def new_async_client_func() -> AsyncGenerator[TestClient, None]:
+    from src.main import app
+
+    async with TestClient(app) as client:
+        yield client
+
+
+@pytest.fixture(scope="module")
+async def new_async_client_module() -> AsyncGenerator[TestClient, None]:
+    from src.main import app
+
+    async with TestClient(app) as client:
+        yield client

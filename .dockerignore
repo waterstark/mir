@@ -6,3 +6,4 @@ pg_data/
 venv/
 jwt-private.pem
 jwt-public.pem
+**/*__pycache__*

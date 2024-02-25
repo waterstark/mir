@@ -16,23 +16,30 @@ from src.redis.redis import redis
 
 async def test_ws_msg_create(
     async_client: TestClient,
+    new_async_client_module: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
+    authorised_cookie_user2: dict,
     user2: AuthUser,
     match: Match,
 ):
     msg = {"match_id": match.id, "text": "lol",
            "from_id": user.id, "to_id": user2.id}
 
-    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
+    async with (
+        async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws,
+        new_async_client_module.websocket_connect("/chat/ws", cookies=authorised_cookie_user2) as ws2,
+    ):
         await ws.send_text(orjson_dumps({
             "action": WSAction.CREATE,
             "message": msg,
         }))
         resp = orjson.loads(await ws.receive_text())
+        resp2 = orjson.loads(await ws2.receive_text())
 
     assert resp["status"] == WSStatus.OK
-    assert resp["message"] == {
+    assert resp2["action"] == WSAction.CREATE
+    assert resp2["message"] == {
         "id": IsUUID(),
         "match_id": IsUUID(),
         "from_id": user.id,
@@ -44,12 +51,11 @@ async def test_ws_msg_create(
         "reply_to": None,
         "group_id": None,
         "media": None,
-
     }
 
-    cache_match = await redis.get(f'match_{resp["message"]["match_id"]}')
+    cache_match = await redis.get(f'match_{resp2["message"]["match_id"]}')
 
-    assert json.loads(cache_match)["match_id"] == resp["message"]["match_id"]
+    assert json.loads(cache_match)["match_id"] == resp2["message"]["match_id"]
 
 
 async def test_ws_connect_without_token(async_client: TestClient):
@@ -109,6 +115,8 @@ async def test_ws_message_delete(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
+    new_async_client_module: TestClient,
+    authorised_cookie_user2: dict,
     user2: AuthUser,
     mongo: Mongo,
     match: Match,
@@ -125,14 +133,20 @@ async def test_ws_message_delete(
     msg["id"] = result.id
     msg.pop("text")
 
-    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
+    async with (
+        async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws,
+        new_async_client_module.websocket_connect("/chat/ws", cookies=authorised_cookie_user2) as ws2,
+    ):
         await ws.send_text(orjson_dumps({
             "action": WSAction.DELETE,
             "message": msg,
         }))
         resp = orjson.loads(await ws.receive_text())
+        resp2 = orjson.loads(await ws2.receive_text())
 
     assert resp["status"] == WSStatus.OK
+    assert resp2["action"] == WSAction.DELETE
+    assert resp2["message"]["id"] == str(result.id)
 
 
 async def test_ws_unknown_message_delete(
@@ -164,6 +178,8 @@ async def test_ws_message_update(
     async_client: TestClient,
     user: AuthUser,
     authorised_cookie: dict,
+    new_async_client_module: TestClient,
+    authorised_cookie_user2: dict,
     user2: AuthUser,
     mongo: Mongo,
     match: Match,
@@ -180,15 +196,20 @@ async def test_ws_message_update(
     msg.text = "lol"
     msg.status = MessageStatus.READ
 
-    async with async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws:
+    async with (
+        async_client.websocket_connect("/chat/ws", cookies=authorised_cookie) as ws,
+        new_async_client_module.websocket_connect("/chat/ws", cookies=authorised_cookie_user2) as ws2,
+    ):
         await ws.send_text(orjson_dumps({
             "action": WSAction.UPDATE,
             "message": msg.dict(exclude={"updated_at", "created_at"}),
         }))
         resp = orjson.loads(await ws.receive_text())
+        resp2 = orjson.loads(await ws2.receive_text())
 
     assert resp["status"] == WSStatus.OK
-    assert resp["message"] == {
+    assert resp2["action"] == WSAction.UPDATE
+    assert resp2["message"] == {
         "id": IsUUID(),
         "match_id": IsUUID(),
         "from_id": user.id,
