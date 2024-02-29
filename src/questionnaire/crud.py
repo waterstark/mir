@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_, delete, select, update
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
@@ -142,11 +143,15 @@ async def get_questionnaire(user_id: UUID, session: AsyncSession):
         return response
     return None
 
+
 async def reset_quest_lists_per_day():
-    async with async_session_maker() as session:
-        stmt = (
-            update(UserQuestionnaire)
-            .values(quest_lists_per_day=0)
-        )
-        await session.execute(stmt)
-        await session.commit()
+    try:
+        async with async_session_maker() as session:
+            stmt = (
+                update(UserQuestionnaire)
+                .values(quest_lists_per_day=0)
+            )
+            await session.execute(stmt)
+            await session.commit()
+    except ProgrammingError:
+        pass

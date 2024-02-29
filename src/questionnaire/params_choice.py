@@ -22,10 +22,12 @@ class Goal(str, Enum):
     nothing_serious = "Ничего серьезного"
     communication = "Общение"
 
+
 class SmokingType(str, Enum):
     positive = "Курю"
     normal = "Нормально"
     negative = "Негативно"
+
 
 class AlcoholType(str, Enum):
     often = "Пью часто"
@@ -33,11 +35,13 @@ class AlcoholType(str, Enum):
     negative = "He пью"
     hate = "Негативно"
 
+
 class SportType(str, Enum):
     often = "Часто занимаюсь"
     sometimes = "Иногда занимаюсь"
     negative = "He занимаюсь"
     hate = "He люблю спорт"
+
 
 class BodyType(str, Enum):
     skinny = "Худое"

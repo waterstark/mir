@@ -30,7 +30,7 @@ class Mongo:
         })
 
         return MessageResponse(
-            **dict(message),
+            **message.dict(),
             id=result.inserted_id,
             status=MessageStatus.SENT,
             created_at=now,
