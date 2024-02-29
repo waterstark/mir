@@ -1,7 +1,9 @@
+from datetime import date
 from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import and_, delete, select, update
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
@@ -64,6 +66,14 @@ async def create_questionnaire(
         )
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
+    today = date.today()
+    min_age = today.replace(year=today.year - 18)
+    max_age = today.replace(year=today.year - 82)
+    if questionnaire.birthday > min_age and questionnaire.birthday < max_age:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Возрастное ограничение строго c 18 лет!",
+        )
     hobbies = user_profile.hobbies
     for hobby in hobbies:
         hobby_obj = UserQuestionnaireHobby(hobby_name=hobby.hobby_name)
@@ -133,11 +143,15 @@ async def get_questionnaire(user_id: UUID, session: AsyncSession):
         return response
     return None
 
+
 async def reset_quest_lists_per_day():
-    async with async_session_maker() as session:
-        stmt = (
-            update(UserQuestionnaire)
-            .values(quest_lists_per_day=0)
-        )
-        await session.execute(stmt)
-        await session.commit()
+    try:
+        async with async_session_maker() as session:
+            stmt = (
+                update(UserQuestionnaire)
+                .values(quest_lists_per_day=0)
+            )
+            await session.execute(stmt)
+            await session.commit()
+    except ProgrammingError:
+        pass

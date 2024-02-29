@@ -2,6 +2,9 @@ FROM python:3.10
 
 WORKDIR /opt/app
 
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 COPY pyproject.toml .
 
 RUN pip3 install poetry
