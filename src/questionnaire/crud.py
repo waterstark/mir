@@ -14,6 +14,8 @@ from src.questionnaire.schemas import (
     ResponseUserQuestionnaireSchema,
 )
 
+min_age = None
+max_age = None
 
 async def get_list_questionnaire(
     user: AuthUser,
@@ -52,6 +54,7 @@ async def create_questionnaire(
     session: AsyncSession,
     user: AuthUser,
 ):
+    global min_age, max_age
     select_user_questionnaire = await get_questionnaire(
         user_id=user.id,
         session=session,
@@ -65,9 +68,6 @@ async def create_questionnaire(
         )
     user_profile_dict = {**user_profile.dict(exclude={"hobbies"})}
     questionnaire = UserQuestionnaire(user_id=user.id, **user_profile_dict)
-    today = date.today()
-    min_age = today.replace(year=today.year - 18)
-    max_age = today.replace(year=today.year - 82)
     if questionnaire.birthday > min_age and questionnaire.birthday < max_age:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -150,3 +150,9 @@ async def reset_quest_lists_per_day():
         )
         await session.execute(stmt)
         await session.commit()
+
+async def reset_age_validation():
+    global min_age, max_age
+    today = date.today()
+    min_age = today.replace(year=today.year - 18)
+    max_age = today.replace(year=today.year - 82)
