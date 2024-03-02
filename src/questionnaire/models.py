@@ -107,3 +107,28 @@ class UserQuestionnaireHobby(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     hobby_name: Mapped[str] = mapped_column(String(length=256), nullable=False)
+
+
+class UsersJointRate(Base):
+    __tablename__ = "users_joint_rate"
+    __table_args__ = (
+        UniqueConstraint("user_id_1", "user_id_2", name="_users_joint_rate_uc"),
+        CheckConstraint("NOT(user_id_1 = user_id_2)", name="_user_joint_rate_cc"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    user_id_1: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    user_id_2: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("auth_user.id", ondelete="CASCADE"),
+    )
+    joint_rate: Mapped[int] = mapped_column(nullable=False)
+
+    user_1: Mapped[AuthUser] = relationship(
+        primaryjoin=AuthUser.id == user_id_1,
+    )
+    user_2: Mapped[AuthUser] = relationship(
+        primaryjoin=AuthUser.id == user_id_2,
+    )
