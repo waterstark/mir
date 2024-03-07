@@ -9,6 +9,7 @@ from src.auth.models import AuthUser
 from src.exceptions import AlreadyExistsException, SelfLikeException
 from src.likes.models import UserLike
 from src.likes.schemas import UserLikeRequest
+from src.questionnaire.crud import get_questionnaire
 
 
 async def add_like(user: AuthUser, user_like: UserLikeRequest, session: AsyncSession):
@@ -23,6 +24,19 @@ async def add_like(user: AuthUser, user_like: UserLikeRequest, session: AsyncSes
         )
         .returning(UserLike)
     )
+
+    user_questionnaire = await get_questionnaire(user_id=user_like.liked_user_id, session=session)
+
+    if user_like.is_liked:
+        plus_rate = 50 * (1000/user_questionnaire.rate)
+        if plus_rate > 150:
+            plus_rate = 150
+        user_questionnaire.rate += plus_rate
+    elif not user_like.is_liked:
+        minus_rate = 10 * (user_questionnaire.rate / 1000)
+        if minus_rate > 30:
+            minus_rate = 30
+        user_questionnaire.rate -= minus_rate
 
     try:
         like = (await session.execute(stmt)).scalar_one_or_none()

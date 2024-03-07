@@ -5,9 +5,11 @@ from dirty_equals import IsDatetime, IsUUID
 from fastapi import status
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.dialects.postgresql import insert
 
 from src.auth.models import AuthUser
 from src.matches.crud import get_match_by_user_ids
+from src.questionnaire.models import UserQuestionnaire
 
 
 async def test_like_user(
@@ -17,6 +19,7 @@ async def test_like_user(
 ):
     """Проверка корректного выставления лайка.
     """
+
     data = {"liked_user_id": str(user2.id), "is_liked": True}
 
     response: Response = await async_client.post("/api/v1/likes", json=data, cookies=authorised_cookie)
