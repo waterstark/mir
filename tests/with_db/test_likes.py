@@ -42,7 +42,7 @@ async def test_skip_user(
     questionary: UserQuestionnaire,
     get_async_session: AsyncSession,
 ):
-    """Проверка корректного выставления скипа.
+    """Проверка корректного скипа.
     """
 
     data = {"liked_user_id": str(user2.id), "is_liked": False}
