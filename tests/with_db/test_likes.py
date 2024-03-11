@@ -17,7 +17,6 @@ async def test_like_user(
     authorised_cookie: dict,
     user3: AuthUser,
     questionary_user3: UserQuestionnaire,
-    get_async_session: AsyncSession,
 ):
     """Проверка корректного выставления лайка.
     """
