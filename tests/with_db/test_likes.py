@@ -1,4 +1,5 @@
 import asyncio
+import uuid
 
 from dirty_equals import IsDatetime, IsUUID
 from fastapi import status
@@ -67,12 +68,12 @@ async def test_like_wrong_user(
 ):
     """Проверка того, что пользователь не может лайкнуть несуществующего пользователя.
     """
-    data = {"liked_user_id": str(user3.id)}
+    data = {"liked_user_id": str(uuid.uuid4())}
 
     response: Response = await async_client.post("/api/v1/likes", json=data, cookies=authorised_cookie)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
-    assert response.json().get("detail") == "bad user id"
+    assert response.json().get("detail") == "questionanire not found"
 
 
 async def test_self_like(

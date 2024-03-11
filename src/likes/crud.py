@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
@@ -26,6 +27,8 @@ async def add_like(user: AuthUser, user_like: UserLikeRequest, session: AsyncSes
     )
 
     user_questionnaire = await get_questionnaire(user_id=user_like.liked_user_id, session=session)
+    if not user_questionnaire:
+        raise HTTPException(status_code=404, detail="questionanire not found")
 
     if user_like.is_liked:
         plus_rate = 50 * (1000/user_questionnaire.rate)
