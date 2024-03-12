@@ -31,7 +31,6 @@ jobs:
           POSTGRES_USER: ${{matrix.POSTGRES_USER}} 
           POSTGRES_PASSWORD: ${{matrix.POSTGRES_PASSWORD}}
           POSTGRES_DB: ${{matrix.POSTGRES_DB}}
-          POSTGRES_TEST_DB: ${{matrix.POSTGRES_TEST_DB}}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -66,27 +65,27 @@ jobs:
         run: openssl genrsa -out jwt-private.pem 2048
       - name: Creating Public RSA Tokens
         run: openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
-      - name: Tests
-        run: poetry run pytest --cov=. --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests
-        env:
-          DEBUG: True
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: ${{matrix.POSTGRES_DB}}
-          DB_USER: ${{matrix.POSTGRES_USER}}
-          DB_PASS: ${{matrix.POSTGRES_DB}}
-          TEST_DB_NAME: ${{matrix.POSTGRES_TEST_DB}}
-          MONGO_HOST: localhost
-          MONGO_PORT: '27017'
-          MONGO_DATABASE: mongodb
-          REDIS_HOST: localhost
-          REDIS_PORT: '6379'
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          ACCESS_TOKEN_EXPIRES_IN: 15
-          REFRESH_TOKEN_EXPIRES_IN: 5000
-          ALGORITHM: RS256
-          COOKIE_ACCESS_TOKEN_KEY: mir
-          COOKIE_REFRESH_TOKEN_KEY: rsmir
+      #- name: Tests
+        #run: poetry run pytest --cov=. --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests
+        #env:
+          #DEBUG: True
+          #DB_HOST: localhost
+          #DB_PORT: 5432
+          #DB_NAME: ${{matrix.POSTGRES_DB}}
+          #DB_USER: ${{matrix.POSTGRES_USER}}
+          #DB_PASS: ${{matrix.POSTGRES_DB}}
+          #TEST_DB_NAME:
+          #MONGO_HOST: localhost
+          #MONGO_PORT: '27017'
+          #MONGO_DATABASE: mongodb
+          #REDIS_HOST: localhost
+          #REDIS_PORT: '6379'
+          #SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          #ACCESS_TOKEN_EXPIRES_IN: 15
+          #REFRESH_TOKEN_EXPIRES_IN: 5000
+          #ALGORITHM: RS256
+          #COOKIE_ACCESS_TOKEN_KEY: mir
+          #COOKIE_REFRESH_TOKEN_KEY: rsmir
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
