@@ -29,6 +29,25 @@ async def test_like_user(
         "is_liked": True,
     }
 
+async def test_skip_user(
+    async_client: AsyncClient,
+    authorised_cookie: dict,
+    user3: AuthUser,
+):
+    """Проверка корректного выставления лайка.
+    """
+    data = {"liked_user_id": str(user3.id), "is_liked": False}
+
+    response: Response = await async_client.post("/api/v1/likes", json=data, cookies=authorised_cookie)
+
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == {
+        "id": IsUUID,
+        "liked_user_id": str(user3.id),
+        "created_at": IsDatetime(iso_string=True),
+        "is_liked": False,
+    }
+
 
 async def test_like_wrong_user(
     async_client: AsyncClient,
