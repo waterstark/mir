@@ -8,11 +8,11 @@ on:
       - "**.toml"
       - "**.lock"
 
-jobs: 
+jobs:
   tests:
     strategy:
       matrix:
-        POSTGRES_USER: [postgres] 
+        POSTGRES_USER: [postgres]
         POSTGRES_PASSWORD: [postgres]
         POSTGRES_DB: [postgres]
         python-version: ["3.10"]
@@ -28,7 +28,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: ${{matrix.POSTGRES_USER}} 
+          POSTGRES_USER: ${{matrix.POSTGRES_USER}}
           POSTGRES_PASSWORD: ${{matrix.POSTGRES_PASSWORD}}
           POSTGRES_DB: ${{matrix.POSTGRES_DB}}
         ports:
@@ -53,11 +53,11 @@ jobs:
           key: python-deps-${{ hashFiles('**/poetry.lock') }}
       - name: Installing Python
         uses: actions/setup-python@v4
-        with: 
+        with:
           python-version: ${{ matrix.python-version }}
       - name: Installing Poetry
         uses: abatilo/actions-poetry@v2
-        with: 
+        with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Installing Deps
         run: poetry install
@@ -65,33 +65,32 @@ jobs:
         run: openssl genrsa -out jwt-private.pem 2048
       - name: Creating Public RSA Tokens
         run: openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
-      #- name: Tests
-        #run: poetry run pytest --cov=. --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests
-        #env:
-          #DEBUG: True
-          #DB_HOST: localhost
-          #DB_PORT: 5432
-          #DB_NAME: ${{matrix.POSTGRES_DB}}
-          #DB_USER: ${{matrix.POSTGRES_USER}}
-          #DB_PASS: ${{matrix.POSTGRES_DB}}
-          #TEST_DB_NAME:
-          #MONGO_HOST: localhost
-          #MONGO_PORT: '27017'
-          #MONGO_DATABASE: mongodb
-          #REDIS_HOST: localhost
-          #REDIS_PORT: '6379'
-          #SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          #ACCESS_TOKEN_EXPIRES_IN: 15
-          #REFRESH_TOKEN_EXPIRES_IN: 5000
-          #ALGORITHM: RS256
-          #COOKIE_ACCESS_TOKEN_KEY: mir
-          #COOKIE_REFRESH_TOKEN_KEY: rsmir
+      - name: Tests
+        run: poetry run pytest --cov=. --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: ${{matrix.POSTGRES_DB}}
+          DB_USER: ${{matrix.POSTGRES_USER}}
+          DB_PASS: ${{matrix.POSTGRES_DB}}
+          TEST_DB_NAME:
+          MONGO_HOST: localhost
+          MONGO_PORT: '27017'
+          MONGO_DATABASE: mongodb
+          REDIS_HOST: localhost
+          REDIS_PORT: '6379'
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ACCESS_TOKEN_EXPIRES_IN: 15
+          REFRESH_TOKEN_EXPIRES_IN: 5000
+          ALGORITHM: RS256
+          COOKIE_ACCESS_TOKEN_KEY: mir
+          COOKIE_REFRESH_TOKEN_KEY: rsmir
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
-  
+
   lint:
     needs: tests
     strategy:
@@ -110,11 +109,11 @@ jobs:
           key: python-deps-${{ hashFiles('**/poetry.lock') }}
       - name: Installing Python
         uses: actions/setup-python@v4
-        with: 
+        with:
           python-version: ${{ matrix.python-version }}
       - name: Installing Poetry
         uses: abatilo/actions-poetry@v2
-        with: 
+        with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Linter
-        run: poetry run ruff check .
+        run: poetry run ruff check . --fix
