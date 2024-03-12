@@ -31,6 +31,7 @@ jobs:
           POSTGRES_USER: ${{matrix.POSTGRES_USER}} 
           POSTGRES_PASSWORD: ${{matrix.POSTGRES_PASSWORD}}
           POSTGRES_DB: ${{matrix.POSTGRES_DB}}
+          POSTGRES_TEST_DB: ${{matrix.POSTGRES_TEST_DB}}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -74,7 +75,7 @@ jobs:
           DB_NAME: ${{matrix.POSTGRES_DB}}
           DB_USER: ${{matrix.POSTGRES_USER}}
           DB_PASS: ${{matrix.POSTGRES_DB}}
-          TEST_DB_NAME:
+          TEST_DB_NAME: ${{matrix.POSTGRES_TEST_DB}}
           MONGO_HOST: localhost
           MONGO_PORT: '27017'
           MONGO_DATABASE: mongodb
