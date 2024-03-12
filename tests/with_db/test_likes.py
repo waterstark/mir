@@ -4,11 +4,8 @@ import uuid
 from dirty_equals import IsDatetime, IsUUID
 from fastapi import status
 from httpx import AsyncClient, Response
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import AuthUser
-from src.matches.crud import get_match_by_user_ids
-from src.questionnaire.crud import get_rate
 from src.questionnaire.models import UserQuestionnaire
 
 
