@@ -44,8 +44,10 @@ async def add_like(user: AuthUser, user_like: UserLikeRequest, session: AsyncSes
     try:
         like = (await session.execute(stmt)).scalar_one_or_none()
         await session.commit()
+        await session.close()
         return like
     except SQLAlchemyError:
+        await session.close()
         return None
 
 
