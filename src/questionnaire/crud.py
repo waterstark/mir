@@ -2,7 +2,7 @@ from datetime import date
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, delete, select, update
+from sqlalchemy import and_, delete, desc, select, update
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,7 +33,7 @@ async def get_list_questionnaire(
         select(UserLike.liked_user_id)
         .where(UserLike.user_id == user.id)
     )
-    query = (
+    query_1 = (
         select(UserQuestionnaire)
         .where(
             UserQuestionnaire.user_id != user.id,
@@ -41,11 +41,30 @@ async def get_list_questionnaire(
             UserQuestionnaire.gender != user_questionnaire.gender,
             UserQuestionnaire.is_visible == is_visible,
             UserQuestionnaire.user_id.notin_(liked_user_ids),
+            UserQuestionnaire.rate >= user_questionnaire.rate,
         )
-        .limit(5).offset(page_number)
+        .order_by(UserQuestionnaire.rate)
+        .limit(3).offset(page_number)
     )
-    result = await session.execute(query)
-    return result.scalars().fetchall()
+    query_2 = (
+        select(UserQuestionnaire)
+        .where(
+            UserQuestionnaire.user_id != user.id,
+            UserQuestionnaire.city == user_questionnaire.city,
+            UserQuestionnaire.gender != user_questionnaire.gender,
+            UserQuestionnaire.is_visible == is_visible,
+            UserQuestionnaire.user_id.notin_(liked_user_ids),
+            UserQuestionnaire.rate < user_questionnaire.rate,
+        )
+        .order_by(desc(UserQuestionnaire.rate))
+        .limit(3).offset(page_number)
+    )
+    result_1 = await session.execute(query_1)
+    result_2 = await session.execute(query_2)
+    query_1_results = result_1.scalars().fetchall()
+    query_2_results = result_2.scalars().fetchall()
+    return query_1_results + query_2_results
+
 
 
 async def create_questionnaire(
@@ -155,3 +174,11 @@ async def reset_quest_lists_per_day():
             await session.commit()
     except ProgrammingError:
         pass
+
+async def get_rate(user_id: UUID, session: AsyncSession):
+    query = select(UserQuestionnaire.rate).where(UserQuestionnaire.user_id == user_id)
+    get_user = await session.execute(query)
+    response = get_user.scalar()
+    if response:
+        return response
+    return None

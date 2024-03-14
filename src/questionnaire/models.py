@@ -72,6 +72,7 @@ class UserQuestionnaire(Base):
         default=datetime.utcnow,
     )
     is_prem: Mapped[bool] = mapped_column(default=False, nullable=False)
+    rate: Mapped[float] = mapped_column(default=1000, nullable=True)
     quest_lists_per_day: Mapped[int] = mapped_column(default=0, nullable=False)
     firstname: Mapped[str] = mapped_column(String(length=256), nullable=True)
     lastname: Mapped[str] = mapped_column(String(length=256), nullable=True)
